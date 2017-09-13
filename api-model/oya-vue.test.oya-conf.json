@@ -1,0 +1,25 @@
+{
+    "name": "OyaMist01",
+    "type": "OyaConf",
+    "tempUnit": "F",
+    "fanThreshold": 80,
+    "cycle": "standard",
+    "mist": {
+        "fan": {
+            "desc": "Misting cycle for use with cooling fan air intake",
+            "on": 15,
+            "off": 15
+        },
+        "standard": {
+            "desc": "Standard misting cycle for all phases of plant growth",
+            "on": 30,
+            "off": 60
+        },
+        "drain": {
+            "desc": "Incremental drain cycle ",
+            "on": 311,
+            "off": -1
+        }
+    },
+    "rbHash": "9d198b9aaf63c13f2a31b01e27b72558"
+}
