@@ -13,7 +13,7 @@
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
-            this.cycle = opts.cycle || this.cycle || OyaConf.CYCLE_STANDARD;
+            this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
 
@@ -55,7 +55,7 @@
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
                 fanThreshold: this.fanThreshold,
-                cycle: this.cycle,
+                startCycle: this.startCycle,
                 mist: this.mist,
             };
         }

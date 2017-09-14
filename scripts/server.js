@@ -5,7 +5,6 @@ const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
 const OyaBundle = require("../index").OyaBundle;
-console.log("OyaBundle", require("../index"));
 const winston = require("winston");
 
 // ensure argv is actually for script instead of mocha

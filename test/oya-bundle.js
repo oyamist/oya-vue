@@ -68,7 +68,7 @@
                         type: 'OyaConf',
                         name: 'test',
                         tempUnit: 'F',
-                        cycle: 'standard',
+                        startCycle: 'standard',
                         fanThreshold: 80,
                     });
                     should(apiModel.mist).properties([

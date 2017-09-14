@@ -6,7 +6,7 @@
     const defaultConf = {
         name: 'test',
         type: 'OyaConf',
-        cycle: 'standard',
+        startCycle: 'standard',
         tempUnit: 'F',
         fanThreshold: 80,
         mist: {
@@ -35,7 +35,7 @@
         var opts = {
             name: 'foo',
             tempUnit: 'C',
-            cycle: 'fan',
+            startCycle: 'fan',
             mist: {
                 fan: {
                     on: 30,
@@ -45,7 +45,7 @@
         should.deepEqual(new OyaConf(opts).toJSON(), {
             name: 'foo',
             type: 'OyaConf',
-            cycle: OyaConf.CYCLE_FAN,
+            startCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             fanThreshold: 80,
             mist: {
@@ -72,7 +72,7 @@
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
-            cycle: 'fan',
+            startCycle: 'fan',
             tempUnit: 'C',
             mist: {
                 fan: {
@@ -83,7 +83,7 @@
         should.deepEqual(oc.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
-            cycle: OyaConf.CYCLE_FAN,
+            startCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             fanThreshold: 80,
             mist: {
