@@ -28,10 +28,10 @@
         },
     };
 
-    it("has a default configuration", function() {
+    it("toJSON() serializes configuration", function() {
         should.deepEqual(new OyaConf().toJSON(), defaultConf);
     });
-    it("contructor takes configuration options", function() {
+    it("ctor takes configuration options", function() {
         var opts = {
             name: 'foo',
             tempUnit: 'C',
@@ -43,6 +43,44 @@
             },
         }
         should.deepEqual(new OyaConf(opts).toJSON(), {
+            name: 'foo',
+            type: 'OyaConf',
+            cycle: OyaConf.CYCLE_FAN,
+            tempUnit: 'C',
+            fanThreshold: 80,
+            mist: {
+                drain: {
+                    desc: "Incremental drain cycle ",
+                    on: 311, // ~1 gallon assuming Aquatec CDP6800 pump operating with no load @0.73LPM
+                    off: -1,
+                },
+                fan: {
+                    desc: "Misting cycle for use with cooling fan air intake",
+                    on: 30,
+                    off: 15,
+                },
+                standard: {
+                    desc: "Standard misting cycle for all phases of plant growth",
+                    on: 30,
+                    off: 60,
+                },
+            },
+        });
+    });
+    it("update(opts) updates configuration ", function() {
+        var oc = new OyaConf();
+        oc.update({
+            name: 'foo',
+            type: 'bad-type', // ignored
+            cycle: 'fan',
+            tempUnit: 'C',
+            mist: {
+                fan: {
+                    on: 30,
+                },
+            },
+        });
+        should.deepEqual(oc.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
             cycle: OyaConf.CYCLE_FAN,

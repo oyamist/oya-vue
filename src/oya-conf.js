@@ -1,32 +1,48 @@
 (function(exports) {
+
     // OyaMist bioreactor configuration
     class OyaConf {
-        constructor(options = {}) {
-            this.name = options.name || 'test';
-            this.cycle = options.cycle || OyaConf.CYCLE_STANDARD;
-            this.tempUnit = options.tempUnit || OyaConf.TEMP_FAHRENHEIT;
-            this.fanThreshold = options.fanThreshold == null ? 80 : options.fanThreshold;
-
-            var optMist = options.mist || {};
-            this.mist = {
-                [OyaConf.CYCLE_FAN]: Object.assign({
-                    desc: "Misting cycle for use with cooling fan air intake",
-                    on: 15,
-                    off: 15,
-                }, optMist[OyaConf.CYCLE_FAN]),
-                [OyaConf.CYCLE_STANDARD]: Object.assign({
-                    desc: "Standard misting cycle for all phases of plant growth",
-                    on: 30,
-                    off: 60,
-                }, optMist[OyaConf.CYCLE_STANDARD]),
-                [OyaConf.CYCLE_DRAIN]: Object.assign({
-                    desc: "Incremental drain cycle ",
-                    on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
-                    off: -1,
-                }, optMist[OyaConf.CYCLE_DRAIN]),
-            };
+        constructor(opts) {
+            this.update(opts);
+        }
+        
+        _updateCycle(name, defaultCycle, optMist) {
+            this.mist[name] = Object.assign({}, defaultCycle, 
+                this.mist && this.mist[name], optMist[name]);
         }
 
+        update(opts = {}) {
+            this.name = opts.name || this.name || 'test';
+            this.cycle = opts.cycle || this.cycle || OyaConf.CYCLE_STANDARD;
+            this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
+            this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
+
+            var optMist = opts.mist || {};
+            this.mist = this.mist || {};
+            this._updateCycle(OyaConf.CYCLE_FAN, {
+                desc: "Misting cycle for use with cooling fan air intake",
+                on: 15,
+                off: 15,
+            }, optMist);
+            this._updateCycle(OyaConf.CYCLE_STANDARD, {
+                desc: "Standard misting cycle for all phases of plant growth",
+                on: 30,
+                off: 60,
+            }, optMist);
+            this._updateCycle(OyaConf.CYCLE_DRAIN, {
+                desc: "Incremental drain cycle ",
+                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
+                off: -1,
+            }, optMist);
+
+            return this;
+        }
+
+        static get CYCLES() { return [
+            OyaConf.CYCLE_STANDARD,
+            OyaConf.CYCLE_FAN,
+            OyaConf.CYCLE_DRAIN,
+        ]};
         static get CYCLE_STANDARD() { return "standard"; }
         static get CYCLE_FAN() { return "fan"; }
         static get CYCLE_DRAIN() { return "drain"; }

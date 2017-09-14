@@ -18,7 +18,7 @@
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
-            this.updateConf({
+            this.oyaConf = new OyaConf({
                 name: this.name,
             });
         }
@@ -27,15 +27,7 @@
             var that = this;
             return new Promise((resolve, reject) => {
                 try {
-                    if (conf) {
-                        that.oyaConf = new OyaConf(conf);
-                    }
-                    if (!that.oyaConf) {
-                        that.oyaConf = new OyaConf({
-                            name: that.name,
-                        });
-                    }
-                    resolve( that.oyaConf );
+                    resolve( that.oyaConf.update(conf) );
                 } catch (err) {
                     winston.warn(err.stack);
                     reject(err);
