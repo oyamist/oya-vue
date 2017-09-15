@@ -1,7 +1,7 @@
 (typeof describe === 'function') && describe("OyaConf", function() {
     const should = require("should");
     const winston = require('winston');
-    const OyaConf = require('../src/oya-conf');
+    const OyaConf = require("../index").OyaConf;
 
     const defaultConf = {
         name: 'test',
