@@ -1,6 +1,6 @@
 <template>
 
-<vmc-camera service="test"></vmc-camera>
+<oya-cycle-vue service="test"></oya-cycle-vue>
 
 </template><script>
 

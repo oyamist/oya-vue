@@ -80,8 +80,6 @@
 <script>
 
 import Introduction from './Introduction.vue';
-import AllServices from './AllServices.vue';
-import Service from './Service.vue';
 import rbvue from "rest-bundle/index-vue";
 import appvue from "../../index-vue";
 
@@ -95,14 +93,6 @@ export default {
                 icon: "question_answer",
                 title: "Introduction",
                 href: "/introduction",
-            },{
-                icon: "web",
-                title: "All Services",
-                href: "/all-services",
-            },{
-                icon: "web_asset",
-                title: "Service Home Page",
-                href: "/service",
             }],
             sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
             sidebarAppRest: rbvue.methods.aboutSidebar(appvue.components),
@@ -118,8 +108,6 @@ export default {
     },
     components: {
         Introduction,
-        AllServices,
-        Service,
     },
 }
 

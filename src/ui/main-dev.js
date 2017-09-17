@@ -8,8 +8,6 @@ import rbvue from 'rest-bundle/index-vue';
 
 import Dev from './Dev.vue';
 import Introduction from './Introduction.vue';
-import AllServices from './AllServices.vue';
-import Service from './Service.vue';
 import appvue from "../../index-vue";
 require('./stylus/main.styl')
 
@@ -27,14 +25,6 @@ var routes = [{
     {
         path: '/introduction',
         component: Introduction
-    },
-    {
-        path: '/all-services',
-        component: AllServices
-    },
-    {
-        path: '/service',
-        component: Service
     },
 ];
 routes = routes.concat(rbvue.methods.aboutRoutes());
@@ -55,7 +45,5 @@ new Vue({
     render: h => h(Dev),
     components: {
         Introduction,
-        AllServices,
-        Service,
     },
 })

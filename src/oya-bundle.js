@@ -2,6 +2,7 @@
     const winston = require('winston');
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
+    const OyaCycle = require("./oya-cycle");
     const path = require("path");
     const rb = require("rest-bundle");
 
@@ -15,12 +16,14 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
+                    this.resourceMethod("post", "oya-cycle", this.postOyaCycle),
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
-            this.oyaConf = new OyaConf({
-                name: this.name,
+            this.oyaCycle = new OyaCycle({
+                name,
             });
+            this.oyaConf = this.oyaCycle.oyaConf;
         }
 
         updateConf(conf) {
@@ -82,10 +85,24 @@
             return this.putApiModel(req, res, next, this.apiFile);
         }
 
+        postOyaCycle(req, res, next) {
+            if (req.body.hasOwnProperty('activate')) {
+                this.oyaCycle.activate(req.body.activate);
+                return {
+                    activate: req.body.activate,
+                }
+            }
+            return "oyacycle:hi";
+        }
+
         getState() {
             return {
                 api: 'oya-bundle',
-                status: 'misting',
+                cycle: this.oyaCycle.cycle,
+                cycles: this.oyaCycle.cycles,
+                isActive: this.oyaCycle.isActive,
+                isMisting: this.oyaCycle.isMisting,
+                countdown: this.oyaCycle.countdown,
             };
         }
 

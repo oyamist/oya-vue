@@ -1,7 +1,7 @@
-import VmcCamera from "./src/ui/VmcCamera.vue";
+import OyaCycleVue from "./src/ui/OyaCycleVue.vue";
 
 var components = {
-    VmcCamera,
+    OyaCycleVue,
 }
 function plugin(Vue, options) {
     Object.keys(components).forEach( key => Vue.component(key, components[key]));

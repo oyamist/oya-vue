@@ -17,6 +17,11 @@
             this.on(OyaCycle.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
             });
+            this.countdown = 0;
+            var self = this;
+            this._countdownId = setInterval(() => {
+                self.countdown = self.countdown <= 0 ? 0 : (self.countdown-1);
+            }, 1000);
         }
         
         static get EVENT_MIST() { return "event:mist"; }
@@ -107,21 +112,24 @@
         if (self.maxCycles && self.cycles >= self.maxCycles) {
             self.activate(false);
         }
+        self.countdown = 0;
         if (mc && self.isActive) {
             self._misting = value;
             if (value) {
                 self.cycles++;
                 self.fire(OyaCycle.EVENT_MIST);
                 var msOn = Number(mc.on) * 1000;
+                self.countdown = Math.trunc(mc.on);
                 if (msOn > 0) {
                     self._mistTimeout = setTimeout(() => {
                         self._mistTimeout = null;
                         mistCycle(self, false);
                     }, msOn);
-                }
+               } 
             } else {
                 self.fire(OyaCycle.EVENT_MIST);
                 var msOff = Number(mc.off) * 1000;
+                self.countdown = Math.trunc(mc.off);
                 if (msOff > 0) {
                     self._mistTimeout = setTimeout(() => {
                         self._mistTimeout = null;
