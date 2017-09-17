@@ -101,7 +101,7 @@
                 cycle: this.oyaCycle.cycle,
                 cycles: this.oyaCycle.cycles,
                 isActive: this.oyaCycle.isActive,
-                isMisting: this.oyaCycle.isMisting,
+                isOn: this.oyaCycle.isOn,
                 countdown: this.oyaCycle.countdown,
             };
         }

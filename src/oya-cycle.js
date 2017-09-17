@@ -8,10 +8,10 @@
             this._cycle = this.oyaConf.startCycle;
             this._active = false;
             this.maxCycles = opts.maxCycles || 0;
-            this._misting = false; 
+            this._on = false; 
             this._events = {};
-            this._mistTimeout = null;
-            this.on(OyaCycle.EVENT_MIST, (self, event) => {
+            this._phaseTimeout = null;
+            this.on(OyaCycle.EVENT_PHASE, (self, event) => {
                 winston.debug(this.summary, event);
             });
             this.on(OyaCycle.EVENT_ACTIVATE, (self, event) => {
@@ -24,20 +24,20 @@
             }, 1000);
         }
         
-        static get EVENT_MIST() { return "event:mist"; }
+        static get EVENT_PHASE() { return "event:phase"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
 
         get summary() { 
             return `${this.name} ` +
                 `cycle:${this.cycle}#${this.cycles} ` +
-                `active:${this.isActive?1:0} mist:${this.isMisting?1:0}`;
+                `active:${this.isActive?1:0} ${this.isOn?'on':'off'}`;
         }
         get name() {
             return this.oyaConf.name;
         }
 
-        get isMisting() {
-            return this._misting;
+        get isOn() {
+            return this._on;
         }
 
         get isActive() {
@@ -66,12 +66,13 @@
                 this._active = value;
                 this.cycles = 0;
                 this.fire(OyaCycle.EVENT_ACTIVATE);
-                mistCycle(this, true);
+                updatePhase(this, true);
             } else if (value === false) {
                 this._active = value;
-                this._misting = false;
-                this._mistTimeout != null & clearTimeout(this._mistTimeout);
-                this._mistTimeout = null;
+                this._on = false;
+                this.countdown = 0;
+                this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
+                this._phaseTimeout = null;
                 this.fire(OyaCycle.EVENT_ACTIVATE);
             } else {
                 var err = new Error(`${this.name} OyaCycle.activate expects a boolean`);
@@ -100,40 +101,40 @@
             return {
                 type: "OyaCycle",
                 isActive: this.isActive,
-                isMisting: this.isMisting,
+                isOn: this.isOn,
                 cycle: this.cycle,
             };
         }
 
     } //// class OyaCycle
 
-    function mistCycle(self, value) {
+    function updatePhase(self, value) {
         var mc = self.oyaConf.mist[self.cycle];
         if (self.maxCycles && self.cycles >= self.maxCycles) {
             self.activate(false);
         }
         self.countdown = 0;
         if (mc && self.isActive) {
-            self._misting = value;
+            self._on = value;
             if (value) {
                 self.cycles++;
-                self.fire(OyaCycle.EVENT_MIST);
+                self.fire(OyaCycle.EVENT_PHASE);
                 var msOn = Number(mc.on) * 1000;
                 self.countdown = Math.trunc(mc.on);
                 if (msOn > 0) {
-                    self._mistTimeout = setTimeout(() => {
-                        self._mistTimeout = null;
-                        mistCycle(self, false);
+                    self._phaseTimeout = setTimeout(() => {
+                        self._phaseTimeout = null;
+                        updatePhase(self, false);
                     }, msOn);
                } 
             } else {
-                self.fire(OyaCycle.EVENT_MIST);
+                self.fire(OyaCycle.EVENT_PHASE);
                 var msOff = Number(mc.off) * 1000;
                 self.countdown = Math.trunc(mc.off);
                 if (msOff > 0) {
-                    self._mistTimeout = setTimeout(() => {
-                        self._mistTimeout = null;
-                        mistCycle(self, true);
+                    self._phaseTimeout = setTimeout(() => {
+                        self._phaseTimeout = null;
+                        updatePhase(self, true);
                     }, msOff);
                 }
             }

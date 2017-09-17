@@ -47,7 +47,7 @@
             oc2.activate("should-be-a-boolean");  
         });
     });
-    it ("isMisting is true when misting is active", function(done) {
+    it ("isOn is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
             try {
                 var oc = new OyaCycle({
@@ -55,29 +55,29 @@
                     maxCycles: 2,
                     mist: testMist,
                 });
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 oc.activate();
                 should(oc.cycles).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(true);
+                should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
                 should(oc.cycles).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), offSec*1000);
                 should(oc.cycles).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(true);
+                should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
                 should(oc.cycles).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);
                 done();
             } catch (err) {
@@ -95,39 +95,39 @@
                     maxCycles: 2,
                     mist: testMist,
                 });
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 oc.activate();
                 should(oc.cycles).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(true);
+                should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
                 should(oc.cycles).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 // changing the cycle re-activates
-                var to = oc._mistTimeout;
+                var to = oc._phaseTimeout;
                 oc.cycle = OyaConf.CYCLE_FAN;
 
                 yield setTimeout(() => async.next(true), onSec*2000);
                 should(oc.cycles).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), offSec*2000);
                 should(oc.cycles).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isMisting).equal(true);
+                should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*2000);
                 should(oc.cycles).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isMisting).equal(false);
+                should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);
                 done();
             } catch (err) {
