@@ -21,5 +21,85 @@
             "off": -1
         }
     },
-    "rbHash": "8a1ce35776f9afe87e56654e642b714c"
+    "actuators": [
+        {
+            "name": "mist1",
+            "type": "timer-cycle",
+            "enabled": true,
+            "startCycle": "standard",
+            "fanThreshold": 80,
+            "cycleDelay": 0,
+            "pin": 33,
+            "cycles": {
+                "fan": {
+                    "desc": "Misting cycle for use with cooling fan air intake",
+                    "on": 15,
+                    "off": 15
+                },
+                "standard": {
+                    "desc": "Standard misting cycle for all phases of plant growth",
+                    "on": 30,
+                    "off": 60
+                },
+                "drain": {
+                    "desc": "Incremental drain cycle ",
+                    "on": 311,
+                    "off": -1
+                }
+            }
+        },
+        {
+            "name": "mist2",
+            "type": "timer-cycle",
+            "enabled": true,
+            "startCycle": "standard",
+            "fanThreshold": 80,
+            "cycleDelay": 0,
+            "pin": 35,
+            "cycles": {
+                "fan": {
+                    "desc": "Misting cycle for use with cooling fan air intake",
+                    "on": 15,
+                    "off": 15
+                },
+                "standard": {
+                    "desc": "Standard misting cycle for all phases of plant growth",
+                    "on": 30,
+                    "off": 60
+                },
+                "drain": {
+                    "desc": "Incremental drain cycle ",
+                    "on": 311,
+                    "off": -1
+                }
+            }
+        },
+        {
+            "name": "mist3",
+            "type": "timer-cycle",
+            "enabled": true,
+            "startCycle": "standard",
+            "fanThreshold": 80,
+            "cycleDelay": 0,
+            "pin": 36,
+            "cycles": {
+                "fan": {
+                    "desc": "Misting cycle for use with cooling fan air intake",
+                    "on": 15,
+                    "off": 15
+                },
+                "standard": {
+                    "desc": "Standard misting cycle for all phases of plant growth",
+                    "on": 30,
+                    "off": 60
+                },
+                "drain": {
+                    "desc": "Incremental drain cycle ",
+                    "on": 311,
+                    "off": -1
+                }
+            }
+        }
+    ],
+    "rbHash": "025de4caa5b4ebe615b0ba7fe40394d1"
 }

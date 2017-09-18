@@ -3,11 +3,14 @@
     const winston = require("winston");
 
     class OyaCycle {
-        constructor(opts = {}) {
+        constructor(opts) {
+            opts = Object.assign(OyaConf.defaultActuator('timer-cycle',0), {
+                maxCycles: 0,
+            }, opts);
             this.oyaConf = new OyaConf(opts);
             this._cycle = this.oyaConf.startCycle;
             this._active = false;
-            this.maxCycles = opts.maxCycles || 0;
+            this.maxCycles = opts.maxCycles;
             this._on = false; 
             this._events = {};
             this._phaseTimeout = null;
@@ -23,7 +26,7 @@
                 self.countdown = self.countdown <= 0 ? 0 : (self.countdown-1);
             }, 1000);
         }
-        
+
         static get EVENT_PHASE() { return "event:phase"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
 

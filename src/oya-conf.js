@@ -6,30 +6,97 @@
             this.update(opts);
         }
         
-        _updateCycle(name, defaultCycle, optMist) {
-            this.mist[name] = Object.assign({}, defaultCycle, 
-                this.mist && this.mist[name], optMist[name]);
+        _updateCycle(cycleName, defaultCycle, optMist) {
+            this.mist[cycleName] = Object.assign({}, defaultCycle, 
+                this.mist && this.mist[cycleName], optMist[cycleName]);
+        }
+
+        _updateCycleDeprecated(cycleName, defaultCycle, optMist) {
+            this.mist[cycleName] = Object.assign({}, defaultCycle, 
+                this.mist && this.mist[cycleName], optMist[cycleName]);
+        }
+
+        _updateActuator(index, newAct) {
+            var defAct = OyaConf.defaultActuator('timer-cycle', index);
+            var curAct = this.actuators[index] || {};
+            ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold', 'cycles']
+            .forEach(prop => {
+                curAct[prop] = newAct[prop] == null 
+                    ? (curAct[prop] == null ? defAct[prop] : curAct[prop])
+                    : newAct[prop];
+            });
+        }
+
+        static defaultActuator(type, index) {
+            const defaultPins = [ 
+                33, // Pimoroni Automation Hat relay 1
+                35, // Pimoroni Automation Hat relay 2
+                36, // Pimoroni Automation Hat relay 3
+            ];
+            if (type === 'timer-cycle') {
+                return {
+                    name: `mist${index+1}`,
+                    type: "timer-cycle",
+                    enabled: true, // actuator can be activated
+                    startCycle: OyaConf.CYCLE_STANDARD,
+                    fanThreshold: 80,
+                    cycleDelay: 0,
+                    pin: defaultPins[index] || -1,
+                    cycles: {
+                        [OyaConf.CYCLE_FAN]: {
+                            desc: "Misting cycle for use with cooling fan air intake",
+                            on: 15,
+                            off: 15,
+                        },
+                        [OyaConf.CYCLE_STANDARD]: {
+                            desc: "Standard misting cycle for all phases of plant growth",
+                            on: 30,
+                            off: 60,
+                        },
+                        [OyaConf.CYCLE_DRAIN]: {
+                            desc: "Incremental drain cycle ",
+                            on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
+                            off: -1,
+                        },
+                    },
+                }
+            } else {
+                return {
+                    name: `actuator${index}`,
+                    type,
+                    enabled: true,
+                }
+            }
         }
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
+            this.actuators = [
+                OyaConf.defaultActuator("timer-cycle", 0),
+                OyaConf.defaultActuator("timer-cycle", 1),
+                OyaConf.defaultActuator("timer-cycle", 2),
+            ];
+            opts.actuators && opts.actuators.forEach((newAct, i) => {
+                this._updateActuator(i, newAct);
+            });
+
             this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
 
             var optMist = opts.mist || {};
             this.mist = this.mist || {};
-            this._updateCycle(OyaConf.CYCLE_FAN, {
+            this._updateCycleDeprecated(OyaConf.CYCLE_FAN, {
                 desc: "Misting cycle for use with cooling fan air intake",
                 on: 15,
                 off: 15,
             }, optMist);
-            this._updateCycle(OyaConf.CYCLE_STANDARD, {
+            this._updateCycleDeprecated(OyaConf.CYCLE_STANDARD, {
                 desc: "Standard misting cycle for all phases of plant growth",
                 on: 30,
                 off: 60,
             }, optMist);
-            this._updateCycle(OyaConf.CYCLE_DRAIN, {
+            this._updateCycleDeprecated(OyaConf.CYCLE_DRAIN, {
                 desc: "Incremental drain cycle ",
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
@@ -57,6 +124,7 @@
                 fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
                 mist: this.mist,
+                actuators: this.actuators,
             };
         }
 
