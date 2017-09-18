@@ -59,12 +59,43 @@
             name: 'foo',
             tempUnit: 'C',
             startCycle: 'fan',
+            actuators: [{
+                name: 'test1',
+                type: 'new-type',
+                startCycle: 'fan',
+                enabled: false,
+                cycleDelay: 2,
+                pin: 27,
+                fanThreshold: 72,
+                cycles: {
+                    fan: {
+                        desc: 'fans are cool',
+                        on: 10,
+                        off: 23,
+                    }
+                },
+            }],
             mist: {
                 fan: {
                     on: 30,
                 },
             },
         }
+        var updatedActuator = OyaConf.defaultActuator("timer-cycle", 0);
+        updatedActuator.name = 'test1';
+        updatedActuator.type = 'new-type';
+        updatedActuator.enabled = false;
+        updatedActuator.startCycle = 'fan';
+        updatedActuator.cycleDelay = 2;
+        updatedActuator.pin = 27;
+        updatedActuator.fanThreshold = 72;
+        updatedActuator.cycles = {
+            fan: {
+                desc: 'fans are cool',
+                on: 10,
+                off: 23,
+            }
+        };
         should.deepEqual(new OyaConf(opts).toJSON(), {
             name: 'foo',
             type: 'OyaConf',
@@ -72,7 +103,7 @@
             tempUnit: 'C',
             fanThreshold: 80,
             actuators: [
-                OyaConf.defaultActuator("timer-cycle", 0),
+                updatedActuator,
                 OyaConf.defaultActuator("timer-cycle", 1),
                 OyaConf.defaultActuator("timer-cycle", 2),
             ],
@@ -156,15 +187,15 @@
                 },
             },
         });
-        var updatedCycle = OyaConf.defaultActuator("timer-cycle", 1);
-        updatedCycle.name = 'test2';
-        updatedCycle.type = 'new-type';
-        updatedCycle.enabled = false;
-        updatedCycle.startCycle = 'fan';
-        updatedCycle.cycleDelay = 2;
-        updatedCycle.pin = 27;
-        updatedCycle.fanThreshold = 72;
-        updatedCycle.cycles = {
+        var updatedActuator = OyaConf.defaultActuator("timer-cycle", 1);
+        updatedActuator.name = 'test2';
+        updatedActuator.type = 'new-type';
+        updatedActuator.enabled = false;
+        updatedActuator.startCycle = 'fan';
+        updatedActuator.cycleDelay = 2;
+        updatedActuator.pin = 27;
+        updatedActuator.fanThreshold = 72;
+        updatedActuator.cycles = {
             fan: {
                 on: 10,
                 off: 23,
@@ -178,7 +209,7 @@
             fanThreshold: 80,
             actuators: [
                 OyaConf.defaultActuator("timer-cycle", 0),
-                updatedCycle,
+                updatedActuator,
                 OyaConf.defaultActuator("timer-cycle", 2),
             ],
             mist: {
