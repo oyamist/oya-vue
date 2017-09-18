@@ -58,11 +58,6 @@
                     }
                 },
             }],
-            mist: {
-                fan: {
-                    on: 30,
-                },
-            },
         }
         var updatedActuator = OyaConf.defaultActuator();
         updatedActuator.name = 'test1';
@@ -145,11 +140,6 @@
                     }
                 },
             }],
-            mist: {
-                fan: {
-                    on: 30,
-                },
-            },
         });
         var updatedActuator = OyaConf.defaultActuator(1);
         updatedActuator.name = 'test2';
@@ -161,6 +151,7 @@
         updatedActuator.fanThreshold = 72;
         updatedActuator.cycles = {
             fan: {
+                desc: "Misting cycle for use with cooling fan air intake",
                 on: 10,
                 off: 23,
             }

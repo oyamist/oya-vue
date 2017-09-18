@@ -6,25 +6,25 @@
             this.update(opts);
         }
         
-        _updateCycle(cycleName, defaultCycle, optMist) {
-            this.mist[cycleName] = Object.assign({}, defaultCycle, 
-                this.mist && this.mist[cycleName], optMist[cycleName]);
-        }
-
-        _updateCycleDeprecated(cycleName, defaultCycle, optMist) {
-            this.mist[cycleName] = Object.assign({}, defaultCycle, 
-                this.mist && this.mist[cycleName], optMist[cycleName]);
-        }
-
         _updateActuator(index, newAct) {
             var defAct = OyaConf.defaultActuator(index);
             var curAct = this.actuators[index] || {};
-            ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold', 'cycles']
+            ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold']
             .forEach(prop => {
                 curAct[prop] = newAct[prop] == null 
                     ? (curAct[prop] == null ? defAct[prop] : curAct[prop])
                     : newAct[prop];
             });
+            if (newAct.cycles) {
+                Object.keys(curAct.cycles).forEach(key => {
+                    if (!newAct.cycles.hasOwnProperty(key)) {
+                        delete curAct.cycles[key];
+                    }
+                });
+                Object.keys(newAct.cycles).forEach(key => {
+                    curAct.cycles[key] = Object.assign(curAct.cycles[key], newAct.cycles[key]);
+                });
+            }
         }
 
         static defaultActuator(index=0, type='timer-cycle') {

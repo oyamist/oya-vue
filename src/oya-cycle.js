@@ -5,7 +5,6 @@
     class OyaCycle {
         constructor(opts = {}) {
             this.actuator = opts.actuator || OyaConf.defaultActuator();
-            this.oyaConf = new OyaConf(opts);
             this._cycle = this.actuator.startCycle;
             this._active = false;
             this._on = false; 
@@ -33,7 +32,7 @@
                 `active:${this.isActive?1:0} ${this.isOn?'on':'off'}`;
         }
         get name() {
-            return this.oyaConf.name;
+            return this.actuator.name;
         }
 
         get isOn() {
