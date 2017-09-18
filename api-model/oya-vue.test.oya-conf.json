@@ -4,23 +4,6 @@
     "tempUnit": "F",
     "fanThreshold": 80,
     "startCycle": "standard",
-    "mist": {
-        "fan": {
-            "desc": "Misting cycle for use with cooling fan air intake",
-            "on": 15,
-            "off": 15
-        },
-        "standard": {
-            "desc": "Standard misting cycle for all phases of plant growth",
-            "on": 30,
-            "off": 60
-        },
-        "drain": {
-            "desc": "Incremental drain cycle ",
-            "on": 311,
-            "off": -1
-        }
-    },
     "actuators": [
         {
             "name": "mist1",
@@ -28,6 +11,7 @@
             "enabled": true,
             "startCycle": "standard",
             "fanThreshold": 80,
+            "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 33,
             "cycles": {
@@ -54,6 +38,7 @@
             "enabled": true,
             "startCycle": "standard",
             "fanThreshold": 80,
+            "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 35,
             "cycles": {
@@ -80,6 +65,7 @@
             "enabled": true,
             "startCycle": "standard",
             "fanThreshold": 80,
+            "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 36,
             "cycles": {
@@ -101,5 +87,5 @@
             }
         }
     ],
-    "rbHash": "025de4caa5b4ebe615b0ba7fe40394d1"
+    "rbHash": "8605bed8eaed9ba0ea7cee73a94a1e0a"
 }

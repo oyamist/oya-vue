@@ -5,35 +5,37 @@
     const OyaConf = require("../index").OyaConf;
     const onSec = 0.005;
     const offSec = 0.01;
-    const testMist = {
-        standard: {
-            on: onSec,
-            off: offSec,
-        },
-        fan: {
-            on: onSec * 2,
-            off: offSec * 2,
-        },
-    };
+    var testActuator = OyaConf.defaultActuator();
+    testActuator.cycles.standard.on = onSec;
+    testActuator.cycles.standard.off = offSec;
+    testActuator.cycles.fan.on = 2*onSec;
+    testActuator.cycles.fan.off = 2*offSec;
     var level = winston.level;
     winston.level = 'error';
 
-    it ("ctor intializes cycle from configuration", function() {
+    it ("ctor intializes cycle from provided actuator", function() {
+        // Default actuator
         var oc1 = new OyaCycle({
             name: 'test1a',
         });
+        should.deepEqual(oc1.actuator, OyaConf.defaultActuator());
         should(oc1.cycle).equal('standard');
+
+        // Custom actuator
+        var actuator = OyaConf.defaultActuator();
+        actuator.startCycle = 'fan';
         var oc2 = new OyaCycle({
             name: 'test1b',
-            startCycle: 'fan',
+            actuator,
         });
         should(oc2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
+        var actuator = OyaConf.defaultActuator();
         var oc = new OyaCycle({
             name: 'test2a',
             maxCycles: 1,
-            mist: testMist,
+            actuator: testActuator,
         });
         should(oc.isActive).equal(false);
         oc.activate();
@@ -41,7 +43,6 @@
         var oc2 = new OyaCycle({
             name: 'test2b',
             maxCycles: 1,
-            mist: testMist,
         });
         should.throws(() => {
             oc2.activate("should-be-a-boolean");  
@@ -50,32 +51,33 @@
     it ("isOn is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
             try {
+                var actuator = JSON.parse(JSON.stringify(testActuator));
+                actuator.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test3a',
-                    maxCycles: 2,
-                    mist: testMist,
+                    actuator,
                 });
                 should(oc.isOn).equal(false);
                 oc.activate();
-                should(oc.cycles).equal(1);
+                should(oc.cycleNumber).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
-                should(oc.cycles).equal(1);
+                should(oc.cycleNumber).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), offSec*1000);
-                should(oc.cycles).equal(2);
+                should(oc.cycleNumber).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
-                should(oc.cycles).equal(2);
+                should(oc.cycleNumber).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);
@@ -90,20 +92,21 @@
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
             try {
+                var actuator = JSON.parse(JSON.stringify(testActuator));
+                actuator.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test4a',
-                    maxCycles: 2,
-                    mist: testMist,
+                    actuator,
                 });
                 should(oc.isOn).equal(false);
                 oc.activate();
-                should(oc.cycles).equal(1);
+                should(oc.cycleNumber).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*1000);
-                should(oc.cycles).equal(1);
+                should(oc.cycleNumber).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
@@ -113,19 +116,19 @@
                 oc.cycle = OyaConf.CYCLE_FAN;
 
                 yield setTimeout(() => async.next(true), onSec*2000);
-                should(oc.cycles).equal(1);
+                should(oc.cycleNumber).equal(1);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), offSec*2000);
-                should(oc.cycles).equal(2);
+                should(oc.cycleNumber).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), onSec*2000);
-                should(oc.cycles).equal(2);
+                should(oc.cycleNumber).equal(2);
                 should(oc.cycle).equal(OyaConf.CYCLE_FAN);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);

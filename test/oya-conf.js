@@ -28,27 +28,10 @@
         tempUnit: 'F',
         fanThreshold: 80,
         actuators: [
-            OyaConf.defaultActuator("timer-cycle", 0),
-            OyaConf.defaultActuator("timer-cycle", 1),
-            OyaConf.defaultActuator("timer-cycle", 2),
+            OyaConf.defaultActuator(0),
+            OyaConf.defaultActuator(1),
+            OyaConf.defaultActuator(2),
         ],
-        mist: {
-            drain: {
-                desc: "Incremental drain cycle ",
-                on: 311, // ~1 gallon assuming Aquatec CDP6800 pump operating with no load @0.73LPM
-                off: -1,
-            },
-            fan: {
-                desc: "Misting cycle for use with cooling fan air intake",
-                on: 15,
-                off: 15,
-            },
-            standard: {
-                desc: "Standard misting cycle for all phases of plant growth",
-                on: 30,
-                off: 60,
-            },
-        },
     };
 
     it("toJSON() serializes configuration", function() {
@@ -81,7 +64,7 @@
                 },
             },
         }
-        var updatedActuator = OyaConf.defaultActuator("timer-cycle", 0);
+        var updatedActuator = OyaConf.defaultActuator();
         updatedActuator.name = 'test1';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
@@ -104,58 +87,39 @@
             fanThreshold: 80,
             actuators: [
                 updatedActuator,
-                OyaConf.defaultActuator("timer-cycle", 1),
-                OyaConf.defaultActuator("timer-cycle", 2),
+                OyaConf.defaultActuator(1),
+                OyaConf.defaultActuator(2),
             ],
-            mist: {
-                drain: {
-                    desc: "Incremental drain cycle ",
-                    on: 311, // ~1 gallon assuming Aquatec CDP6800 pump operating with no load @0.73LPM
-                    off: -1,
-                },
-                fan: {
-                    desc: "Misting cycle for use with cooling fan air intake",
-                    on: 30,
-                    off: 15,
-                },
-                standard: {
-                    desc: "Standard misting cycle for all phases of plant growth",
-                    on: 30,
-                    off: 60,
-                },
-            },
         });
     });
-    it("defaultActuator(type, index) returns default actuator configuration", function() {
-        should.deepEqual(OyaConf.defaultActuator("timer-cycle", 0), {
-            "name": "mist1",
-            "type": "timer-cycle",
-            "enabled": true,
-            "startCycle": "standard",
-            "fanThreshold": 80,
-            "cycleDelay": 0,
-            "pin": 33,
-            "cycles": defaultCycles,
+    it("defaultActuator(index,type) returns default actuator configuration", function() {
+        should.deepEqual(OyaConf.defaultActuator(), {
+            name: "mist1",
+            type: "timer-cycle",
+            enabled: true,
+            startCycle: "standard",
+            fanThreshold: 80,
+            cycleDelay: 0,
+            maxCycles: 0,
+            pin: 33,
+            cycles: defaultCycles,
         });
-        should.deepEqual(OyaConf.defaultActuator("timer-cycle", 1), {
-            "name": "mist2",
-            "type": "timer-cycle",
-            "enabled": true,
-            "startCycle": "standard",
-            "fanThreshold": 80,
-            "cycleDelay": 0,
-            "pin": 35,
-            "cycles": defaultCycles,
+        should.deepEqual(OyaConf.defaultActuator(1), {
+            name: "mist2",
+            type: "timer-cycle",
+            enabled: true,
+            startCycle: "standard",
+            fanThreshold: 80,
+            maxCycles: 0,
+            cycleDelay: 0,
+            pin: 35,
+            cycles: defaultCycles,
         });
-        should.deepEqual(OyaConf.defaultActuator("timer-cycle", 2), {
-            "name": "mist3",
-            "type": "timer-cycle",
-            "enabled": true,
-            "startCycle": "standard",
-            "fanThreshold": 80,
-            "cycleDelay": 0,
-            "pin": 36,
-            "cycles": defaultCycles,
+        should.deepEqual(OyaConf.defaultActuator(2,'some-type'), {
+            name: "actuator2",
+            type: "some-type",
+            enabled: true,
+            pin: 36,
         });
     });
     it("update(opts) updates configuration ", function() {
@@ -187,7 +151,7 @@
                 },
             },
         });
-        var updatedActuator = OyaConf.defaultActuator("timer-cycle", 1);
+        var updatedActuator = OyaConf.defaultActuator(1);
         updatedActuator.name = 'test2';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
@@ -208,27 +172,10 @@
             tempUnit: 'C',
             fanThreshold: 80,
             actuators: [
-                OyaConf.defaultActuator("timer-cycle", 0),
+                OyaConf.defaultActuator(0),
                 updatedActuator,
-                OyaConf.defaultActuator("timer-cycle", 2),
+                OyaConf.defaultActuator(2),
             ],
-            mist: {
-                drain: {
-                    desc: "Incremental drain cycle ",
-                    on: 311, // ~1 gallon assuming Aquatec CDP6800 pump operating with no load @0.73LPM
-                    off: -1,
-                },
-                fan: {
-                    desc: "Misting cycle for use with cooling fan air intake",
-                    on: 30,
-                    off: 15,
-                },
-                standard: {
-                    desc: "Standard misting cycle for all phases of plant growth",
-                    on: 30,
-                    off: 60,
-                },
-            },
         });
     });
 });

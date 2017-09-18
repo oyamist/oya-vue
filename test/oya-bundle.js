@@ -71,7 +71,7 @@
                         startCycle: 'standard',
                         fanThreshold: 80,
                     });
-                    should(apiModel.mist).properties([
+                    should(apiModel.actuators[0].cycles).properties([
                         OyaConf.CYCLE_FAN,
                         OyaConf.CYCLE_STANDARD,
                         OyaConf.CYCLE_DRAIN,

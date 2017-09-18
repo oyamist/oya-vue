@@ -17,7 +17,7 @@
         }
 
         _updateActuator(index, newAct) {
-            var defAct = OyaConf.defaultActuator('timer-cycle', index);
+            var defAct = OyaConf.defaultActuator(index);
             var curAct = this.actuators[index] || {};
             ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold', 'cycles']
             .forEach(prop => {
@@ -27,7 +27,7 @@
             });
         }
 
-        static defaultActuator(type, index) {
+        static defaultActuator(index=0, type='timer-cycle') {
             const defaultPins = [ 
                 33, // Pimoroni Automation Hat relay 1
                 35, // Pimoroni Automation Hat relay 2
@@ -40,6 +40,7 @@
                     enabled: true, // actuator can be activated
                     startCycle: OyaConf.CYCLE_STANDARD,
                     fanThreshold: 80,
+                    maxCycles: 0,
                     cycleDelay: 0,
                     pin: defaultPins[index] || -1,
                     cycles: {
@@ -65,6 +66,7 @@
                     name: `actuator${index}`,
                     type,
                     enabled: true,
+                    pin: defaultPins[index] || -1,
                 }
             }
         }
@@ -72,9 +74,9 @@
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
             this.actuators = [
-                OyaConf.defaultActuator("timer-cycle", 0),
-                OyaConf.defaultActuator("timer-cycle", 1),
-                OyaConf.defaultActuator("timer-cycle", 2),
+                OyaConf.defaultActuator(0),
+                OyaConf.defaultActuator(1),
+                OyaConf.defaultActuator(2),
             ];
             opts.actuators && opts.actuators.forEach((newAct, i) => {
                 this._updateActuator(i, newAct);
@@ -83,24 +85,6 @@
             this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
-
-            var optMist = opts.mist || {};
-            this.mist = this.mist || {};
-            this._updateCycleDeprecated(OyaConf.CYCLE_FAN, {
-                desc: "Misting cycle for use with cooling fan air intake",
-                on: 15,
-                off: 15,
-            }, optMist);
-            this._updateCycleDeprecated(OyaConf.CYCLE_STANDARD, {
-                desc: "Standard misting cycle for all phases of plant growth",
-                on: 30,
-                off: 60,
-            }, optMist);
-            this._updateCycleDeprecated(OyaConf.CYCLE_DRAIN, {
-                desc: "Incremental drain cycle ",
-                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
-                off: -1,
-            }, optMist);
 
             return this;
         }
@@ -123,7 +107,6 @@
                 tempUnit: this.tempUnit,
                 fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
-                mist: this.mist,
                 actuators: this.actuators,
             };
         }

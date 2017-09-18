@@ -38,7 +38,7 @@
         </v-card-text>
         <v-card-text>
         </v-card-text>
-        <v-card-text>Cycle#: {{rbService.cycles}}</v-card-text>
+        <v-card-text>Cycle#: {{rbService.cycleNumber}}</v-card-text>
         <v-card-text>Misting: {{rbService.isOn}}</v-card-text>
         <v-card-text>{{apiModel}}</v-card-text>
         <v-card-text>{{rbService}}</v-card-text>
@@ -102,10 +102,10 @@ export default {
             return this.rbResource.httpErr;
         },
         cycleDef() {
+            var actuators = this.apiModel && this.apiModel.actuators;
+            var actuator = actuators && actuators[0];
             var cycle = this.rbService && this.rbService.cycle;
-            var mist = this.apiModel && this.apiModel.mist;
-            var def = cycle && mist && mist[cycle];
-            return def;
+            return actuator && cycle && actuator.cycles[cycle];
         },
     },
     components: {

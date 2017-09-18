@@ -20,10 +20,11 @@
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
+            this.oyaConf = new OyaConf(options);
             this.oyaCycle = new OyaCycle({
                 name,
+                actuator: this.oyaConf.actuators[0],
             });
-            this.oyaConf = this.oyaCycle.oyaConf;
         }
 
         updateConf(conf) {
@@ -99,7 +100,7 @@
             return {
                 api: 'oya-bundle',
                 cycle: this.oyaCycle.cycle,
-                cycles: this.oyaCycle.cycles,
+                cycleNumber: this.oyaCycle.cycleNumber,
                 isActive: this.oyaCycle.isActive,
                 isOn: this.oyaCycle.isOn,
                 countdown: this.oyaCycle.countdown,

@@ -3,14 +3,11 @@
     const winston = require("winston");
 
     class OyaCycle {
-        constructor(opts) {
-            opts = Object.assign(OyaConf.defaultActuator('timer-cycle',0), {
-                maxCycles: 0,
-            }, opts);
+        constructor(opts = {}) {
+            this.actuator = opts.actuator || OyaConf.defaultActuator();
             this.oyaConf = new OyaConf(opts);
-            this._cycle = this.oyaConf.startCycle;
+            this._cycle = this.actuator.startCycle;
             this._active = false;
-            this.maxCycles = opts.maxCycles;
             this._on = false; 
             this._events = {};
             this._phaseTimeout = null;
@@ -32,7 +29,7 @@
 
         get summary() { 
             return `${this.name} ` +
-                `cycle:${this.cycle}#${this.cycles} ` +
+                `cycle:${this.cycle}#${this.cycleNumber} ` +
                 `active:${this.isActive?1:0} ${this.isOn?'on':'off'}`;
         }
         get name() {
@@ -62,12 +59,12 @@
             cbs.forEach(cb => cb(this, event));
         }
 
-        activate(value=true, maxCycles=this.maxCycles) {
+        activate(value=true) {
             if (this.isActive === value) {
                 winston.debug(`${this.name} redundant activate ignored`);
             } else if (value === true) {
                 this._active = value;
-                this.cycles = 0;
+                this.cycleNumber = 0;
                 this.fire(OyaCycle.EVENT_ACTIVATE);
                 updatePhase(this, true);
             } else if (value === false) {
@@ -112,18 +109,19 @@
     } //// class OyaCycle
 
     function updatePhase(self, value) {
-        var mc = self.oyaConf.mist[self.cycle];
-        if (self.maxCycles && self.cycles >= self.maxCycles) {
+        var actuator = self.actuator;
+        var cycle = actuator.cycles[self.cycle];
+        if (actuator.maxCycles && self.cycleNumber >= actuator.maxCycles) {
             self.activate(false);
         }
         self.countdown = 0;
-        if (mc && self.isActive) {
+        if (cycle && self.isActive) {
             self._on = value;
             if (value) {
-                self.cycles++;
+                self.cycleNumber++;
                 self.fire(OyaCycle.EVENT_PHASE);
-                var msOn = Number(mc.on) * 1000;
-                self.countdown = Math.trunc(mc.on);
+                var msOn = Number(cycle.on) * 1000;
+                self.countdown = Math.trunc(cycle.on);
                 if (msOn > 0) {
                     self._phaseTimeout = setTimeout(() => {
                         self._phaseTimeout = null;
@@ -132,8 +130,8 @@
                } 
             } else {
                 self.fire(OyaCycle.EVENT_PHASE);
-                var msOff = Number(mc.off) * 1000;
-                self.countdown = Math.trunc(mc.off);
+                var msOff = Number(cycle.off) * 1000;
+                self.countdown = Math.trunc(cycle.off);
                 if (msOff > 0) {
                     self._phaseTimeout = setTimeout(() => {
                         self._phaseTimeout = null;
