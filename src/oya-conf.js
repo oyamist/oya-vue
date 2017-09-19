@@ -73,7 +73,7 @@
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
-            this.actuators = [
+            this.actuators = this.actuators || [
                 OyaConf.defaultActuator(0),
                 OyaConf.defaultActuator(1),
                 OyaConf.defaultActuator(2),

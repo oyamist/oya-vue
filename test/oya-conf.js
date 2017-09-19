@@ -119,6 +119,7 @@
     });
     it("update(opts) updates configuration ", function() {
         var oc = new OyaConf();
+        var actuator0 = oc.actuators[0];
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
@@ -141,6 +142,10 @@
                 },
             }],
         });
+
+        // actuators are not changed by update
+        should.equal(actuator0, oc.actuators[0]);
+
         var updatedActuator = OyaConf.defaultActuator(1);
         updatedActuator.name = 'test2';
         updatedActuator.type = 'new-type';
@@ -156,6 +161,10 @@
                 off: 23,
             }
         };
+
+        // actuators are not changed by update
+        should.equal(actuator0, oc.actuators[0]);
+
         should.deepEqual(oc.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
