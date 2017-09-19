@@ -136,6 +136,8 @@
                         self._phaseTimeout = null;
                         updatePhase(self, true);
                     }, msOff);
+                } else if (msOff < 0) {
+                    self.activate(false);
                 }
             }
         }

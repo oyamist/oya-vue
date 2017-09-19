@@ -92,8 +92,13 @@
                 return {
                     activate: req.body.activate,
                 }
+            } else if (req.body.hasOwnProperty('cycle')) {
+                this.oyaCycle.cycle = req.body.cycle;
+                return {
+                    cycle: req.body.cycle,
+                }
             }
-            return "oyacycle:hi";
+            throw new Error("unknown oya-cycle request: ", req.body);
         }
 
         getState() {

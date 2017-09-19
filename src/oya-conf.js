@@ -44,6 +44,11 @@
                     cycleDelay: 0,
                     pin: defaultPins[index] || -1,
                     cycles: {
+                        [OyaConf.CYCLE_CONSERVE]: {
+                            desc: "Conservative misting cycle for plants with good roots",
+                            on: 5,
+                            off: 60,
+                        },
                         [OyaConf.CYCLE_FAN]: {
                             desc: "Misting cycle for use with cooling fan air intake",
                             on: 15,
@@ -55,7 +60,7 @@
                             off: 60,
                         },
                         [OyaConf.CYCLE_DRAIN]: {
-                            desc: "Incremental drain cycle ",
+                            "desc": "Partially drain reservoir before adding fresh nutrients",
                             on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                             off: -1,
                         },
@@ -92,11 +97,13 @@
         static get CYCLES() { return [
             OyaConf.CYCLE_STANDARD,
             OyaConf.CYCLE_FAN,
+            OyaConf.CYCLE_CONSERVE,
             OyaConf.CYCLE_DRAIN,
         ]};
         static get CYCLE_STANDARD() { return "standard"; }
         static get CYCLE_FAN() { return "fan"; }
         static get CYCLE_DRAIN() { return "drain"; }
+        static get CYCLE_CONSERVE() { return "conserve"; }
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
 

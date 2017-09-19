@@ -14,11 +14,16 @@
             "on": 30,
             "off": 60
         },
+        "conserve": {
+            "desc": "Conservative misting cycle for plants with good roots",
+            "on": 5,
+            "off": 60,
+        },
         "drain": {
-            "desc": "Incremental drain cycle ",
+            "desc": "Partially drain reservoir before adding fresh nutrients",
             "on": 311,
             "off": -1
-        }
+        },
     };
 
     const defaultConf = {

@@ -15,6 +15,11 @@
             "cycleDelay": 0,
             "pin": 33,
             "cycles": {
+                "conserve": {
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
+                },
                 "fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
@@ -26,7 +31,7 @@
                     "off": 60
                 },
                 "drain": {
-                    "desc": "Incremental drain cycle ",
+                    "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
                 }
@@ -42,6 +47,11 @@
             "cycleDelay": 0,
             "pin": 35,
             "cycles": {
+                "conserve": {
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
+                },
                 "fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
@@ -53,7 +63,7 @@
                     "off": 60
                 },
                 "drain": {
-                    "desc": "Incremental drain cycle ",
+                    "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
                 }
@@ -69,6 +79,11 @@
             "cycleDelay": 0,
             "pin": 36,
             "cycles": {
+                "conserve": {
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
+                },
                 "fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
@@ -80,12 +95,12 @@
                     "off": 60
                 },
                 "drain": {
-                    "desc": "Incremental drain cycle ",
+                    "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
                 }
             }
         }
     ],
-    "rbHash": "8605bed8eaed9ba0ea7cee73a94a1e0a"
+    "rbHash": "5b67f67f228f843b06642db7fd83e2b1"
 }
