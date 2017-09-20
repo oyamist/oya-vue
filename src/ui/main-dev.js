@@ -7,7 +7,7 @@ import VueAxios from 'vue-axios';
 import rbvue from 'rest-bundle/index-vue';
 
 import Dev from './Dev.vue';
-import Introduction from './Introduction.vue';
+import Home from './Home.vue';
 import appvue from "../../index-vue";
 require('./stylus/main.styl')
 
@@ -20,11 +20,11 @@ Vue.use(appvue);
 
 var routes = [{
         path: '/',
-        redirect: "/introduction"
+        redirect: "/home"
     },
     {
-        path: '/introduction',
-        component: Introduction
+        path: '/home',
+        component: Home
     },
 ];
 routes = routes.concat(rbvue.methods.aboutRoutes());
@@ -44,6 +44,6 @@ new Vue({
     store,
     render: h => h(Dev),
     components: {
-        Introduction,
+        Home,
     },
 })

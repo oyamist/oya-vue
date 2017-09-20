@@ -79,7 +79,7 @@
 </template> 
 <script>
 
-import Introduction from './Introduction.vue';
+import Home from './Home.vue';
 import rbvue from "rest-bundle/index-vue";
 import appvue from "../../index-vue";
 
@@ -91,8 +91,8 @@ export default {
             drawer: false,
             sidebarMain: [{
                 icon: "question_answer",
-                title: "Introduction",
-                href: "/introduction",
+                title: "Home",
+                href: "/home",
             }],
             sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
             sidebarAppRest: rbvue.methods.aboutSidebar(appvue.components),
@@ -107,7 +107,7 @@ export default {
         },
     },
     components: {
-        Introduction,
+        Home,
     },
 }
 
