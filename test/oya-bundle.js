@@ -68,7 +68,7 @@
                         type: 'OyaConf',
                         name: 'test',
                         tempUnit: 'F',
-                        startCycle: 'standard',
+                        startCycle: OyaConf.CYCLE_STANDARD,
                         fanThreshold: 80,
                     });
                     should(apiModel.actuators[0].cycles).properties([

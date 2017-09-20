@@ -4,22 +4,22 @@
     const OyaConf = require("../index").OyaConf;
 
     const defaultCycles = {
-        "fan": {
+        [OyaConf.CYCLE_FAN]: {
             "desc": "Misting cycle for use with cooling fan air intake",
             "on": 15,
             "off": 15
         },
-        "standard": {
+        [OyaConf.CYCLE_STANDARD]: {
             "desc": "Standard misting cycle for all phases of plant growth",
             "on": 30,
             "off": 60
         },
-        "conserve": {
+        [OyaConf.CYCLE_CONSERVE]: {
             "desc": "Conservative misting cycle for plants with good roots",
             "on": 5,
             "off": 60,
         },
-        "drain": {
+        [OyaConf.CYCLE_DRAIN]: {
             "desc": "Partially drain reservoir before adding fresh nutrients",
             "on": 311,
             "off": -1
@@ -29,7 +29,7 @@
     const defaultConf = {
         name: 'test',
         type: 'OyaConf',
-        startCycle: 'standard',
+        startCycle: OyaConf.CYCLE_STANDARD,
         tempUnit: 'F',
         fanThreshold: 80,
         actuators: [
@@ -46,17 +46,17 @@
         var opts = {
             name: 'foo',
             tempUnit: 'C',
-            startCycle: 'fan',
+            startCycle: OyaConf.CYCLE_FAN,
             actuators: [{
                 name: 'test1',
                 type: 'new-type',
-                startCycle: 'fan',
+                startCycle: OyaConf.CYCLE_FAN,
                 enabled: false,
                 cycleDelay: 2,
                 pin: 27,
                 fanThreshold: 72,
                 cycles: {
-                    fan: {
+                    [OyaConf.CYCLE_FAN]: {
                         desc: 'fans are cool',
                         on: 10,
                         off: 23,
@@ -68,12 +68,12 @@
         updatedActuator.name = 'test1';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
-        updatedActuator.startCycle = 'fan';
+        updatedActuator.startCycle = OyaConf.CYCLE_FAN;
         updatedActuator.cycleDelay = 2;
         updatedActuator.pin = 27;
         updatedActuator.fanThreshold = 72;
         updatedActuator.cycles = {
-            fan: {
+            [OyaConf.CYCLE_FAN]: {
                 desc: 'fans are cool',
                 on: 10,
                 off: 23,
@@ -97,7 +97,7 @@
             name: "mist1",
             type: "timer-cycle",
             enabled: true,
-            startCycle: "standard",
+            startCycle: OyaConf.CYCLE_STANDARD,
             fanThreshold: 80,
             cycleDelay: 0,
             maxCycles: 0,
@@ -108,7 +108,7 @@
             name: "mist2",
             type: "timer-cycle",
             enabled: true,
-            startCycle: "standard",
+            startCycle: OyaConf.CYCLE_STANDARD,
             fanThreshold: 80,
             maxCycles: 0,
             cycleDelay: 0,
@@ -128,19 +128,19 @@
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
-            startCycle: 'fan',
+            startCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             actuators: [{
             },{
                 name: 'test2',
                 type: 'new-type',
-                startCycle: 'fan',
+                startCycle: OyaConf.CYCLE_FAN,
                 enabled: false,
                 cycleDelay: 2,
                 pin: 27,
                 fanThreshold: 72,
                 cycles: {
-                    fan: {
+                    [OyaConf.CYCLE_FAN]: {
                         on: 10,
                         off: 23,
                     }
@@ -155,12 +155,12 @@
         updatedActuator.name = 'test2';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
-        updatedActuator.startCycle = 'fan';
+        updatedActuator.startCycle = OyaConf.CYCLE_FAN;
         updatedActuator.cycleDelay = 2;
         updatedActuator.pin = 27;
         updatedActuator.fanThreshold = 72;
         updatedActuator.cycles = {
-            fan: {
+            [OyaConf.CYCLE_FAN]: {
                 desc: "Misting cycle for use with cooling fan air intake",
                 on: 10,
                 off: 23,

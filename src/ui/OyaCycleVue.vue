@@ -6,12 +6,15 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="actuatorIndex" value="0" slot="prop">Index (0-based) of actuator for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
-        <v-card-title >
-            <div class="headline ">{{name}}</div>
-        </v-card-title>
+        <v-toolbar class="green darken-3">
+            <v-toolbar-title class="white--text">{{name}}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-side-icon dark @click="clickMenu"></v-toolbar-side-icon>
+        </v-toolbar> 
         <v-card-text class="text-xs-center">
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
                 <div style="display:flex; flex-direction: column">
@@ -30,40 +33,56 @@
                         </v-btn>
                     </div>
                 </div>
-                <v-list v-show="actuator" two-line subheader>
-                    <v-subheader inset>Timer cycle </v-subheader>
+                <v-list v-show="actuator" subheader>
+                    <v-subheader >Timer cycle </v-subheader>
                     <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
-                        v-tooltip:left='{ html: cycleDef(cycle).desc}'
+                        v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
                         >
                         <v-list-tile-action >
                             <v-icon v-bind:class='[cycle===rbService.cycle?  "green--text text--darken-3" : "grey--text text--lighten-2"]'>face</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content >
                             <v-list-tile-title>
-                                {{cycle}}
+                                {{cycleDef(cycle).desc}}
                             </v-list-tile-title>
-                            <v-list-tile-sub-title class="cycle-desc">
-                                {{cycleDef(cycle).on}}s on 
-                                <span v-show="cycleDef(cycle).off >= 0">+ {{cycleDef(cycle).off}}s off&nbsp;&#x21bb;</span>
-                                <span v-show="cycleDef(cycle).off < 0">&#x279b; stop</span>
-                            </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-list>
             </div>
         </v-card-text>
-        <!--
-        <v-card-text>Cycle#: {{rbService.cycleNumber}}</v-card-text>
-        <v-card-text>Misting: {{rbService.isOn}}</v-card-text>
-        <v-card-text>{{apiModel}}</v-card-text>
-        <v-card-text>{{rbService}}</v-card-text>
-        -->
         <v-system-bar v-if='httpErr' 
             v-tooltip:above='{html:`${httpErr.config.url} \u2794 HTTP${httpErr.response.status} ${httpErr.response.statusText}`}'
             class='error' dark>
             <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
         </v-system-bar>
     </v-card>
+    <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
+        <div slot="title">Actuator Settings</div>
+            <rb-dialog-row label="Actuator">
+                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].name' 
+                    label="Name" class="input-group--focused" />
+            </rb-dialog-row>
+            <rb-dialog-row :label="`${cycleCopy.name} cycle`" v-for="cycleCopy in editCycles" key="name">
+                <v-text-field v-model='cycleCopy.cycle.desc'
+                    label="Description" class="input-group--focused" />
+                <v-layout>
+                <v-flex xs3>
+                    <v-text-field v-model='cycleCopy.cycle.on'
+                        label="On seconds" class="input-group--focused" />
+                </v-flex>
+                <v-flex xs3>
+                    <v-text-field v-model='cycleCopy.cycle.off'
+                        label="Off seconds" class="input-group--focused" />
+                </v-flex>
+                </v-layout>
+            </rb-dialog-row>
+            <rb-dialog-row label="Advanced">
+                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].fanThreshold' 
+                    :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].pin' 
+                    label="MCU Pin" class="input-group--focused" />
+            </rb-dialog-row>
+    </rb-api-dialog>
 
 </div>
 
@@ -73,6 +92,7 @@
 import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
+const RbDialogRow = rbvue.components.RbDialogRow;
 
 export default {
     mixins: [ 
@@ -106,6 +126,9 @@ export default {
             var actuator = this.actuator;
             var cycle = cycle || this.rbService && this.rbService.cycle;
             return actuator && cycle && actuator.cycles[cycle];
+        },
+        clickMenu() {
+            this.apiEdit();
         },
         clickActivate() {
             var url = [this.restOrigin(), this.service, 'oya-cycle'].join('/');
@@ -150,10 +173,21 @@ export default {
                 return [];
             }
             return Object.keys(this.actuator.cycles).sort();
-        }
+        },
+        editCycles() {
+            var cycleNames = Object.keys(this.actuator.cycles).sort();
+            var actuator = this.apiModelCopy.actuators[this.actuatorIndex];
+            return cycleNames.map(name => {
+                return {
+                    name: name,
+                    cycle: actuator.cycles[name],
+                }
+            });
+        },
     },
     components: {
         RbApiDialog,
+        RbDialogRow,
     },
     created() {
         this.restBundleResource();

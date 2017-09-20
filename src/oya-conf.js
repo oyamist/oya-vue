@@ -100,10 +100,10 @@
             OyaConf.CYCLE_CONSERVE,
             OyaConf.CYCLE_DRAIN,
         ]};
-        static get CYCLE_STANDARD() { return "standard"; }
-        static get CYCLE_FAN() { return "fan"; }
-        static get CYCLE_DRAIN() { return "drain"; }
-        static get CYCLE_CONSERVE() { return "conserve"; }
+        static get CYCLE_STANDARD() { return "Standard"; }
+        static get CYCLE_FAN() { return "Fan"; }
+        static get CYCLE_DRAIN() { return "Drain"; }
+        static get CYCLE_CONSERVE() { return "Conserve"; }
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
 

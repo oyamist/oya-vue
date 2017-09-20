@@ -3,34 +3,34 @@
     "type": "OyaConf",
     "tempUnit": "F",
     "fanThreshold": 80,
-    "startCycle": "standard",
+    "startCycle": "Standard",
     "actuators": [
         {
             "name": "mist1",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "standard",
+            "startCycle": "Standard",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 33,
             "cycles": {
-                "conserve": {
+                "Conserve": {
                     "desc": "Conservative misting cycle for plants with good roots",
                     "on": 5,
                     "off": 60
                 },
-                "fan": {
+                "Fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
                     "off": 15
                 },
-                "standard": {
+                "Standard": {
                     "desc": "Standard misting cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "drain": {
+                "Drain": {
                     "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
@@ -41,28 +41,28 @@
             "name": "mist2",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "standard",
+            "startCycle": "Standard",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 35,
             "cycles": {
-                "conserve": {
+                "Conserve": {
                     "desc": "Conservative misting cycle for plants with good roots",
                     "on": 5,
                     "off": 60
                 },
-                "fan": {
+                "Fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
                     "off": 15
                 },
-                "standard": {
+                "Standard": {
                     "desc": "Standard misting cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "drain": {
+                "Drain": {
                     "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
@@ -73,28 +73,28 @@
             "name": "mist3",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "standard",
+            "startCycle": "Standard",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 36,
             "cycles": {
-                "conserve": {
+                "Conserve": {
                     "desc": "Conservative misting cycle for plants with good roots",
                     "on": 5,
                     "off": 60
                 },
-                "fan": {
+                "Fan": {
                     "desc": "Misting cycle for use with cooling fan air intake",
                     "on": 15,
                     "off": 15
                 },
-                "standard": {
+                "Standard": {
                     "desc": "Standard misting cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "drain": {
+                "Drain": {
                     "desc": "Partially drain reservoir before adding fresh nutrients",
                     "on": 311,
                     "off": -1
@@ -102,5 +102,5 @@
             }
         }
     ],
-    "rbHash": "5b67f67f228f843b06642db7fd83e2b1"
+    "rbHash": "f5842056ecdf867a508d5996a4e9cfc3"
 }

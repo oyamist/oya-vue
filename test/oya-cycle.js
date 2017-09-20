@@ -6,10 +6,10 @@
     const onSec = 0.005;
     const offSec = 0.01;
     var testActuator = OyaConf.defaultActuator();
-    testActuator.cycles.standard.on = onSec;
-    testActuator.cycles.standard.off = offSec;
-    testActuator.cycles.fan.on = 2*onSec;
-    testActuator.cycles.fan.off = 2*offSec;
+    testActuator.cycles[OyaConf.CYCLE_STANDARD].on = onSec;
+    testActuator.cycles[OyaConf.CYCLE_STANDARD].off = offSec;
+    testActuator.cycles[OyaConf.CYCLE_FAN].on = 2*onSec;
+    testActuator.cycles[OyaConf.CYCLE_FAN].off = 2*offSec;
     var level = winston.level;
     winston.level = 'error';
 
@@ -19,7 +19,7 @@
             name: 'test1a',
         });
         should.deepEqual(oc1.actuator, OyaConf.defaultActuator());
-        should(oc1.cycle).equal('standard');
+        should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
         // Custom actuator
         var actuator = OyaConf.defaultActuator();
