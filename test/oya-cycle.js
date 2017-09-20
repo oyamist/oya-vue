@@ -5,7 +5,7 @@
     const OyaConf = require("../index").OyaConf;
     const onSec = 0.005;
     const offSec = 0.01;
-    var testActuator = OyaConf.defaultActuator();
+    var testActuator = OyaConf.createActuator();
     testActuator.cycles[OyaConf.CYCLE_STANDARD].on = onSec;
     testActuator.cycles[OyaConf.CYCLE_STANDARD].off = offSec;
     testActuator.cycles[OyaConf.CYCLE_FAN].on = 2*onSec;
@@ -18,11 +18,11 @@
         var oc1 = new OyaCycle({
             name: 'test1a',
         });
-        should.deepEqual(oc1.actuator, OyaConf.defaultActuator());
+        should.deepEqual(oc1.actuator, OyaConf.createActuator());
         should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
         // Custom actuator
-        var actuator = OyaConf.defaultActuator();
+        var actuator = OyaConf.createActuator();
         actuator.startCycle = 'fan';
         var oc2 = new OyaCycle({
             name: 'test1b',
@@ -31,7 +31,7 @@
         should(oc2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
-        var actuator = OyaConf.defaultActuator();
+        var actuator = OyaConf.createActuator();
         var oc = new OyaCycle({
             name: 'test2a',
             maxCycles: 1,

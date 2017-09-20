@@ -2,12 +2,12 @@
 
     // OyaMist bioreactor configuration
     class OyaConf {
-        constructor(opts) {
+        constructor(opts = {}) {
             this.update(opts);
         }
         
         _updateActuator(index, newAct) {
-            var defAct = OyaConf.defaultActuator(index);
+            var defAct = OyaConf.createActuator(index);
             var curAct = this.actuators[index] || {};
             ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold']
             .forEach(prop => {
@@ -54,41 +54,38 @@
             },
         }}
 
-        static defaultActuator(index=0, type='timer-cycle') {
+        static createActuator(index=0, opts={}) {
             const defaultPins = [ 
                 33, // Pimoroni Automation Hat relay 1
                 35, // Pimoroni Automation Hat relay 2
                 36, // Pimoroni Automation Hat relay 3
             ];
-            if (type === 'timer-cycle') {
-                return {
-                    name: `mist${index+1}`,
-                    type: "timer-cycle",
-                    enabled: true, // actuator can be activated
-                    startCycle: OyaConf.CYCLE_STANDARD,
-                    fanThreshold: 80,
-                    maxCycles: 0,
-                    cycleDelay: 0,
-                    pin: defaultPins[index] || -1,
-                    cycles: this.DEFAULT_CYCLES,
-                }
-            } else {
-                return {
-                    name: `actuator${index}`,
-                    type,
-                    enabled: true,
-                    pin: defaultPins[index] || -1,
-                }
+            return {
+                name: opts.name || `mist${index+1}`,
+                type: opts.type || 'timer-cycle',
+                enabled: opts.enabled == null ? true : opts.enabled, // actuator can be activated
+                startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,
+                fanThreshold: opts.fanThreshold || 80,
+                maxCycles: opts.maxCycles || 0,
+                cycleDelay: opts.cycleDelay || 0,
+                pin: opts.pin == null ?  (defaultPins[index] || -1) : opts.pin,
+                cycles: opts.cycles || this.DEFAULT_CYCLES,
             }
         }
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
-            this.actuators = this.actuators || [
-                OyaConf.defaultActuator(0),
-                OyaConf.defaultActuator(1),
-                OyaConf.defaultActuator(2),
-            ];
+            if (this.actuators == null) {
+                if (opts.actuators) {
+                    this.actuators = opts.actuators.map((a,i) => OyaConf.createActuator(i));
+                } else {
+                    this.actuators = [
+                        OyaConf.createActuator(0),
+                        OyaConf.createActuator(1),
+                        OyaConf.createActuator(2),
+                    ];
+                }
+            }
             opts.actuators && opts.actuators.forEach((newAct, i) => {
                 this._updateActuator(i, newAct);
             });

@@ -4,7 +4,7 @@
 
     class OyaCycle {
         constructor(opts = {}) {
-            this.actuator = opts.actuator || OyaConf.defaultActuator();
+            this.actuator = opts.actuator || OyaConf.createActuator();
             this._cycle = this.actuator.startCycle;
             this._active = false;
             this._on = false; 

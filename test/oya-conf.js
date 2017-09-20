@@ -12,9 +12,9 @@
         tempUnit: 'F',
         fanThreshold: 80,
         actuators: [
-            OyaConf.defaultActuator(0),
-            OyaConf.defaultActuator(1),
-            OyaConf.defaultActuator(2),
+            OyaConf.createActuator(0),
+            OyaConf.createActuator(1),
+            OyaConf.createActuator(2),
         ],
     };
 
@@ -26,6 +26,24 @@
             name: 'foo',
             tempUnit: 'C',
             startCycle: OyaConf.CYCLE_FAN,
+            actuators: [
+                OyaConf.createActuator(0, {
+                    name: 'test1',
+                    type: 'new-type',
+                    startCycle: OyaConf.CYCLE_FAN,
+                    enabled: false,
+                    cycleDelay: 2,
+                    pin: 27,
+                    fanThreshold: 72,
+                    cycles: {
+                        [OyaConf.CYCLE_FAN]: {
+                            desc: 'fans are cool',
+                            on: 10,
+                            off: 23,
+                        }
+                    },
+            })],
+            /*
             actuators: [{
                 name: 'test1',
                 type: 'new-type',
@@ -42,8 +60,9 @@
                     }
                 },
             }],
+            */
         }
-        var updatedActuator = OyaConf.defaultActuator();
+        var updatedActuator = OyaConf.createActuator();
         updatedActuator.name = 'test1';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
@@ -67,13 +86,11 @@
             fanThreshold: 80,
             actuators: [
                 updatedActuator,
-                OyaConf.defaultActuator(1),
-                OyaConf.defaultActuator(2),
             ],
         });
     });
-    it("defaultActuator(index,type) returns default actuator configuration", function() {
-        should.deepEqual(OyaConf.defaultActuator(), {
+    it("createActuator(index,opts) creates a custom actuator", function() {
+        should.deepEqual(OyaConf.createActuator(), {
             name: "mist1",
             type: "timer-cycle",
             enabled: true,
@@ -84,7 +101,7 @@
             pin: 33,
             cycles: defaultCycles,
         });
-        should.deepEqual(OyaConf.defaultActuator(1), {
+        should.deepEqual(OyaConf.createActuator(1), {
             name: "mist2",
             type: "timer-cycle",
             enabled: true,
@@ -95,11 +112,42 @@
             pin: 35,
             cycles: defaultCycles,
         });
-        should.deepEqual(OyaConf.defaultActuator(2,'some-type'), {
-            name: "actuator2",
+        var opts = {
+            name: "dubba",
+            type: "testtype",
+            enabled: true,
+            startCycle: OyaConf.CYCLE_FAN,
+            fanThreshold: 81,
+            maxCycles: 2,
+            cycleDelay: 3,
+            pin: 39,
+            cycles: defaultCycles,
+        }
+        should.deepEqual(OyaConf.createActuator(1, opts), {
+            name: "dubba",
+            type: "testtype",
+            enabled: true,
+            startCycle: OyaConf.CYCLE_FAN,
+            fanThreshold: 81,
+            maxCycles: 2,
+            cycleDelay: 3,
+            pin: 39,
+            cycles: defaultCycles,
+        });
+        var opts = { 
+            type: 'some-type',
+        };
+        should.deepEqual(OyaConf.createActuator(2,opts), {
+            name: "mist3",
             type: "some-type",
             enabled: true,
             pin: 36,
+            startCycle: OyaConf.CYCLE_STANDARD,
+            fanThreshold: 80,
+            cycleDelay: 0,
+            maxCycles: 0,
+            pin: 36,
+            cycles: defaultCycles,
         });
     });
     it("update(opts) updates configuration ", function() {
@@ -131,7 +179,7 @@
         // actuators are not changed by update
         should.equal(actuator0, oc.actuators[0]);
 
-        var updatedActuator = OyaConf.defaultActuator(1);
+        var updatedActuator = OyaConf.createActuator(1);
         updatedActuator.name = 'test2';
         updatedActuator.type = 'new-type';
         updatedActuator.enabled = false;
@@ -158,9 +206,9 @@
             tempUnit: 'C',
             fanThreshold: 80,
             actuators: [
-                OyaConf.defaultActuator(0),
+                OyaConf.createActuator(0),
                 updatedActuator,
-                OyaConf.defaultActuator(2),
+                OyaConf.createActuator(2),
             ],
         });
     });
