@@ -34,17 +34,20 @@
                     </div>
                 </div>
                 <v-list v-show="actuator" subheader>
-                    <v-subheader >Timer cycle </v-subheader>
+                    <v-subheader >Mist cycle </v-subheader>
                     <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
-                        v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
+                        unused-v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
                         >
                         <v-list-tile-action >
-                            <v-icon v-bind:class='[cycle===rbService.cycle?  "green--text text--darken-3" : "grey--text text--lighten-2"]'>face</v-icon>
+                            <v-icon v-bind:class='[cycle===rbService.cycle?  "green--text text--darken-3" : "grey--text text--lighten-1"]'>face</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content >
                             <v-list-tile-title>
-                                {{cycleDef(cycle).desc}}
+                                {{cycleDef(cycle).name}}
                             </v-list-tile-title>
+                            <v-list-tile-sub-title class="cycle-desc">
+                                {{cycleDef(cycle).desc}}
+                            </v-list-tile-sub-title>
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-list>
@@ -57,12 +60,12 @@
         </v-system-bar>
     </v-card>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
-        <div slot="title">Actuator Settings</div>
-            <rb-dialog-row label="Actuator">
+        <div slot="title">Bioreactor Settings</div>
+            <rb-dialog-row label="Bioreactor">
                 <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].name' 
                     label="Name" class="input-group--focused" />
             </rb-dialog-row>
-            <rb-dialog-row :label="`${cycleCopy.name} cycle`" v-for="cycleCopy in editCycles" key="name">
+            <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
                 <v-text-field v-model='cycleCopy.cycle.desc'
                     label="Description" class="input-group--focused" />
                 <v-layout>
@@ -208,5 +211,7 @@ export default {
 <style> 
 .cycle-desc {
     font-style: italic;
+}
+.cycle-desc:hover {
 }
 </style>

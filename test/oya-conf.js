@@ -3,28 +3,7 @@
     const winston = require('winston');
     const OyaConf = require("../index").OyaConf;
 
-    const defaultCycles = {
-        [OyaConf.CYCLE_FAN]: {
-            "desc": "Misting cycle for use with cooling fan air intake",
-            "on": 15,
-            "off": 15
-        },
-        [OyaConf.CYCLE_STANDARD]: {
-            "desc": "Standard misting cycle for all phases of plant growth",
-            "on": 30,
-            "off": 60
-        },
-        [OyaConf.CYCLE_CONSERVE]: {
-            "desc": "Conservative misting cycle for plants with good roots",
-            "on": 5,
-            "off": 60,
-        },
-        [OyaConf.CYCLE_DRAIN]: {
-            "desc": "Partially drain reservoir before adding fresh nutrients",
-            "on": 311,
-            "off": -1
-        },
-    };
+    const defaultCycles = OyaConf.DEFAULT_CYCLES;
 
     const defaultConf = {
         name: 'test',
@@ -74,6 +53,7 @@
         updatedActuator.fanThreshold = 72;
         updatedActuator.cycles = {
             [OyaConf.CYCLE_FAN]: {
+                name: "Cool",
                 desc: 'fans are cool',
                 on: 10,
                 off: 23,
@@ -161,7 +141,8 @@
         updatedActuator.fanThreshold = 72;
         updatedActuator.cycles = {
             [OyaConf.CYCLE_FAN]: {
-                desc: "Misting cycle for use with cooling fan air intake",
+                name: "Cool",
+                desc: defaultCycles[OyaConf.CYCLE_FAN].desc,
                 on: 10,
                 off: 23,
             }

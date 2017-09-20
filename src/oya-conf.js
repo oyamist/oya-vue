@@ -27,6 +27,33 @@
             }
         }
 
+        static get DEFAULT_CYCLES() { return {
+            [OyaConf.CYCLE_STANDARD]: {
+                name: "Standard",
+                desc: "Standard cycle for all phases of plant growth",
+                on: 30,
+                off: 60,
+            },
+            [OyaConf.CYCLE_DRAIN]: {
+                name: "Drain",
+                desc: "Partially drain reservoir and stop to add fresh nutrients",
+                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
+                off: -1,
+            },
+            [OyaConf.CYCLE_FAN]: {
+                name: "Cool",
+                desc: "Hot day evaporative cooling cycle with fan",
+                on: 15,
+                off: 15,
+            },
+            [OyaConf.CYCLE_CONSERVE]: {
+                name: "Conserve",
+                desc: "Conservative misting cycle for plants with good roots",
+                on: 5,
+                off: 60,
+            },
+        }}
+
         static defaultActuator(index=0, type='timer-cycle') {
             const defaultPins = [ 
                 33, // Pimoroni Automation Hat relay 1
@@ -43,28 +70,7 @@
                     maxCycles: 0,
                     cycleDelay: 0,
                     pin: defaultPins[index] || -1,
-                    cycles: {
-                        [OyaConf.CYCLE_CONSERVE]: {
-                            desc: "Conservative misting cycle for plants with good roots",
-                            on: 5,
-                            off: 60,
-                        },
-                        [OyaConf.CYCLE_FAN]: {
-                            desc: "Misting cycle for use with cooling fan air intake",
-                            on: 15,
-                            off: 15,
-                        },
-                        [OyaConf.CYCLE_STANDARD]: {
-                            desc: "Standard misting cycle for all phases of plant growth",
-                            on: 30,
-                            off: 60,
-                        },
-                        [OyaConf.CYCLE_DRAIN]: {
-                            "desc": "Partially drain reservoir before adding fresh nutrients",
-                            on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
-                            off: -1,
-                        },
-                    },
+                    cycles: this.DEFAULT_CYCLES,
                 }
             } else {
                 return {
@@ -100,10 +106,10 @@
             OyaConf.CYCLE_CONSERVE,
             OyaConf.CYCLE_DRAIN,
         ]};
-        static get CYCLE_STANDARD() { return "Standard"; }
-        static get CYCLE_FAN() { return "Fan"; }
-        static get CYCLE_DRAIN() { return "Drain"; }
-        static get CYCLE_CONSERVE() { return "Conserve"; }
+        static get CYCLE_STANDARD() { return "Cycle #1"; }
+        static get CYCLE_DRAIN() { return "Cycle #2"; }
+        static get CYCLE_FAN() { return "Cycle #3"; }
+        static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
 

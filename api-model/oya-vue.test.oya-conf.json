@@ -3,37 +3,41 @@
     "type": "OyaConf",
     "tempUnit": "F",
     "fanThreshold": 80,
-    "startCycle": "Standard",
+    "startCycle": "Cycle #1",
     "actuators": [
         {
             "name": "mist1",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "Standard",
+            "startCycle": "Cycle #1",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 33,
             "cycles": {
-                "Conserve": {
-                    "desc": "Conservative misting cycle for plants with good roots",
-                    "on": 5,
-                    "off": 60
-                },
-                "Fan": {
-                    "desc": "Misting cycle for use with cooling fan air intake",
-                    "on": 15,
-                    "off": 15
-                },
-                "Standard": {
-                    "desc": "Standard misting cycle for all phases of plant growth",
+                "Cycle #1": {
+                    "name": "Standard",
+                    "desc": "Standard cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "Drain": {
-                    "desc": "Partially drain reservoir before adding fresh nutrients",
+                "Cycle #2": {
+                    "name": "Drain",
+                    "desc": "Partially drain reservoir and stop to add fresh nutrients",
                     "on": 311,
                     "off": -1
+                },
+                "Cycle #3": {
+                    "name": "Cool",
+                    "desc": "Hot day evaporative cooling cycle with fan",
+                    "on": 15,
+                    "off": 15
+                },
+                "Cycle #4": {
+                    "name": "Conserve",
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
                 }
             }
         },
@@ -41,31 +45,35 @@
             "name": "mist2",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "Standard",
+            "startCycle": "Cycle #1",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 35,
             "cycles": {
-                "Conserve": {
-                    "desc": "Conservative misting cycle for plants with good roots",
-                    "on": 5,
-                    "off": 60
-                },
-                "Fan": {
-                    "desc": "Misting cycle for use with cooling fan air intake",
-                    "on": 15,
-                    "off": 15
-                },
-                "Standard": {
-                    "desc": "Standard misting cycle for all phases of plant growth",
+                "Cycle #1": {
+                    "name": "Standard",
+                    "desc": "Standard cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "Drain": {
-                    "desc": "Partially drain reservoir before adding fresh nutrients",
+                "Cycle #2": {
+                    "name": "Drain",
+                    "desc": "Partially drain reservoir and stop to add fresh nutrients",
                     "on": 311,
                     "off": -1
+                },
+                "Cycle #3": {
+                    "name": "Cool",
+                    "desc": "Hot day evaporative cooling cycle with fan",
+                    "on": 15,
+                    "off": 15
+                },
+                "Cycle #4": {
+                    "name": "Conserve",
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
                 }
             }
         },
@@ -73,34 +81,38 @@
             "name": "mist3",
             "type": "timer-cycle",
             "enabled": true,
-            "startCycle": "Standard",
+            "startCycle": "Cycle #1",
             "fanThreshold": 80,
             "maxCycles": 0,
             "cycleDelay": 0,
             "pin": 36,
             "cycles": {
-                "Conserve": {
-                    "desc": "Conservative misting cycle for plants with good roots",
-                    "on": 5,
-                    "off": 60
-                },
-                "Fan": {
-                    "desc": "Misting cycle for use with cooling fan air intake",
-                    "on": 15,
-                    "off": 15
-                },
-                "Standard": {
-                    "desc": "Standard misting cycle for all phases of plant growth",
+                "Cycle #1": {
+                    "name": "Standard",
+                    "desc": "Standard cycle for all phases of plant growth",
                     "on": 30,
                     "off": 60
                 },
-                "Drain": {
-                    "desc": "Partially drain reservoir before adding fresh nutrients",
+                "Cycle #2": {
+                    "name": "Drain",
+                    "desc": "Partially drain reservoir and stop to add fresh nutrients",
                     "on": 311,
                     "off": -1
+                },
+                "Cycle #3": {
+                    "name": "Cool",
+                    "desc": "Hot day evaporative cooling cycle with fan",
+                    "on": 15,
+                    "off": 15
+                },
+                "Cycle #4": {
+                    "name": "Conserve",
+                    "desc": "Conservative misting cycle for plants with good roots",
+                    "on": 5,
+                    "off": 60
                 }
             }
         }
     ],
-    "rbHash": "f5842056ecdf867a508d5996a4e9cfc3"
+    "rbHash": "ee8ccafaf3808bec02e91aed5c088dd3"
 }
