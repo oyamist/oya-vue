@@ -89,6 +89,40 @@
         }();
         async.next();
     });
+    it ("on(event, cb) invokes event callback", function(done) {
+        var async = function*() {
+            try {
+                var actuator = JSON.parse(JSON.stringify(testActuator));
+                actuator.maxCycles = 2;
+                var oc = new OyaCycle({
+                    name: 'test3a',
+                    actuator,
+                });
+                var count = 0;
+                oc.on(OyaCycle.EVENT_PHASE, (context,event) => {
+                    count++;
+                    should(context).equal(oc);
+                    should(event).equal(OyaCycle.EVENT_PHASE);
+                });
+                oc.activate();
+                should(count).equal(1);
+                should(oc.isOn).equal(true);
+                yield setTimeout(() => async.next(true), onSec*1000);
+                should(count).equal(2);
+                should(oc.isOn).equal(false);
+                yield setTimeout(() => async.next(true), offSec*1000);
+                should(count).equal(3);
+                yield setTimeout(() => async.next(true), onSec*1000);
+                yield setTimeout(() => async.next(true), onSec*1000);
+                should(count).equal(3); // should not change
+                done();
+            } catch (err) {
+                winston.log(err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
             try {

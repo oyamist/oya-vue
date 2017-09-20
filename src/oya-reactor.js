@@ -6,7 +6,7 @@
     const path = require("path");
     const rb = require("rest-bundle");
 
-    class OyaBundle extends rb.RestBundle {
+    class OyaReactor extends rb.RestBundle {
         constructor(name = "test", options = {}) {
             super(name, Object.assign({
                 srcPkg,
@@ -103,7 +103,7 @@
 
         getState() {
             return {
-                api: 'oya-bundle',
+                api: 'oya-reactor',
                 cycle: this.oyaCycle.cycle,
                 cycleNumber: this.oyaCycle.cycleNumber,
                 isActive: this.oyaCycle.isActive,
@@ -113,7 +113,7 @@
         }
 
 
-    } //// class OyaBundle
+    } //// class OyaReactor
 
-    module.exports = exports.OyaBundle = OyaBundle;
+    module.exports = exports.OyaReactor = OyaReactor;
 })(typeof exports === "object" ? exports : (exports = {}));

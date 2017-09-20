@@ -1,6 +1,6 @@
-(typeof describe === 'function') && describe("OyaBundle", function() {
+(typeof describe === 'function') && describe("OyaReactor", function() {
     const should = require("should");
-    const OyaBundle = require("../index").OyaBundle;
+    const OyaReactor = require("../index").OyaReactor;
     const OyaConf = require("../index").OyaConf;
     const supertest = require('supertest');
     const winston = require('winston');

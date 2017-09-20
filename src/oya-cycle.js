@@ -49,7 +49,7 @@
         }
 
         fire(event) {
-            var cbs = this._events[OyaCycle.EVENT_ACTIVATE];
+            var cbs = this._events[event];
             if (cbs == null) {
                 var err = new Error(`${this.name} OyaCycle.fire(${event}) unknown event`);
                 winston.warn(err);

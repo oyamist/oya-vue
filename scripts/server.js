@@ -4,7 +4,7 @@ const path = require("path");
 const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
-const OyaBundle = require("../index").OyaBundle;
+const OyaReactor = require("../index").OyaReactor;
 const winston = require("winston");
 
 // ensure argv is actually for script instead of mocha
@@ -29,7 +29,7 @@ let async = function*() {
         var services = ['test'].concat(argv.filter((a, i) => i>1 && a[0]!=='-' && a!=="test"));
         for (var iService = 0; iService < services.length; iService++) {
             var serviceName = services[iService];
-            var oya = new OyaBundle(serviceName);
+            var oya = new OyaReactor(serviceName);
             restBundles.push(oya);
         }
 
