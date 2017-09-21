@@ -5,8 +5,8 @@
 
     class OyaCycle {
         constructor(opts = {}) {
-            this.actuator = opts.actuator || OyaConf.createActuator();
-            this._cycle = this.actuator.startCycle;
+            this.timer = opts.timer || OyaConf.createTimer();
+            this._cycle = this.timer.startCycle;
             this._active = false;
             this.emitter = new EventEmitter();
             this._on = false; 
@@ -33,7 +33,7 @@
                 `active:${this.isActive?1:0} ${this.isOn?'on':'off'}`;
         }
         get name() {
-            return this.actuator.name;
+            return this.timer.name;
         }
 
         get isOn() {
@@ -102,9 +102,9 @@
     } //// class OyaCycle
 
     function updatePhase(self, value) {
-        var actuator = self.actuator;
-        var cycle = actuator.cycles[self.cycle];
-        if (actuator.maxCycles && self.cycleNumber >= actuator.maxCycles) {
+        var timer = self.timer;
+        var cycle = timer.cycles[self.cycle];
+        if (timer.maxCycles && self.cycleNumber >= timer.maxCycles) {
             self.activate(false);
         }
         self.countdown = 0;

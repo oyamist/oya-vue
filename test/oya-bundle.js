@@ -71,7 +71,7 @@
                         startCycle: OyaConf.CYCLE_STANDARD,
                         fanThreshold: 80,
                     });
-                    should(apiModel.actuators[0].cycles).properties([
+                    should(apiModel.timers[0].cycles).properties([
                         OyaConf.CYCLE_FAN,
                         OyaConf.CYCLE_STANDARD,
                         OyaConf.CYCLE_DRAIN,

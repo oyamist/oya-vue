@@ -28,7 +28,7 @@
             this.oyaConf = new OyaConf(opts);
             this.oyaCycle = new OyaCycle({
                 name,
-                actuator: this.oyaConf.actuators[0],
+                timer: this.oyaConf.timers[0],
             });
         }
 

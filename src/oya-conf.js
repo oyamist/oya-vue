@@ -6,23 +6,23 @@
             this.update(opts);
         }
         
-        _updateActuator(index, newAct) {
-            var defAct = OyaConf.createActuator(index);
-            var curAct = this.actuators[index] || {};
+        _updateTimer(index, newTimer) {
+            var defTimer = OyaConf.createTimer(index);
+            var curTimer = this.timers[index] || {};
             ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold']
             .forEach(prop => {
-                curAct[prop] = newAct[prop] == null 
-                    ? (curAct[prop] == null ? defAct[prop] : curAct[prop])
-                    : newAct[prop];
+                curTimer[prop] = newTimer[prop] == null 
+                    ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
+                    : newTimer[prop];
             });
-            if (newAct.cycles) {
-                Object.keys(curAct.cycles).forEach(key => {
-                    if (!newAct.cycles.hasOwnProperty(key)) {
-                        delete curAct.cycles[key];
+            if (newTimer.cycles) {
+                Object.keys(curTimer.cycles).forEach(key => {
+                    if (!newTimer.cycles.hasOwnProperty(key)) {
+                        delete curTimer.cycles[key];
                     }
                 });
-                Object.keys(newAct.cycles).forEach(key => {
-                    curAct.cycles[key] = Object.assign(curAct.cycles[key], newAct.cycles[key]);
+                Object.keys(newTimer.cycles).forEach(key => {
+                    curTimer.cycles[key] = Object.assign(curTimer.cycles[key], newTimer.cycles[key]);
                 });
             }
         }
@@ -54,7 +54,7 @@
             },
         }}
 
-        static createActuator(index=0, opts={}) {
+        static createTimer(index=0, opts={}) {
             const defaultPins = [ 
                 33, // Pimoroni Automation Hat relay 1
                 35, // Pimoroni Automation Hat relay 2
@@ -63,7 +63,7 @@
             return {
                 name: opts.name || `mist${index+1}`,
                 type: opts.type || 'timer-cycle',
-                enabled: opts.enabled == null ? true : opts.enabled, // actuator can be activated
+                enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
                 startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,
                 fanThreshold: opts.fanThreshold || 80,
                 maxCycles: opts.maxCycles || 0,
@@ -75,19 +75,19 @@
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
-            if (this.actuators == null) {
-                if (opts.actuators) {
-                    this.actuators = opts.actuators.map((a,i) => OyaConf.createActuator(i));
+            if (this.timers == null) {
+                if (opts.timers) {
+                    this.timers = opts.timers.map((a,i) => OyaConf.createTimer(i));
                 } else {
-                    this.actuators = [
-                        OyaConf.createActuator(0),
-                        OyaConf.createActuator(1),
-                        OyaConf.createActuator(2),
+                    this.timers = [
+                        OyaConf.createTimer(0),
+                        OyaConf.createTimer(1),
+                        OyaConf.createTimer(2),
                     ];
                 }
             }
-            opts.actuators && opts.actuators.forEach((newAct, i) => {
-                this._updateActuator(i, newAct);
+            opts.timers && opts.timers.forEach((newTimer, i) => {
+                this._updateTimer(i, newTimer);
             });
 
             this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
@@ -117,7 +117,7 @@
                 tempUnit: this.tempUnit,
                 fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
-                actuators: this.actuators,
+                timers: this.timers,
             };
         }
 

@@ -5,37 +5,37 @@
     const OyaConf = require("../index").OyaConf;
     const onSec = 0.005;
     const offSec = 0.01;
-    var testActuator = OyaConf.createActuator();
-    testActuator.cycles[OyaConf.CYCLE_STANDARD].on = onSec;
-    testActuator.cycles[OyaConf.CYCLE_STANDARD].off = offSec;
-    testActuator.cycles[OyaConf.CYCLE_FAN].on = 2*onSec;
-    testActuator.cycles[OyaConf.CYCLE_FAN].off = 2*offSec;
+    var testTimer = OyaConf.createTimer();
+    testTimer.cycles[OyaConf.CYCLE_STANDARD].on = onSec;
+    testTimer.cycles[OyaConf.CYCLE_STANDARD].off = offSec;
+    testTimer.cycles[OyaConf.CYCLE_FAN].on = 2*onSec;
+    testTimer.cycles[OyaConf.CYCLE_FAN].off = 2*offSec;
     var level = winston.level;
     winston.level = 'error';
 
-    it ("ctor intializes cycle from provided actuator", function() {
-        // Default actuator
+    it ("ctor intializes cycle from provided timer", function() {
+        // Default timer
         var oc1 = new OyaCycle({
             name: 'test1a',
         });
-        should.deepEqual(oc1.actuator, OyaConf.createActuator());
+        should.deepEqual(oc1.timer, OyaConf.createTimer());
         should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
-        // Custom actuator
-        var actuator = OyaConf.createActuator();
-        actuator.startCycle = 'fan';
+        // Custom timer
+        var timer = OyaConf.createTimer();
+        timer.startCycle = 'fan';
         var oc2 = new OyaCycle({
             name: 'test1b',
-            actuator,
+            timer,
         });
         should(oc2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
-        var actuator = OyaConf.createActuator();
+        var timer = OyaConf.createTimer();
         var oc = new OyaCycle({
             name: 'test2a',
             maxCycles: 1,
-            actuator: testActuator,
+            timer: testTimer,
         });
         should(oc.isActive).equal(false);
         oc.activate();
@@ -51,11 +51,11 @@
     it ("isOn is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
             try {
-                var actuator = JSON.parse(JSON.stringify(testActuator));
-                actuator.maxCycles = 2;
+                var timer = JSON.parse(JSON.stringify(testTimer));
+                timer.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test3a',
-                    actuator,
+                    timer,
                 });
                 should(oc.isOn).equal(false);
                 oc.activate();
@@ -92,11 +92,11 @@
     it ("on(event, cb) invokes event callback", function(done) {
         var async = function*() {
             try {
-                var actuator = JSON.parse(JSON.stringify(testActuator));
-                actuator.maxCycles = 2;
+                var timer = JSON.parse(JSON.stringify(testTimer));
+                timer.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test3a',
-                    actuator,
+                    timer,
                 });
                 var count = 0;
                 oc.on(OyaCycle.EVENT_PHASE, (context,event,value) => {
@@ -139,11 +139,11 @@
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
             try {
-                var actuator = JSON.parse(JSON.stringify(testActuator));
-                actuator.maxCycles = 2;
+                var timer = JSON.parse(JSON.stringify(testTimer));
+                timer.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test4a',
-                    actuator,
+                    timer,
                 });
                 should(oc.isOn).equal(false);
                 oc.activate();

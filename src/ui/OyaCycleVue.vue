@@ -6,7 +6,7 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
-        <rb-about-item name="actuatorIndex" value="0" slot="prop">Index (0-based) of actuator for component</rb-about-item>
+        <rb-about-item name="timerIndex" value="0" slot="prop">Index (0-based) of timer for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
@@ -33,7 +33,7 @@
                         </v-btn>
                     </div>
                 </div>
-                <v-list v-show="actuator" subheader>
+                <v-list v-show="timer" subheader>
                     <v-subheader >Mist cycle </v-subheader>
                     <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
                         unused-v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
@@ -62,7 +62,7 @@
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
             <rb-dialog-row label="Bioreactor">
-                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].name' 
+                <v-text-field v-model='apiModelCopy.timers[timerIndex].name' 
                     label="Name" class="input-group--focused" />
             </rb-dialog-row>
             <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
@@ -80,9 +80,9 @@
                 </v-layout>
             </rb-dialog-row>
             <rb-dialog-row label="Advanced">
-                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].fanThreshold' 
+                <v-text-field v-model='apiModelCopy.timers[timerIndex].fanThreshold' 
                     :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
-                <v-text-field v-model='apiModelCopy.actuators[actuatorIndex].pin' 
+                <v-text-field v-model='apiModelCopy.timers[timerIndex].pin' 
                     label="MCU Pin" class="input-group--focused" />
             </rb-dialog-row>
     </rb-api-dialog>
@@ -103,7 +103,7 @@ export default {
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),
     ],
     props: {
-        actuatorIndex: {
+        timerIndex: {
             default: 0,
         },
     },
@@ -126,9 +126,9 @@ export default {
     },
     methods: {
         cycleDef(cycle) {
-            var actuator = this.actuator;
+            var timer = this.timer;
             var cycle = cycle || this.rbService && this.rbService.cycle;
-            return actuator && cycle && actuator.cycles[cycle];
+            return timer && cycle && timer.cycles[cycle];
         },
         clickMenu() {
             this.apiEdit();
@@ -160,30 +160,30 @@ export default {
         },
     },
     computed: {
-        actuator() {
-            var actuators = this.apiModel && this.apiModel.actuators;
-            return actuators && actuators[this.actuatorIndex];
+        timer() {
+            var timers = this.apiModel && this.apiModel.timers;
+            return timers && timers[this.timerIndex];
         },
         name() {
-            return this.actuator && this.actuator.name;
+            return this.timer && this.timer.name;
         },
         httpErr() {
             return this.rbResource.httpErr;
         },
         cycles() {
-            var actuator = this.actuator;
-            if (actuator  == null) {
+            var timer = this.timer;
+            if (timer  == null) {
                 return [];
             }
-            return Object.keys(this.actuator.cycles).sort();
+            return Object.keys(this.timer.cycles).sort();
         },
         editCycles() {
-            var cycleNames = Object.keys(this.actuator.cycles).sort();
-            var actuator = this.apiModelCopy.actuators[this.actuatorIndex];
+            var cycleNames = Object.keys(this.timer.cycles).sort();
+            var timer = this.apiModelCopy.timers[this.timerIndex];
             return cycleNames.map(name => {
                 return {
                     name: name,
-                    cycle: actuator.cycles[name],
+                    cycle: timer.cycles[name],
                 }
             });
         },
