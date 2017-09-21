@@ -25,7 +25,7 @@
         should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
         // Custom timer
-        var timer = OyaConf.createTimer({name: 'test1b'});
+        var timer = OyaConf.createTimer(0, {name: 'test1b'});
         timer.startCycle = 'fan';
         var oc2 = new OyaCycle({
             name: 'test1c',
@@ -55,6 +55,7 @@
         var async = function*() {
             try {
                 var timer = JSON.parse(JSON.stringify(testTimer));
+                timer.name = 'test3a';
                 timer.maxCycles = 2;
                 var oc = new OyaCycle({
                     name: 'test3a',
