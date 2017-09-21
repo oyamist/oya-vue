@@ -118,14 +118,10 @@
         }
 
         getState() {
-            return {
+            return Object.assign(this.oyaCycle.state, {
                 api: 'oya-reactor',
-                cycle: this.oyaCycle.cycle,
-                cycleNumber: this.oyaCycle.cycleNumber,
-                isActive: this.oyaCycle.isActive,
-                isOn: this.oyaCycle.isOn,
                 countdown: this.oyaCycle.countdown,
-            };
+            });
         }
 
 

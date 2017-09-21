@@ -7,10 +7,12 @@
         constructor(opts = {}) {
             this.timer = opts.timer || OyaConf.createTimer();
             this._cycle = this.timer.startCycle;
+            this.nextCycle = this._cycle;
             this._active = false;
             this.emitter = new EventEmitter();
             this._on = false; 
             this._phaseTimeout = null;
+            this.cycleNumber = 0;
             this.on(OyaCycle.EVENT_PHASE, (self, event) => {
                 winston.debug(this.summary, event);
             });
@@ -87,6 +89,7 @@
             } else {
                 this._cycle = value;
             }
+            this.nextCycle = this._cycle;
             return this;
         }
 
@@ -96,6 +99,8 @@
                 isActive: this.isActive,
                 isOn: this.isOn,
                 cycle: this.cycle,
+                nextCycle: this.nextCycle,
+                cycleNumber: this.cycleNumber,
             };
         }
 
@@ -104,14 +109,18 @@
     function updatePhase(self, value) {
         var timer = self.timer;
         var cycle = timer.cycles[self.cycle];
-        if (timer.maxCycles && self.cycleNumber >= timer.maxCycles) {
-            self.activate(false);
-        }
         self.countdown = 0;
-        if (cycle && self.isActive) {
-            self._on = value;
-            if (value) {
+        if (!cycle || !self.isActive) {
+            return;
+        }
+        self._on = value;
+        if (value) {
+            if (!timer.maxCycles || self.cycleNumber <= timer.maxCycles) {
                 self.cycleNumber++;
+            }
+            if (timer.maxCycles && self.cycleNumber > timer.maxCycles) {
+                self.activate(false);
+            } else { 
                 self.emit(OyaCycle.EVENT_PHASE, value);
                 var msOn = Number(cycle.on) * 1000;
                 self.countdown = Math.trunc(cycle.on);
@@ -120,19 +129,23 @@
                         self._phaseTimeout = null;
                         updatePhase(self, false);
                     }, msOn);
-               } 
-            } else {
-                self.emit(OyaCycle.EVENT_PHASE, value);
-                var msOff = Number(cycle.off) * 1000;
-                self.countdown = Math.trunc(cycle.off);
-                if (msOff > 0) {
-                    self._phaseTimeout = setTimeout(() => {
-                        self._phaseTimeout = null;
+               }
+           }
+        } else {
+            self.emit(OyaCycle.EVENT_PHASE, value);
+            var msOff = Number(cycle.off) * 1000;
+            self.countdown = Math.trunc(cycle.off);
+            if (msOff > 0) {
+                self._phaseTimeout = setTimeout(() => {
+                    self._phaseTimeout = null;
+                    if (self.cycle === self.nextCycle) {
                         updatePhase(self, true);
-                    }, msOff);
-                } else if (msOff < 0) {
-                    self.activate(false);
-                }
+                    } else {
+                        self.cycle = self.nextCycle;
+                    }
+                }, msOff);
+            } else if (msOff < 0) {
+                self.activate(false);
             }
         }
     }
