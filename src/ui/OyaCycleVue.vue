@@ -6,7 +6,8 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
-        <rb-about-item name="timerIndex" value="0" slot="prop">Index (0-based) of timer for component</rb-about-item>
+        <rb-about-item name="timerIndex" value="0" slot="prop">
+            Index (0-based) of timer for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
@@ -19,13 +20,16 @@
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
                 <div style="display:flex; flex-direction: column">
                     <div>
-                        <img v-show="rbService.isActive && rbService.isOn" src="/assets/mist-on.svg" height=200px/>
-                        <img v-show="rbService.isActive && !rbService.isOn" src="/assets/mist-off.svg" height=200px/>
+                        <img v-show="rbService.isActive && rbService.isOn" 
+                            src="/assets/mist-on.svg" height=200px/>
+                        <img v-show="rbService.isActive && !rbService.isOn" 
+                            src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.isActive" src="/assets/inactive.svg" height=200px/>
                         <h5>{{rbService.countdown}}</h5>
                     </div>
                     <div>
-                        <v-btn v-show="!rbService.isActive" @click="clickActivate()" class="green darken-3" dark>
+                        <v-btn v-show="!rbService.isActive" @click="clickActivate()" 
+                            class="green darken-3" dark>
                             Run
                         </v-btn>
                         <v-btn error v-show="rbService.isActive" @click="clickActivate()">
@@ -38,8 +42,16 @@
                     <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
                         unused-v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
                         >
-                        <v-list-tile-action >
-                            <v-icon v-bind:class='[cycle===rbService.cycle?  "green--text text--darken-3" : "grey--text text--lighten-1"]'>face</v-icon>
+                        <v-list-tile-action v-show='cycle===rbService.cycle' >
+                            <v-icon class='green--text text--darken-3'>face</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-action 
+                            v-show='cycle!==rbService.nextCycle && cycle!==rbService.cycle' >
+                            <v-icon class='grey--text text--lighten-1'>face</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-action 
+                            v-show='rbService.nextCycle!==rbService.cycle && cycle===rbService.nextCycle' >
+                            <v-icon class='green--text text--darken-3'>hourglass_full</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content >
                             <v-list-tile-title>

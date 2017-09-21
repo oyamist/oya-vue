@@ -5,7 +5,7 @@
 
     class OyaCycle {
         constructor(opts = {}) {
-            this.timer = opts.timer || OyaConf.createTimer();
+            this.timer = opts.timer || OyaConf.createTimer(0, opts);
             this._cycle = this.timer.startCycle;
             this.nextCycle = this._cycle;
             this._active = false;
@@ -31,7 +31,7 @@
 
         get summary() { 
             return `${this.name} ` +
-                `cycle:${this.cycle}#${this.cycleNumber} ` +
+                `cycle:"${this.cycle}" ${this.cycleNumber} ` +
                 `active:${this.isActive?1:0} ${this.isOn?'on':'off'}`;
         }
         get name() {

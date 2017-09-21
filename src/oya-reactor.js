@@ -21,9 +21,8 @@
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
             this.senseEmitter = opts.senseEmitter;
-            var self = this;
             this.senseEmitter && this.senseEmitter.on(OyaReactor.SENSE_TEMP_INTERNAL, 
-                (context, event, value) => self.onTemp(event, value)
+                (value) => this.onTempInternal(value)
             );
             this.oyaConf = new OyaConf(opts);
             this.oyaCycle = new OyaCycle({
@@ -40,7 +39,18 @@
         static get SENSE_PH() { return "sense: pH"; }
         static get SENSE_PPM() { return "sense: ppm"; }
 
-        onTemp(event, value) {
+        onTempInternal(value) {
+            winston.debug(`onTempInternal ${value}`);
+            if (value < this.oyaConf.fanThreshold) {
+                if (this.oyaCycle.nextCycle === this.oyaCycle.timer.hotCycle) {
+                    winston.info("onTempInternal: reverting to default cycle");
+                    // cancel cooling and revert to default cycle
+                    this.oyaCycle.nextCycle = this.oyaCycle.startCycle;
+                }
+            } else {
+                winston.info("onTempInternal: next cycle will be cooling cycle");
+                this.oyaCycle.nextCycle = this.oyaCycle.timer.hotCycle;
+            }
         }
 
         updateConf(conf) {

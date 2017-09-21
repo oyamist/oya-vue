@@ -3,11 +3,12 @@
     const winston = require('winston');
     const OyaCycle = exports.OyaCycle || require("../index").OyaCycle;
     const OyaConf = require("../index").OyaConf;
-    const STANDARD_ON = 0.005;
-    const STANDARD_OFF = 0.01;
+    const STANDARD_ON = 0.01;
+    const STANDARD_OFF = 0.02;
     const FAN_ON = 2*STANDARD_ON;
     const FAN_OFF = 2*STANDARD_OFF;
-    var testTimer = OyaConf.createTimer();
+    const SETTLE_MS = 5;
+    var testTimer = OyaConf.createTimer(0, {name: 'test0a'});
     testTimer.cycles[OyaConf.CYCLE_STANDARD].on = STANDARD_ON;
     testTimer.cycles[OyaConf.CYCLE_STANDARD].off = STANDARD_OFF;
     testTimer.cycles[OyaConf.CYCLE_FAN].on = FAN_ON;
@@ -20,22 +21,22 @@
         var oc1 = new OyaCycle({
             name: 'test1a',
         });
-        should.deepEqual(oc1.timer, OyaConf.createTimer());
+        should.deepEqual(oc1.timer, OyaConf.createTimer(0, {name: 'test1a'}));
         should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
         // Custom timer
-        var timer = OyaConf.createTimer();
+        var timer = OyaConf.createTimer({name: 'test1b'});
         timer.startCycle = 'fan';
         var oc2 = new OyaCycle({
-            name: 'test1b',
+            name: 'test1c',
             timer,
         });
         should(oc2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
-        var timer = OyaConf.createTimer();
+        var timer = OyaConf.createTimer({name: 'test2a'});
         var oc = new OyaCycle({
-            name: 'test2a',
+            name: 'test2b',
             maxCycles: 1,
             timer: testTimer,
         });
@@ -43,7 +44,7 @@
         oc.activate();
         should(oc.isActive).equal(true);
         var oc2 = new OyaCycle({
-            name: 'test2b',
+            name: 'test2c',
             maxCycles: 1,
         });
         should.throws(() => {
@@ -133,18 +134,6 @@
             }
         }();
         async.next();
-    });
-    it ("emit(event, ...) emits event", function() {
-        var oc = new OyaCycle();
-        var eventValue = null;
-        var count = 0;
-        oc.on(OyaCycle.EVENT_PHASE, (context,event,value) => {
-            count++;
-            eventValue = value;
-        });
-        oc.emit(OyaCycle.EVENT_PHASE, 'hello');
-        should(eventValue).equal('hello');
-        should(count).equal(1);
     });
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
@@ -278,7 +267,7 @@
                 });
 
                 // all done
-                yield setTimeout(() => async.next(true), FAN_ON*1000);
+                yield setTimeout(() => async.next(true), FAN_ON*1000+SETTLE_MS);
                 should.deepEqual(oc.state, {
                     cycle: OyaConf.CYCLE_FAN,
                     isActive: false,
@@ -294,6 +283,20 @@
             }
         }();
         async.next();
+    });
+    it ("emit(event, ...) emits event", function() {
+        var oc = new OyaCycle({
+            name: "test6a",
+        });
+        var eventValue = null;
+        var count = 0;
+        oc.on(OyaCycle.EVENT_PHASE, (context,event,value) => {
+            count++;
+            eventValue = value;
+        });
+        oc.emit(OyaCycle.EVENT_PHASE, 'hello');
+        should(eventValue).equal('hello');
+        should(count).equal(1);
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
