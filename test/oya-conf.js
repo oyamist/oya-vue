@@ -9,6 +9,7 @@
         name: 'test',
         type: 'OyaConf',
         startCycle: OyaConf.CYCLE_STANDARD,
+        hotCycle: OyaConf.CYCLE_FAN,
         tempUnit: 'F',
         fanThreshold: 80,
         timers: [
@@ -26,11 +27,13 @@
             name: 'foo',
             tempUnit: 'C',
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_FAN,
             timers: [
                 OyaConf.createTimer(0, {
                     name: 'test1',
                     type: 'new-type',
                     startCycle: OyaConf.CYCLE_FAN,
+                    hotCycle: OyaConf.CYCLE_FAN,
                     enabled: false,
                     cycleDelay: 2,
                     pin: 27,
@@ -48,6 +51,7 @@
                 name: 'test1',
                 type: 'new-type',
                 startCycle: OyaConf.CYCLE_FAN,
+                hotCycle: OyaConf.CYCLE_FAN,
                 enabled: false,
                 cycleDelay: 2,
                 pin: 27,
@@ -82,6 +86,7 @@
             name: 'foo',
             type: 'OyaConf',
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             fanThreshold: 80,
             timers: [
@@ -95,6 +100,7 @@
             type: "timer-cycle",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
+            hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 80,
             cycleDelay: 0,
             maxCycles: 0,
@@ -106,6 +112,7 @@
             type: "timer-cycle",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
+            hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 80,
             maxCycles: 0,
             cycleDelay: 0,
@@ -117,6 +124,7 @@
             type: "testtype",
             enabled: true,
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 81,
             maxCycles: 2,
             cycleDelay: 3,
@@ -128,6 +136,7 @@
             type: "testtype",
             enabled: true,
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 81,
             maxCycles: 2,
             cycleDelay: 3,
@@ -143,6 +152,7 @@
             enabled: true,
             pin: 36,
             startCycle: OyaConf.CYCLE_STANDARD,
+            hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 80,
             cycleDelay: 0,
             maxCycles: 0,
@@ -157,12 +167,14 @@
             name: 'foo',
             type: 'bad-type', // ignored
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
             timers: [{
             },{
                 name: 'test2',
                 type: 'new-type',
                 startCycle: OyaConf.CYCLE_FAN,
+                hotCycle: OyaConf.CYCLE_STANDARD,
                 enabled: false,
                 cycleDelay: 2,
                 pin: 27,
@@ -184,6 +196,7 @@
         updatedTimer.type = 'new-type';
         updatedTimer.enabled = false;
         updatedTimer.startCycle = OyaConf.CYCLE_FAN;
+        updatedTimer.hotCycle = OyaConf.CYCLE_STANDARD;
         updatedTimer.cycleDelay = 2;
         updatedTimer.pin = 27;
         updatedTimer.fanThreshold = 72;
@@ -203,6 +216,7 @@
             name: 'foo',
             type: 'OyaConf',
             startCycle: OyaConf.CYCLE_FAN,
+            hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
             fanThreshold: 80,
             timers: [

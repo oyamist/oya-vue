@@ -9,7 +9,7 @@
         _updateTimer(index, newTimer) {
             var defTimer = OyaConf.createTimer(index);
             var curTimer = this.timers[index] || {};
-            ['name', 'type', 'enabled', 'startCycle', 'cycleDelay', 'pin', 'fanThreshold']
+            ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay', 'pin', 'fanThreshold']
             .forEach(prop => {
                 curTimer[prop] = newTimer[prop] == null 
                     ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
@@ -65,6 +65,7 @@
                 type: opts.type || 'timer-cycle',
                 enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
                 startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,
+                hotCycle: opts.hotCycle || OyaConf.CYCLE_FAN,
                 fanThreshold: opts.fanThreshold || 80,
                 maxCycles: opts.maxCycles || 0,
                 cycleDelay: opts.cycleDelay || 0,
@@ -91,6 +92,7 @@
             });
 
             this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
+            this.hotCycle = opts.hotCycle || this.hotCycle || OyaConf.CYCLE_FAN;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
 
@@ -117,6 +119,7 @@
                 tempUnit: this.tempUnit,
                 fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
+                hotCycle: this.hotCycle,
                 timers: this.timers,
             };
         }
