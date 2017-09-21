@@ -7,10 +7,10 @@
     const rb = require("rest-bundle");
 
     class OyaReactor extends rb.RestBundle {
-        constructor(name = "test", options = {}) {
+        constructor(name = "test", opts = {}) {
             super(name, Object.assign({
                 srcPkg,
-            }, options));
+            }, opts));
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
@@ -20,11 +20,27 @@
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
-            this.oyaConf = new OyaConf(options);
+            this.senseEmitter = opts.senseEmitter;
+            var self = this;
+            this.senseEmitter && this.senseEmitter.on(OyaReactor.SENSE_TEMP_INTERNAL, 
+                (context, event, value) => self.onTemp(event, value)
+            );
+            this.oyaConf = new OyaConf(opts);
             this.oyaCycle = new OyaCycle({
                 name,
                 actuator: this.oyaConf.actuators[0],
             });
+        }
+
+        static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
+        static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
+        static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
+        static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
+        static get SENSE_HUMIDITY_ExTERNAL() { return "sense: humidity-external"; }
+        static get SENSE_PH() { return "sense: pH"; }
+        static get SENSE_PPM() { return "sense: ppm"; }
+
+        onTemp(event, value) {
         }
 
         updateConf(conf) {
