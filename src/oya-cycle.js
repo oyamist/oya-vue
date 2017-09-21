@@ -1,5 +1,6 @@
 (function(exports) {
     const OyaConf = require("../src/oya-conf");
+    const EventEmitter = require("events");
     const winston = require("winston");
 
     class OyaCycle {
@@ -7,8 +8,8 @@
             this.actuator = opts.actuator || OyaConf.createActuator();
             this._cycle = this.actuator.startCycle;
             this._active = false;
+            this.emitter = new EventEmitter();
             this._on = false; 
-            this._events = {};
             this._phaseTimeout = null;
             this.on(OyaCycle.EVENT_PHASE, (self, event) => {
                 winston.debug(this.summary, event);
@@ -44,18 +45,11 @@
         }
 
         on(event, cb) {
-            this._events[event] = this._events[event] || [];
-            this._events[event].push(cb);
+            this.emitter.on(event, cb);
         }
 
-        fire(event) {
-            var cbs = this._events[event];
-            if (cbs == null) {
-                var err = new Error(`${this.name} OyaCycle.fire(${event}) unknown event`);
-                winston.warn(err);
-                throw err;
-            }
-            cbs.forEach(cb => cb(this, event));
+        emit(event) {
+            this.emitter.emit(event, this, ...arguments);
         }
 
         activate(value=true) {
@@ -64,7 +58,7 @@
             } else if (value === true) {
                 this._active = value;
                 this.cycleNumber = 0;
-                this.fire(OyaCycle.EVENT_ACTIVATE);
+                this.emit(OyaCycle.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
                 this._active = value;
@@ -72,7 +66,7 @@
                 this.countdown = 0;
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
-                this.fire(OyaCycle.EVENT_ACTIVATE);
+                this.emit(OyaCycle.EVENT_ACTIVATE, value);
             } else {
                 var err = new Error(`${this.name} OyaCycle.activate expects a boolean`);
                 winston.warn(err.stack);
@@ -118,7 +112,7 @@
             self._on = value;
             if (value) {
                 self.cycleNumber++;
-                self.fire(OyaCycle.EVENT_PHASE);
+                self.emit(OyaCycle.EVENT_PHASE, value);
                 var msOn = Number(cycle.on) * 1000;
                 self.countdown = Math.trunc(cycle.on);
                 if (msOn > 0) {
@@ -128,7 +122,7 @@
                     }, msOn);
                } 
             } else {
-                self.fire(OyaCycle.EVENT_PHASE);
+                self.emit(OyaCycle.EVENT_PHASE, value);
                 var msOff = Number(cycle.off) * 1000;
                 self.countdown = Math.trunc(cycle.off);
                 if (msOff > 0) {

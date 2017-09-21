@@ -99,10 +99,11 @@
                     actuator,
                 });
                 var count = 0;
-                oc.on(OyaCycle.EVENT_PHASE, (context,event) => {
+                oc.on(OyaCycle.EVENT_PHASE, (context,event,value) => {
                     count++;
                     should(context).equal(oc);
                     should(event).equal(OyaCycle.EVENT_PHASE);
+                    should(value).equal(oc.isOn);
                 });
                 oc.activate();
                 should(count).equal(1);
@@ -122,6 +123,18 @@
             }
         }();
         async.next();
+    });
+    it ("emit(event, ...) emits event", function() {
+        var oc = new OyaCycle();
+        var eventValue = null;
+        var count = 0;
+        oc.on(OyaCycle.EVENT_PHASE, (context,event,value) => {
+            count++;
+            eventValue = value;
+        });
+        oc.emit(OyaCycle.EVENT_PHASE, 'hello');
+        should(eventValue).equal('hello');
+        should(count).equal(1);
     });
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
