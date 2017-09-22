@@ -13,8 +13,18 @@
             OyaConf.createVesselConfig(1),
         ],
         actuators: [
-            OyaConf.createActuatorConfig(0),
-            OyaConf.createActuatorConfig(1),
+            OyaConf.createActuatorConfig(0, {
+                vesselIndex: 0,
+                emit: OyaVessel.EVENT_PUMP1}),
+            OyaConf.createActuatorConfig(1, {
+                vesselIndex: 0,
+                emit: OyaVessel.EVENT_FAN1}),
+            OyaConf.createActuatorConfig(2, {
+                vesselIndex: 1,
+                emit: OyaVessel.EVENT_PUMP1}),
+            OyaConf.createActuatorConfig(3, {
+                vesselIndex: 1,
+                emit: OyaVessel.EVENT_FAN1}),
         ],
     };
     winston.level = 'warn';
@@ -43,6 +53,16 @@
                         }
                     },
             })],
+            actuators: [
+                OyaConf.createActuatorConfig(0, {
+                    vesselIndex: 0,
+                    emit: OyaVessel.EVENT_PUMP1,
+                }),
+                OyaConf.createActuatorConfig(1, {
+                    vesselIndex: 0,
+                    emit: OyaVessel.EVENT_FAN1,
+                }),
+            ],
         }
         var updatedVessel = OyaConf.createVesselConfig();
         updatedVessel.name = 'test1';
@@ -67,7 +87,10 @@
             ],
             actuators: [
                 OyaConf.createActuatorConfig(0),
-                OyaConf.createActuatorConfig(1),
+                OyaConf.createActuatorConfig(1, {
+                    vesselIndex: 0,
+                    emit: OyaVessel.EVENT_FAN1,
+                }),
             ],
         });
     });
@@ -183,8 +206,22 @@
                 updatedVessel,
             ],
             actuators: [
-                OyaConf.createActuatorConfig(0),
-                OyaConf.createActuatorConfig(1),
+                OyaConf.createActuatorConfig(0, {
+                    vesselIndex: 0,
+                    emit: OyaVessel.EVENT_PUMP1,
+                }),
+                OyaConf.createActuatorConfig(1, {
+                    vesselIndex: 0,
+                    emit: OyaVessel.EVENT_FAN1,
+                }),
+                OyaConf.createActuatorConfig(2, {
+                    vesselIndex: 1,
+                    emit: OyaVessel.EVENT_PUMP1,
+                }),
+                OyaConf.createActuatorConfig(3, {
+                    vesselIndex: 1,
+                    emit: OyaVessel.EVENT_FAN1,
+                }),
             ],
         });
     });

@@ -7,18 +7,21 @@
             this.update(opts);
         }
         
-        static createActuatorConfig(index=0, opts={}) {
-            return {
-                name: opts.name || `actuator${index}`,
-                type: opts.type || OyaConf.ACTUATOR_SPST_NO,
-            }
-        }
-
         static createVesselConfig(index=0, opts={}) {
             var vessel = new OyaVessel(Object.assign({
                 name: `vessel${index+1}`,
             }, opts));
             return vessel.toJSON();
+        }
+
+        static createActuatorConfig(index=0, opts={}) {
+            return {
+                name: opts.name || `actuator${index}`,
+                type: opts.type || OyaConf.ACTUATOR_SPST_NO,
+                vesselIndex: opts.vesselIndex || 0,
+                emit: opts.emit || OyaVessel.EVENT_PUMP1,
+                pin: opts.pin || index, // MCU control pin
+            }
         }
 
         update(opts = {}) {
@@ -42,10 +45,19 @@
                 if (opts.actuators) {
                     this.actuators = opts.actuators.map((a,i) => OyaConf.createActuatorConfig(i));
                 } else {
-                    this.actuators = [
-                        OyaConf.createActuatorConfig(0),
-                        OyaConf.createActuatorConfig(1),
-                    ];
+                    this.actuators = [];
+                    for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
+                        this.actuators.push(
+                            OyaConf.createActuatorConfig(this.actuators.length, {
+                                vesselIndex: iVessel,
+                                emit: OyaVessel.EVENT_PUMP1,
+                        }));
+                        this.actuators.push(
+                            OyaConf.createActuatorConfig(this.actuators.length, {
+                                vesselIndex: iVessel,
+                                emit: OyaVessel.EVENT_FAN1,
+                        }));
+                    }
                 }
             }
             opts.actuators && opts.actuators.forEach((delta, i) => {
