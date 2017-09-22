@@ -52,7 +52,7 @@
             }
         }
 
-        applyDelta(delta) {
+        applyDelta(delta={}) {
             ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold', 'maxCycles']
             .forEach(prop => {
                 this[prop] = delta[prop] == null ? this[prop] : delta[prop];

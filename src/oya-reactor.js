@@ -2,7 +2,7 @@
     const winston = require('winston');
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
-    const OyaCycle = require("./oya-cycle");
+    const OyaVessel = require("./oya-vessel");
     const path = require("path");
     const rb = require("rest-bundle");
 
@@ -25,10 +25,9 @@
                 (value) => this.onTempInternal(value)
             );
             this.oyaConf = new OyaConf(opts);
-            this.oyaCycle = new OyaCycle({
+            this.vessel = new OyaVessel(Object.assign({
                 name,
-                timer: this.oyaConf.timers[0],
-            });
+            }, this.oyaConf.timers[0]))
         }
 
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
@@ -42,14 +41,14 @@
         onTempInternal(value) {
             winston.debug(`onTempInternal ${value}`);
             if (value < this.oyaConf.fanThreshold) {
-                if (this.oyaCycle.nextCycle === this.oyaCycle.timer.hotCycle) {
+                if (this.vessel.nextCycle === this.vessel.hotCycle) {
                     winston.info("onTempInternal: reverting to default cycle");
                     // cancel cooling and revert to default cycle
-                    this.oyaCycle.nextCycle = this.oyaCycle.startCycle;
+                    this.vessel.nextCycle = this.vessel.startCycle;
                 }
             } else {
                 winston.info("onTempInternal: next cycle will be cooling cycle");
-                this.oyaCycle.nextCycle = this.oyaCycle.timer.hotCycle;
+                this.vessel.nextCycle = this.vessel.hotCycle;
             }
         }
 
@@ -57,6 +56,7 @@
             var that = this;
             return new Promise((resolve, reject) => {
                 try {
+                    that.vessel.applyDelta(conf);
                     resolve( that.oyaConf.update(conf) );
                 } catch (err) {
                     winston.warn(err.stack);
@@ -114,12 +114,12 @@
 
         postOyaCycle(req, res, next) {
             if (req.body.hasOwnProperty('activate')) {
-                this.oyaCycle.activate(req.body.activate);
+                this.vessel.activate(req.body.activate);
                 return {
                     activate: req.body.activate,
                 }
             } else if (req.body.hasOwnProperty('cycle')) {
-                this.oyaCycle.cycle = req.body.cycle;
+                this.vessel.cycle = req.body.cycle;
                 return {
                     cycle: req.body.cycle,
                 }
@@ -128,9 +128,9 @@
         }
 
         getState() {
-            return Object.assign(this.oyaCycle.state, {
+            return Object.assign(this.vessel.state, {
                 api: 'oya-reactor',
-                countdown: this.oyaCycle.countdown,
+                countdown: this.vessel.countdown,
             });
         }
 
