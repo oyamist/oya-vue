@@ -8,10 +8,7 @@
     const defaultConf = {
         name: 'test',
         type: 'OyaConf',
-        startCycle: OyaConf.CYCLE_STANDARD,
-        hotCycle: OyaConf.CYCLE_FAN,
         tempUnit: 'F',
-//        fanThreshold: 80,
         vessels: [
             OyaConf.createTimer(0),
             OyaConf.createTimer(1),
@@ -26,8 +23,6 @@
         var opts = {
             name: 'foo',
             tempUnit: 'C',
-            startCycle: OyaConf.CYCLE_FAN,
-            hotCycle: OyaConf.CYCLE_FAN,
             vessels: [
                 OyaConf.createTimer(0, {
                     name: 'test1',
@@ -64,8 +59,6 @@
         should.deepEqual(new OyaConf(opts).toJSON(), {
             name: 'foo',
             type: 'OyaConf',
-            startCycle: OyaConf.CYCLE_FAN,
-            hotCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             vessels: [
                 updatedVessel,
@@ -185,8 +178,6 @@
         should.deepEqual(ov.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
-            startCycle: OyaConf.CYCLE_FAN,
-            hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
             vessels: [
                 OyaConf.createTimer(0),

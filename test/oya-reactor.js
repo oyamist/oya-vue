@@ -78,8 +78,6 @@
                         type: 'OyaConf',
                         name: 'test',
                         tempUnit: 'F',
-                        startCycle: OyaConf.CYCLE_STANDARD,
-                        hotCycle: OyaConf.CYCLE_FAN,
                     });
                     should(apiModel.vessels[0].cycles).properties([
                         OyaConf.CYCLE_FAN,

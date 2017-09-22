@@ -91,8 +91,6 @@
                 this.updateVessel(i, delta);
             });
 
-            this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
-            this.hotCycle = opts.hotCycle || this.hotCycle || OyaConf.CYCLE_FAN;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
 
             return this;
@@ -116,8 +114,6 @@
                 name: this.name,
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
-                startCycle: this.startCycle,
-                hotCycle: this.hotCycle,
                 vessels: this.vessels,
             };
         }
