@@ -59,6 +59,7 @@
             name: 'test2c',
             maxCycles: 1,
         });
+        winston.warn("The following error is expected");
         should.throws(() => {
             vessel2.activate("should-be-a-boolean");  
         });

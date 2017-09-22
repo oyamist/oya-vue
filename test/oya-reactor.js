@@ -25,7 +25,7 @@
     testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
     testTimer.cycles[OyaVessel.CYCLE_FAN].off = FAN_OFF;
     var level = winston.level;
-    winston.level = 'warn';
+    winston.level = 'error';
 
     function testInit() { 
         return app;
@@ -96,7 +96,6 @@
     it("PUT /oya-conf updates OyaConf apiModel", function(done) {
         var async = function* () {
             try {
-                winston.level = 'warn';
                 var app = testInit();
                 if (fs.existsSync(APIMODEL_PATH)) {
                     fs.unlinkSync(APIMODEL_PATH);
