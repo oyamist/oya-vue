@@ -1,7 +1,7 @@
 (typeof describe === 'function') && describe("OyaCycle", function() {
     const should = require("should");
     const winston = require('winston');
-    const OyaCycle = exports.OyaCycle || require("../index").OyaCycle;
+    const OyaCycle = exports.OyaCycle || require("../src/oya-cycle");
     const OyaVessel = exports.OyaVessel || require("../index").OyaVessel;
     const OyaConf = require("../index").OyaConf;
     const STANDARD_ON = 0.01;
@@ -9,7 +9,7 @@
     const FAN_ON = 2*STANDARD_ON;
     const FAN_OFF = 2*STANDARD_OFF;
     const SETTLE_MS = 5;
-    var testTimer = OyaConf.createTimer(0, {name: 'test0a'});
+    var testTimer = OyaConf.createVesselConfig(0, {name: 'test0a'});
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
     testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
@@ -22,11 +22,11 @@
         var oc1 = new OyaCycle({
             name: 'test1a',
         });
-        should.deepEqual(oc1.timer, OyaConf.createTimer(0, {name: 'test1a'}));
+        should.deepEqual(oc1.timer, OyaConf.createVesselConfig(0, {name: 'test1a'}));
         should(oc1.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // Custom timer
-        var timer = OyaConf.createTimer(0, {name: 'test1b'});
+        var timer = OyaConf.createVesselConfig(0, {name: 'test1b'});
         timer.startCycle = 'fan';
         var oc2 = new OyaCycle({
             name: 'test1c',
@@ -35,7 +35,7 @@
         should(oc2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
-        var timer = OyaConf.createTimer({name: 'test2a'});
+        var timer = OyaConf.createVesselConfig({name: 'test2a'});
         var oc = new OyaCycle({
             name: 'test2b',
             maxCycles: 1,

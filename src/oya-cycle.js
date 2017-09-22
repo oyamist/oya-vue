@@ -5,7 +5,7 @@
 
     class OyaCycle {
         constructor(opts = {}) {
-            this.timer = opts.timer || OyaConf.createTimer(0, opts);
+            this.timer = opts.timer || OyaConf.createVesselConfig(0, opts);
             this._cycle = this.timer.startCycle;
             this.nextCycle = this._cycle;
             this._active = false;

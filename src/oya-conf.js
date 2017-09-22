@@ -8,9 +8,9 @@
         }
         
         updateVessel(index, delta) {
-            var defTimer = OyaConf.createTimer(index);
+            var defTimer = OyaConf.createVesselConfig(index);
             var curTimer = this.vessels[index] || {};
-            ['name', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay','fanThreshold']
+            ['name', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold']
             .forEach(prop => {
                 curTimer[prop] = delta[prop] == null 
                     ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
@@ -28,29 +28,22 @@
             }
         }
 
-        static createTimer(index=0, opts={}) {
-            return {
-                name: opts.name || `vessel${index+1}`,
-                type: opts.type || 'OyaVessel',
-                enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
-                startCycle: opts.startCycle || OyaVessel.CYCLE_STANDARD,
-                hotCycle: opts.hotCycle || OyaVessel.CYCLE_FAN,
-                fanThreshold: opts.fanThreshold || 80,
-                maxCycles: opts.maxCycles || 0,
-                cycleDelay: opts.cycleDelay || 0,
-                cycles: opts.cycles || OyaVessel.DEFAULT_CYCLES,
-            }
+        static createVesselConfig(index=0, opts={}) {
+            var vessel = new OyaVessel(Object.assign({
+                name: `vessel${index+1}`,
+            }, opts));
+            return vessel.toJSON();
         }
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
             if (this.vessels == null) {
                 if (opts.vessels) {
-                    this.vessels = opts.vessels.map((a,i) => OyaConf.createTimer(i));
+                    this.vessels = opts.vessels.map((a,i) => OyaConf.createVesselConfig(i));
                 } else {
                     this.vessels = [
-                        OyaConf.createTimer(0),
-                        OyaConf.createTimer(1),
+                        OyaConf.createVesselConfig(0),
+                        OyaConf.createVesselConfig(1),
                     ];
                 }
             }

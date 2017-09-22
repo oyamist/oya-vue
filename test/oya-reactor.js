@@ -11,7 +11,6 @@
     const EventEmitter = require("events");
     const winston = require('winston');
     const OyaReactor = exports.OyaReactor || require("../index").OyaReactor;
-    const OyaCycle = exports.OyaCycle || require("../index").OyaCycle;
     const OyaConf = require("../index").OyaConf;
     const OyaVessel = require("../index").OyaVessel;
     const STANDARD_ON = 0.005;
@@ -20,7 +19,7 @@
     const FAN_OFF = 2*STANDARD_OFF;
     const DEFAULT_CONF = new OyaConf().toJSON();
     const DEFAULT_APIMODEL = Object.assign({}, DEFAULT_CONF );
-    var testTimer = OyaConf.createTimer();
+    var testTimer = OyaConf.createVesselConfig();
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
     testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
