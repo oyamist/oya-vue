@@ -25,9 +25,12 @@
                 (value) => this.onTempInternal(value)
             );
             this.oyaConf = new OyaConf(opts);
-            this.vessel = new OyaVessel(Object.assign({
-                name,
-            }, this.oyaConf.vessels[0]))
+            this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
+                return new OyaVessel(Object.assign({
+                    name: `${name}-vessel${iv}`,
+                }, vconf));
+            });
+            this.vessel = this.vessels[0];
         }
 
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
@@ -56,7 +59,9 @@
             var that = this;
             return new Promise((resolve, reject) => {
                 try {
-                    that.vessel.applyDelta(conf);
+                    conf && conf.vessels.forEach((v,i) => {
+                        that.vessels[i].applyDelta(v);
+                    });
                     resolve( that.oyaConf.update(conf) );
                 } catch (err) {
                     winston.warn(err.stack);

@@ -30,10 +30,13 @@
     function testInit() { 
         return app;
     }
+    function testReactor() {
+        return app.locals.restBundles.filter(rb => rb.name==='test')[0];
+    }
 
     it("Initialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
         var async = function*() {
-            if (null == app.locals.restBundles.filter(rb => rb.name==='test')[0]) {
+            if (null == testReactor()) {
                 yield app.locals.asyncOnReady.push(async);
             }
             winston.info("test suite initialized");
@@ -124,6 +127,7 @@
                 };
                 newConf.name = 'OyaMist01';
                 newConf.fanThreshold = 81;
+                newConf.vessels[0].cycles[OyaConf.CYCLE_STANDARD].on = 3;
                 console.log("newConf", newConf);
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
@@ -135,6 +139,8 @@
                     should.deepEqual(apiModel, Object.assign({},newConf,{
                         rbHash: rbh.hash(newConf),
                     }));
+                    should(testReactor().vessels[0].name).equal('vessel1');
+                    should(testReactor().vessels[0].cycles[OyaConf.CYCLE_STANDARD].on).equal(3);
                     should.ok(apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();

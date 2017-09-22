@@ -61,7 +61,7 @@
                 36, // Pimoroni Automation Hat relay 3
             ];
             return {
-                name: opts.name || `mist${index+1}`,
+                name: opts.name || `vessel${index+1}`,
                 type: opts.type || 'OyaVessel',
                 enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
                 startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,

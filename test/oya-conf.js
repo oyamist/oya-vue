@@ -96,7 +96,7 @@
     });
     it("createTimer(index,opts) creates a custom timer", function() {
         should.deepEqual(OyaConf.createTimer(), {
-            name: "mist1",
+            name: "vessel1",
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
@@ -108,7 +108,7 @@
             cycles: defaultCycles,
         });
         should.deepEqual(OyaConf.createTimer(1), {
-            name: "mist2",
+            name: "vessel2",
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
@@ -147,7 +147,7 @@
             type: 'some-type',
         };
         should.deepEqual(OyaConf.createTimer(2,opts), {
-            name: "mist3",
+            name: "vessel3",
             type: "some-type",
             enabled: true,
             pin: 36,
