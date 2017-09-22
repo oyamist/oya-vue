@@ -50,6 +50,20 @@
         });
         should(vessel2.cycle).equal('fan');
     });
+    it ("vessel responds to emitter sensor events", function() {
+        var vessel = new OyaVessel();
+        should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
+        const fanThreshold = vessel.fanThreshold;
+        should(typeof fanThreshold).equal("number");
+
+        // just right
+        vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.fanThreshold-1);
+        should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
+
+        // too hot
+        vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.fanThreshold+1);
+        should(vessel.nextCycle).equal(OyaVessel.CYCLE_FAN);
+    });
     it ("isActive property is initially false", function() {
         var vessel = createTestVessel({name:'test2b', maxCycles:1});
         should(vessel.isActive).equal(false);

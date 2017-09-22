@@ -30,6 +30,9 @@
             this.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
             });
+            this.on(OyaVessel.SENSE_TEMP_INTERNAL, 
+                (value) => this.onTempInternal(value)
+            );
             this._countdownId = setInterval(() => {
                 this.countdown = this.countdown <= 0 ? 0 : (this.countdown-1);
             }, 1000);
@@ -62,13 +65,19 @@
             },
         }}
 
-
         static get CYCLE_STANDARD() { return "Cycle #1"; }
         static get CYCLE_DRAIN() { return "Cycle #2"; }
         static get CYCLE_FAN() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_PHASE() { return "event:phase"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
+        static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
+        static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
+        static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
+        static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
+        static get SENSE_HUMIDITY_ExTERNAL() { return "sense: humidity-external"; }
+        static get SENSE_PH() { return "sense: pH"; }
+        static get SENSE_PPM() { return "sense: ppm"; }
 
         toJSON() {
             return {
@@ -115,11 +124,28 @@
         }
 
         on(event, cb) {
+            if (typeof event != 'string') {
+                throw new Error("OyaVessel.on(event) requires an event string");
+            }
             this.emitter.on(event, cb);
         }
 
         emit(event) {
             this.emitter.emit(event, this, ...arguments);
+        }
+
+        onTempInternal(value) {
+            winston.debug(`onTempInternal ${value}`);
+            if (value < this.fanThreshold) {
+                if (this.nextCycle === this.hotCycle) {
+                    winston.info("onTempInternal: reverting to default cycle");
+                    // cancel cooling and revert to default cycle
+                    this.nextCycle = this.startCycle;
+                }
+            } else {
+                winston.info("onTempInternal: next cycle will be cooling cycle");
+                this.nextCycle = this.hotCycle;
+            }
         }
 
         activate(value=true) {

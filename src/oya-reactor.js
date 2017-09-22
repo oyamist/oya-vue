@@ -20,10 +20,6 @@
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
-            this.senseEmitter = opts.senseEmitter;
-            this.senseEmitter && this.senseEmitter.on(OyaReactor.SENSE_TEMP_INTERNAL, 
-                (value) => this.TODOonTempInternal(value)
-            );
             this.oyaConf = new OyaConf(opts);
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 return new OyaVessel(Object.assign({
@@ -38,27 +34,6 @@
             35, // Pimoroni Automation Hat relay 2
             36, // Pimoroni Automation Hat relay 3
         ]};
-        static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
-        static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
-        static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
-        static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
-        static get SENSE_HUMIDITY_ExTERNAL() { return "sense: humidity-external"; }
-        static get SENSE_PH() { return "sense: pH"; }
-        static get SENSE_PPM() { return "sense: ppm"; }
-
-        TODOonTempInternal(value) {
-            winston.debug(`onTempInternal ${value}`);
-            if (value < this.oyaConf.fanThreshold) {
-                if (this.vessel.nextCycle === this.vessel.hotCycle) {
-                    winston.info("onTempInternal: reverting to default cycle");
-                    // cancel cooling and revert to default cycle
-                    this.vessel.nextCycle = this.vessel.startCycle;
-                }
-            } else {
-                winston.info("onTempInternal: next cycle will be cooling cycle");
-                this.vessel.nextCycle = this.vessel.hotCycle;
-            }
-        }
 
         updateConf(conf) {
             var that = this;

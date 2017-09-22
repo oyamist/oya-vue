@@ -146,25 +146,6 @@
         }();
         async.next();
     });
-    it ("TODOreactor response to senseEmitter events", function() {
-    return;
-        winston.level = 'debug';
-        var senseEmitter = new EventEmitter();
-        var reactor = new OyaReactor("test", {
-            senseEmitter,
-        });
-        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
-        const fanThreshold = reactor.oyaConf.fanThreshold;
-        should(typeof fanThreshold).equal("number");
-
-        // just right
-        senseEmitter.emit(OyaReactor.SENSE_TEMP_INTERNAL, reactor.oyaConf.fanThreshold-1);
-        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
-
-        // too hot
-        senseEmitter.emit(OyaReactor.SENSE_TEMP_INTERNAL, reactor.oyaConf.fanThreshold+1);
-        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_FAN);
-    });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
         app.locals.rbServer.close();
