@@ -33,6 +33,11 @@
             this.vessel = this.vessels[0];
         }
 
+        static get DEFAULT_PINS() { return [ 
+            33, // Pimoroni Automation Hat relay 1
+            35, // Pimoroni Automation Hat relay 2
+            36, // Pimoroni Automation Hat relay 3
+        ]};
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
@@ -60,7 +65,7 @@
             return new Promise((resolve, reject) => {
                 try {
                     conf && conf.vessels.forEach((v,i) => {
-                        that.vessels[i].applyDelta(v);
+                        OyaVessel.applyDelta(this.vessels[i], v);
                     });
                     resolve( that.oyaConf.update(conf) );
                 } catch (err) {

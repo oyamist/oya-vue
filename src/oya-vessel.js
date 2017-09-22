@@ -15,7 +15,7 @@
             this.fanThreshold = 80;
             this.maxCycles = 0;
             this.cycles = OyaConf.DEFAULT_CYCLES,
-            this.applyDelta(opts);
+            OyaVessel.applyDelta(this, opts);
 
             this._cycle = this.startCycle,
             this.nextCycle = this._cycle,
@@ -52,19 +52,19 @@
             }
         }
 
-        applyDelta(delta={}) {
+        static applyDelta(vessel, delta={}) {
             ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold', 'maxCycles']
             .forEach(prop => {
-                this[prop] = delta[prop] == null ? this[prop] : delta[prop];
+                vessel[prop] = delta[prop] == null ? vessel[prop] : delta[prop];
             });
             if (delta.cycles) {
-                Object.keys(this.cycles).forEach(key => {
+                Object.keys(vessel.cycles).forEach(key => {
                     if (!delta.cycles.hasOwnProperty(key)) {
-                        delete this.cycles[key];
+                        delete vessel.cycles[key];
                     }
                 });
                 Object.keys(delta.cycles).forEach(key => {
-                    this.cycles[key] = Object.assign(this.cycles[key], delta.cycles[key]);
+                    vessel.cycles[key] = Object.assign(vessel.cycles[key], delta.cycles[key]);
                 });
             }
         }

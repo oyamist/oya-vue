@@ -12,7 +12,6 @@
         vessels: [
             OyaConf.createTimer(0),
             OyaConf.createTimer(1),
-            OyaConf.createTimer(2),
         ],
     };
 
@@ -43,7 +42,6 @@
         }
         var updatedVessel = OyaConf.createTimer();
         updatedVessel.name = 'test1';
-        updatedVessel.type = 'new-type';
         updatedVessel.enabled = false;
         updatedVessel.startCycle = OyaConf.CYCLE_FAN;
         updatedVessel.cycleDelay = 2;
@@ -127,7 +125,7 @@
     });
     it("update(opts) updates configuration ", function() {
         var ov = new OyaConf();
-        var timer0 = ov.vessels[0];
+        var vessel0 = ov.vessels[0];
         ov.update({
             name: 'foo',
             type: 'bad-type', // ignored
@@ -153,11 +151,10 @@
         });
 
         // vessels are not changed by update
-        should.equal(timer0, ov.vessels[0]);
+        should.equal(vessel0, ov.vessels[0]);
 
         var updatedVessel = OyaConf.createTimer(1);
         updatedVessel.name = 'test2';
-        updatedVessel.type = 'new-type';
         updatedVessel.enabled = false;
         updatedVessel.startCycle = OyaConf.CYCLE_FAN;
         updatedVessel.hotCycle = OyaConf.CYCLE_STANDARD;
@@ -173,7 +170,7 @@
         };
 
         // vessels are not changed by update
-        should.equal(timer0, ov.vessels[0]);
+        should.equal(vessel0, ov.vessels[0]);
 
         should.deepEqual(ov.toJSON(), {
             name: 'foo',
@@ -182,7 +179,6 @@
             vessels: [
                 OyaConf.createTimer(0),
                 updatedVessel,
-                OyaConf.createTimer(2),
             ],
         });
     });

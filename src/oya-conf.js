@@ -9,7 +9,7 @@
         updateVessel(index, delta) {
             var defTimer = OyaConf.createTimer(index);
             var curTimer = this.vessels[index] || {};
-            ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay','fanThreshold']
+            ['name', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay','fanThreshold']
             .forEach(prop => {
                 curTimer[prop] = delta[prop] == null 
                     ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
@@ -55,11 +55,6 @@
         }}
 
         static createTimer(index=0, opts={}) {
-            const defaultPins = [ 
-                33, // Pimoroni Automation Hat relay 1
-                35, // Pimoroni Automation Hat relay 2
-                36, // Pimoroni Automation Hat relay 3
-            ];
             return {
                 name: opts.name || `vessel${index+1}`,
                 type: opts.type || 'OyaVessel',
@@ -69,7 +64,6 @@
                 fanThreshold: opts.fanThreshold || 80,
                 maxCycles: opts.maxCycles || 0,
                 cycleDelay: opts.cycleDelay || 0,
-                //pin: opts.pin == null ?  (defaultPins[index] || -1) : opts.pin,
                 cycles: opts.cycles || this.DEFAULT_CYCLES,
             }
         }
@@ -83,7 +77,6 @@
                     this.vessels = [
                         OyaConf.createTimer(0),
                         OyaConf.createTimer(1),
-                        OyaConf.createTimer(2),
                     ];
                 }
             }
