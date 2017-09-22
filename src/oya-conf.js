@@ -7,27 +7,6 @@
             this.update(opts);
         }
         
-        updateVessel(index, delta) {
-            var defTimer = OyaConf.createVesselConfig(index);
-            var curTimer = this.vessels[index] || {};
-            ['name', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold']
-            .forEach(prop => {
-                curTimer[prop] = delta[prop] == null 
-                    ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
-                    : delta[prop];
-            });
-            if (delta.cycles) {
-                Object.keys(curTimer.cycles).forEach(key => {
-                    if (!delta.cycles.hasOwnProperty(key)) {
-                        delete curTimer.cycles[key];
-                    }
-                });
-                Object.keys(delta.cycles).forEach(key => {
-                    curTimer.cycles[key] = Object.assign(curTimer.cycles[key], delta.cycles[key]);
-                });
-            }
-        }
-
         static createVesselConfig(index=0, opts={}) {
             var vessel = new OyaVessel(Object.assign({
                 name: `vessel${index+1}`,
@@ -48,7 +27,7 @@
                 }
             }
             opts.vessels && opts.vessels.forEach((delta, i) => {
-                this.updateVessel(i, delta);
+                OyaVessel.applyDelta(this.vessels[i], delta);
             });
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;

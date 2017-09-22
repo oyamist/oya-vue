@@ -84,7 +84,7 @@
         }
 
         static applyDelta(vessel, delta={}) {
-            ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold', 'maxCycles']
+            ['name', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold', 'maxCycles']
             .forEach(prop => {
                 vessel[prop] = delta[prop] == null ? vessel[prop] : delta[prop];
             });
