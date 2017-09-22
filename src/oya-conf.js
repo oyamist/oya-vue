@@ -62,7 +62,7 @@
             ];
             return {
                 name: opts.name || `mist${index+1}`,
-                type: opts.type || 'timer-cycle',
+                type: opts.type || 'OyaVessel',
                 enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
                 startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,
                 hotCycle: opts.hotCycle || OyaConf.CYCLE_FAN,

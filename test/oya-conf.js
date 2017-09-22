@@ -97,7 +97,7 @@
     it("createTimer(index,opts) creates a custom timer", function() {
         should.deepEqual(OyaConf.createTimer(), {
             name: "mist1",
-            type: "timer-cycle",
+            type: "OyaVessel",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
             hotCycle: OyaConf.CYCLE_FAN,
@@ -109,7 +109,7 @@
         });
         should.deepEqual(OyaConf.createTimer(1), {
             name: "mist2",
-            type: "timer-cycle",
+            type: "OyaVessel",
             enabled: true,
             startCycle: OyaConf.CYCLE_STANDARD,
             hotCycle: OyaConf.CYCLE_FAN,
