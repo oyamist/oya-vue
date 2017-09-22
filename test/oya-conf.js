@@ -3,9 +3,7 @@
     const winston = require('winston');
     const OyaConf = require("../index").OyaConf;
     const OyaVessel = require("../index").OyaVessel;
-
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
-
     const defaultConf = {
         name: 'test',
         type: 'OyaConf',
@@ -14,12 +12,17 @@
             OyaConf.createVesselConfig(0),
             OyaConf.createVesselConfig(1),
         ],
+        actuators: [
+            OyaConf.createActuatorConfig(0),
+            OyaConf.createActuatorConfig(1),
+        ],
     };
+    winston.level = 'warn';
 
     it("toJSON() serializes configuration", function() {
         should.deepEqual(new OyaConf().toJSON(), defaultConf);
     });
-    it("ctor takes configuration options", function() {
+    it("TESTTESTctor takes configuration options", function() {
         var opts = {
             name: 'foo',
             tempUnit: 'C',
@@ -34,6 +37,7 @@
                     cycles: {
                         [OyaVessel.CYCLE_FAN]: {
                             desc: 'fans are cool',
+                            emit: OyaVessel.EVENT_FAN1,
                             on: 10,
                             off: 23,
                         }
@@ -49,6 +53,7 @@
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: 'fans are cool',
+                emit: OyaVessel.EVENT_FAN1,
                 on: 10,
                 off: 23,
             }
@@ -59,6 +64,10 @@
             tempUnit: 'C',
             vessels: [
                 updatedVessel,
+            ],
+            actuators: [
+                OyaConf.createActuatorConfig(0),
+                OyaConf.createActuatorConfig(1),
             ],
         });
     });
@@ -156,6 +165,7 @@
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: defaultCycles[OyaVessel.CYCLE_FAN].desc,
+                emit: OyaVessel.EVENT_PUMP1,
                 on: 10,
                 off: 23,
             }
@@ -171,6 +181,10 @@
             vessels: [
                 OyaConf.createVesselConfig(0),
                 updatedVessel,
+            ],
+            actuators: [
+                OyaConf.createActuatorConfig(0),
+                OyaConf.createActuatorConfig(1),
             ],
         });
     });

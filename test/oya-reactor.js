@@ -25,7 +25,7 @@
     testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
     testTimer.cycles[OyaVessel.CYCLE_FAN].off = FAN_OFF;
     var level = winston.level;
-    winston.level = 'error';
+    winston.level = 'warn';
 
     function testInit() { 
         return app;

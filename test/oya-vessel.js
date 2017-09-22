@@ -24,7 +24,7 @@
         return vessel;
     }
     var level = winston.level;
-    winston.level = 'error';
+    winston.level = 'warn';
 
     it ("ctor intializes cycle from provided timer", function() {
         // Default timer

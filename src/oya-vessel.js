@@ -42,24 +42,28 @@
             [OyaVessel.CYCLE_STANDARD]: {
                 name: "Standard",
                 desc: "Standard cycle for all phases of plant growth",
+                emit: OyaVessel.EVENT_PUMP1,
                 on: 30,
                 off: 60,
             },
             [OyaVessel.CYCLE_DRAIN]: {
                 name: "Drain",
                 desc: "Partially drain reservoir and stop to add fresh nutrients",
+                emit: OyaVessel.EVENT_PUMP1,
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
             },
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: "Hot day evaporative cooling cycle with fan",
+                emit: OyaVessel.EVENT_PUMP1,
                 on: 15,
                 off: 15,
             },
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
                 desc: "Conservative misting cycle for plants with good roots",
+                emit: OyaVessel.EVENT_PUMP1,
                 on: 5,
                 off: 60,
             },
@@ -69,6 +73,8 @@
         static get CYCLE_DRAIN() { return "Cycle #2"; }
         static get CYCLE_FAN() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
+        static get EVENT_PUMP1() { return "event:pump1"; }
+        static get EVENT_FAN1() { return "event:fan1"; }
         static get EVENT_PHASE() { return "event:phase"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
