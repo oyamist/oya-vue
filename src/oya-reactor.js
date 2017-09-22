@@ -16,7 +16,7 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
-                    this.resourceMethod("post", "oya-cycle", this.postOyaCycle),
+                    this.resourceMethod("post", "control", this.postControl),
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
@@ -97,7 +97,7 @@
             return this.putApiModel(req, res, next, this.apiFile);
         }
 
-        postOyaCycle(req, res, next) {
+        postControl(req, res, next) {
             if (req.body.hasOwnProperty('activate')) {
                 this.vessel.activate(req.body.activate);
                 return {
@@ -109,7 +109,7 @@
                     cycle: req.body.cycle,
                 }
             }
-            throw new Error("unknown oya-cycle request: ", req.body);
+            throw new Error("unknown control request: ", req.body);
         }
 
         getState() {

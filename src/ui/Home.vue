@@ -1,6 +1,6 @@
 <template>
 
-<oya-cycle-vue service="test"></oya-cycle-vue>
+<oya-reactor-vue service="test"></oya-reactor-vue>
 
 </template><script>
 

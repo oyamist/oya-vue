@@ -146,7 +146,7 @@ export default {
             this.apiEdit();
         },
         clickActivate() {
-            var url = [this.restOrigin(), this.service, 'oya-cycle'].join('/');
+            var url = [this.restOrigin(), this.service, 'control'].join('/');
             console.log("activate");
             this.$http.post(url, {
                 activate:!this.rbService.isActive,
@@ -159,7 +159,7 @@ export default {
             });;
         },
         clickCycle(cycle) {
-            var url = [this.restOrigin(), this.service, 'oya-cycle'].join('/');
+            var url = [this.restOrigin(), this.service, 'control'].join('/');
             console.log("clicked", cycle);
             this.$http.post(url, {
                 cycle,
