@@ -27,7 +27,7 @@
             this.oyaConf = new OyaConf(opts);
             this.vessel = new OyaVessel(Object.assign({
                 name,
-            }, this.oyaConf.timers[0]))
+            }, this.oyaConf.vessels[0]))
         }
 
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }

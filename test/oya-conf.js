@@ -12,7 +12,7 @@
         hotCycle: OyaConf.CYCLE_FAN,
         tempUnit: 'F',
         fanThreshold: 80,
-        timers: [
+        vessels: [
             OyaConf.createTimer(0),
             OyaConf.createTimer(1),
             OyaConf.createTimer(2),
@@ -28,7 +28,7 @@
             tempUnit: 'C',
             startCycle: OyaConf.CYCLE_FAN,
             hotCycle: OyaConf.CYCLE_FAN,
-            timers: [
+            vessels: [
                 OyaConf.createTimer(0, {
                     name: 'test1',
                     type: 'new-type',
@@ -47,7 +47,7 @@
                     },
             })],
             /*
-            timers: [{
+            vessels: [{
                 name: 'test1',
                 type: 'new-type',
                 startCycle: OyaConf.CYCLE_FAN,
@@ -89,7 +89,7 @@
             hotCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
             fanThreshold: 80,
-            timers: [
+            vessels: [
                 updatedTimer,
             ],
         });
@@ -162,14 +162,14 @@
     });
     it("update(opts) updates configuration ", function() {
         var oc = new OyaConf();
-        var timer0 = oc.timers[0];
+        var timer0 = oc.vessels[0];
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
             startCycle: OyaConf.CYCLE_FAN,
             hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
-            timers: [{
+            vessels: [{
             },{
                 name: 'test2',
                 type: 'new-type',
@@ -188,8 +188,8 @@
             }],
         });
 
-        // timers are not changed by update
-        should.equal(timer0, oc.timers[0]);
+        // vessels are not changed by update
+        should.equal(timer0, oc.vessels[0]);
 
         var updatedTimer = OyaConf.createTimer(1);
         updatedTimer.name = 'test2';
@@ -209,8 +209,8 @@
             }
         };
 
-        // timers are not changed by update
-        should.equal(timer0, oc.timers[0]);
+        // vessels are not changed by update
+        should.equal(timer0, oc.vessels[0]);
 
         should.deepEqual(oc.toJSON(), {
             name: 'foo',
@@ -219,7 +219,7 @@
             hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
             fanThreshold: 80,
-            timers: [
+            vessels: [
                 OyaConf.createTimer(0),
                 updatedTimer,
                 OyaConf.createTimer(2),

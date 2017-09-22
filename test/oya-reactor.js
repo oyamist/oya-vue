@@ -80,7 +80,7 @@
                         hotCycle: OyaConf.CYCLE_FAN,
                         fanThreshold: 80,
                     });
-                    should(apiModel.timers[0].cycles).properties([
+                    should(apiModel.vessels[0].cycles).properties([
                         OyaConf.CYCLE_FAN,
                         OyaConf.CYCLE_STANDARD,
                         OyaConf.CYCLE_DRAIN,
@@ -124,6 +124,7 @@
                 };
                 newConf.name = 'OyaMist01';
                 newConf.fanThreshold = 81;
+                console.log("newConf", newConf);
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;

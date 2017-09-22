@@ -8,7 +8,7 @@
         
         _updateTimer(index, newTimer) {
             var defTimer = OyaConf.createTimer(index);
-            var curTimer = this.timers[index] || {};
+            var curTimer = this.vessels[index] || {};
             ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay', 'pin', 'fanThreshold']
             .forEach(prop => {
                 curTimer[prop] = newTimer[prop] == null 
@@ -76,18 +76,18 @@
 
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
-            if (this.timers == null) {
-                if (opts.timers) {
-                    this.timers = opts.timers.map((a,i) => OyaConf.createTimer(i));
+            if (this.vessels == null) {
+                if (opts.vessels) {
+                    this.vessels = opts.vessels.map((a,i) => OyaConf.createTimer(i));
                 } else {
-                    this.timers = [
+                    this.vessels = [
                         OyaConf.createTimer(0),
                         OyaConf.createTimer(1),
                         OyaConf.createTimer(2),
                     ];
                 }
             }
-            opts.timers && opts.timers.forEach((newTimer, i) => {
+            opts.vessels && opts.vessels.forEach((newTimer, i) => {
                 this._updateTimer(i, newTimer);
             });
 
@@ -120,7 +120,7 @@
                 fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
                 hotCycle: this.hotCycle,
-                timers: this.timers,
+                vessels: this.vessels,
             };
         }
 

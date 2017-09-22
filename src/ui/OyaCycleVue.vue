@@ -74,7 +74,7 @@
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
             <rb-dialog-row label="Bioreactor">
-                <v-text-field v-model='apiModelCopy.timers[timerIndex].name' 
+                <v-text-field v-model='apiModelCopy.vessels[timerIndex].name' 
                     label="Name" class="input-group--focused" />
             </rb-dialog-row>
             <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
@@ -92,9 +92,9 @@
                 </v-layout>
             </rb-dialog-row>
             <rb-dialog-row label="Advanced">
-                <v-text-field v-model='apiModelCopy.timers[timerIndex].fanThreshold' 
+                <v-text-field v-model='apiModelCopy.vessels[timerIndex].fanThreshold' 
                     :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
-                <v-text-field v-model='apiModelCopy.timers[timerIndex].pin' 
+                <v-text-field v-model='apiModelCopy.vessels[timerIndex].pin' 
                     label="MCU Pin" class="input-group--focused" />
             </rb-dialog-row>
     </rb-api-dialog>
@@ -173,8 +173,8 @@ export default {
     },
     computed: {
         timer() {
-            var timers = this.apiModel && this.apiModel.timers;
-            return timers && timers[this.timerIndex];
+            var vessels = this.apiModel && this.apiModel.vessels;
+            return vessels && vessels[this.timerIndex];
         },
         name() {
             return this.timer && this.timer.name;
@@ -191,7 +191,7 @@ export default {
         },
         editCycles() {
             var cycleNames = Object.keys(this.timer.cycles).sort();
-            var timer = this.apiModelCopy.timers[this.timerIndex];
+            var timer = this.apiModelCopy.vessels[this.timerIndex];
             return cycleNames.map(name => {
                 return {
                     name: name,
