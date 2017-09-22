@@ -1,4 +1,5 @@
 (function(exports) {
+    const OyaVessel = require('./oya-vessel');
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -27,44 +28,17 @@
             }
         }
 
-        static get DEFAULT_CYCLES() { return {
-            [OyaConf.CYCLE_STANDARD]: {
-                name: "Standard",
-                desc: "Standard cycle for all phases of plant growth",
-                on: 30,
-                off: 60,
-            },
-            [OyaConf.CYCLE_DRAIN]: {
-                name: "Drain",
-                desc: "Partially drain reservoir and stop to add fresh nutrients",
-                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
-                off: -1,
-            },
-            [OyaConf.CYCLE_FAN]: {
-                name: "Cool",
-                desc: "Hot day evaporative cooling cycle with fan",
-                on: 15,
-                off: 15,
-            },
-            [OyaConf.CYCLE_CONSERVE]: {
-                name: "Conserve",
-                desc: "Conservative misting cycle for plants with good roots",
-                on: 5,
-                off: 60,
-            },
-        }}
-
         static createTimer(index=0, opts={}) {
             return {
                 name: opts.name || `vessel${index+1}`,
                 type: opts.type || 'OyaVessel',
                 enabled: opts.enabled == null ? true : opts.enabled, // timer can be activated
-                startCycle: opts.startCycle || OyaConf.CYCLE_STANDARD,
-                hotCycle: opts.hotCycle || OyaConf.CYCLE_FAN,
+                startCycle: opts.startCycle || OyaVessel.CYCLE_STANDARD,
+                hotCycle: opts.hotCycle || OyaVessel.CYCLE_FAN,
                 fanThreshold: opts.fanThreshold || 80,
                 maxCycles: opts.maxCycles || 0,
                 cycleDelay: opts.cycleDelay || 0,
-                cycles: opts.cycles || this.DEFAULT_CYCLES,
+                cycles: opts.cycles || OyaVessel.DEFAULT_CYCLES,
             }
         }
 
@@ -89,16 +63,6 @@
             return this;
         }
 
-        static get CYCLES() { return [
-            OyaConf.CYCLE_STANDARD,
-            OyaConf.CYCLE_FAN,
-            OyaConf.CYCLE_CONSERVE,
-            OyaConf.CYCLE_DRAIN,
-        ]};
-        static get CYCLE_STANDARD() { return "Cycle #1"; }
-        static get CYCLE_DRAIN() { return "Cycle #2"; }
-        static get CYCLE_FAN() { return "Cycle #3"; }
-        static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
 

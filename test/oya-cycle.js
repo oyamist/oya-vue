@@ -2,6 +2,7 @@
     const should = require("should");
     const winston = require('winston');
     const OyaCycle = exports.OyaCycle || require("../index").OyaCycle;
+    const OyaVessel = exports.OyaVessel || require("../index").OyaVessel;
     const OyaConf = require("../index").OyaConf;
     const STANDARD_ON = 0.01;
     const STANDARD_OFF = 0.02;
@@ -9,10 +10,10 @@
     const FAN_OFF = 2*STANDARD_OFF;
     const SETTLE_MS = 5;
     var testTimer = OyaConf.createTimer(0, {name: 'test0a'});
-    testTimer.cycles[OyaConf.CYCLE_STANDARD].on = STANDARD_ON;
-    testTimer.cycles[OyaConf.CYCLE_STANDARD].off = STANDARD_OFF;
-    testTimer.cycles[OyaConf.CYCLE_FAN].on = FAN_ON;
-    testTimer.cycles[OyaConf.CYCLE_FAN].off = FAN_OFF;
+    testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
+    testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
+    testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
+    testTimer.cycles[OyaVessel.CYCLE_FAN].off = FAN_OFF;
     var level = winston.level;
     winston.level = 'error';
 
@@ -22,7 +23,7 @@
             name: 'test1a',
         });
         should.deepEqual(oc1.timer, OyaConf.createTimer(0, {name: 'test1a'}));
-        should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
+        should(oc1.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // Custom timer
         var timer = OyaConf.createTimer(0, {name: 'test1b'});
@@ -64,31 +65,31 @@
                 should(oc.isOn).equal(false);
                 oc.activate();
                 should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
                 should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
                 should(oc.cycleNumber).equal(3);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);
 
@@ -148,41 +149,41 @@
                 should(oc.isOn).equal(false);
                 oc.activate();
                 should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(oc.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 // changing the cycle re-activates
                 var to = oc._phaseTimeout;
-                oc.cycle = OyaConf.CYCLE_FAN;
+                oc.cycle = OyaVessel.CYCLE_FAN;
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
+                should(oc.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
+                should(oc.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(oc.isOn).equal(true);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
+                should(oc.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should(oc.cycleNumber).equal(3);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
+                should(oc.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(oc.isOn).equal(false);
                 should(oc.isActive).equal(false);
 
@@ -204,10 +205,10 @@
                     timer,
                 });
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_STANDARD,
+                    cycle: OyaVessel.CYCLE_STANDARD,
                     isActive: false,
                     isOn: false,
-                    nextCycle: OyaConf.CYCLE_STANDARD,
+                    nextCycle: OyaVessel.CYCLE_STANDARD,
                     type: "OyaCycle",
                     cycleNumber: 0,
                 });
@@ -215,21 +216,21 @@
                 // activation turns stuff on
                 oc.activate();
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_STANDARD,
+                    cycle: OyaVessel.CYCLE_STANDARD,
                     isActive: true,
                     isOn: true,
-                    nextCycle: OyaConf.CYCLE_STANDARD,
+                    nextCycle: OyaVessel.CYCLE_STANDARD,
                     type: "OyaCycle",
                     cycleNumber: 1,
                 });
 
                 // setting nextCycle has no immediate effect
-                oc.nextCycle = OyaConf.CYCLE_FAN;
+                oc.nextCycle = OyaVessel.CYCLE_FAN;
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_STANDARD,
+                    cycle: OyaVessel.CYCLE_STANDARD,
                     isActive: true,
                     isOn: true,
-                    nextCycle: OyaConf.CYCLE_FAN,
+                    nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaCycle",
                     cycleNumber: 1,
                 });
@@ -237,10 +238,10 @@
                 // nextCycle has no effect during off phase
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_STANDARD,
+                    cycle: OyaVessel.CYCLE_STANDARD,
                     isActive: true,
                     isOn: false,
-                    nextCycle: OyaConf.CYCLE_FAN,
+                    nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaCycle",
                     cycleNumber: 1,
                 });
@@ -248,10 +249,10 @@
                 // nextCycle takes effect after off phase
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_FAN,
+                    cycle: OyaVessel.CYCLE_FAN,
                     isActive: true,
                     isOn: true,
-                    nextCycle: OyaConf.CYCLE_FAN,
+                    nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaCycle",
                     cycleNumber: 1, // first iteration of new cycle
                 });
@@ -259,10 +260,10 @@
                 // off phase of new cycle
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_FAN,
+                    cycle: OyaVessel.CYCLE_FAN,
                     isActive: true,
                     isOn: false,
-                    nextCycle: OyaConf.CYCLE_FAN,
+                    nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaCycle",
                     cycleNumber: 1, 
                 });
@@ -270,10 +271,10 @@
                 // all done
                 yield setTimeout(() => async.next(true), FAN_ON*1000+SETTLE_MS);
                 should.deepEqual(oc.state, {
-                    cycle: OyaConf.CYCLE_FAN,
+                    cycle: OyaVessel.CYCLE_FAN,
                     isActive: false,
                     isOn: false,
-                    nextCycle: OyaConf.CYCLE_FAN,
+                    nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaCycle",
                     cycleNumber: 2,
                 });

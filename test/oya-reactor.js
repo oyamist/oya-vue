@@ -13,6 +13,7 @@
     const OyaReactor = exports.OyaReactor || require("../index").OyaReactor;
     const OyaCycle = exports.OyaCycle || require("../index").OyaCycle;
     const OyaConf = require("../index").OyaConf;
+    const OyaVessel = require("../index").OyaVessel;
     const STANDARD_ON = 0.005;
     const STANDARD_OFF = 0.01;
     const FAN_ON = 2*STANDARD_ON;
@@ -20,10 +21,10 @@
     const DEFAULT_CONF = new OyaConf().toJSON();
     const DEFAULT_APIMODEL = Object.assign({}, DEFAULT_CONF );
     var testTimer = OyaConf.createTimer();
-    testTimer.cycles[OyaConf.CYCLE_STANDARD].on = STANDARD_ON;
-    testTimer.cycles[OyaConf.CYCLE_STANDARD].off = STANDARD_OFF;
-    testTimer.cycles[OyaConf.CYCLE_FAN].on = FAN_ON;
-    testTimer.cycles[OyaConf.CYCLE_FAN].off = FAN_OFF;
+    testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
+    testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
+    testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
+    testTimer.cycles[OyaVessel.CYCLE_FAN].off = FAN_OFF;
     var level = winston.level;
     winston.level = 'warn';
 
@@ -80,9 +81,9 @@
                         tempUnit: 'F',
                     });
                     should(apiModel.vessels[0].cycles).properties([
-                        OyaConf.CYCLE_FAN,
-                        OyaConf.CYCLE_STANDARD,
-                        OyaConf.CYCLE_DRAIN,
+                        OyaVessel.CYCLE_FAN,
+                        OyaVessel.CYCLE_STANDARD,
+                        OyaVessel.CYCLE_DRAIN,
                     ]);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -123,7 +124,7 @@
                 };
                 newConf.name = 'OyaMist01';
                 newConf.vessels[0].fanThreshold = 81;
-                newConf.vessels[0].cycles[OyaConf.CYCLE_STANDARD].on = 3;
+                newConf.vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on = 3;
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;
@@ -135,7 +136,7 @@
                         rbHash: rbh.hash(newConf),
                     }));
                     should(testReactor().vessels[0].name).equal('vessel1');
-                    should(testReactor().vessels[0].cycles[OyaConf.CYCLE_STANDARD].on).equal(3);
+                    should(testReactor().vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on).equal(3);
                     should(testReactor().vessels[0].fanThreshold).equal(81);
                     should.ok(apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
@@ -154,17 +155,17 @@
         var reactor = new OyaReactor("test", {
             senseEmitter,
         });
-        should(reactor.vessel.nextCycle).equal(OyaConf.CYCLE_STANDARD);
+        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
         const fanThreshold = reactor.oyaConf.fanThreshold;
         should(typeof fanThreshold).equal("number");
 
         // just right
         senseEmitter.emit(OyaReactor.SENSE_TEMP_INTERNAL, reactor.oyaConf.fanThreshold-1);
-        should(reactor.vessel.nextCycle).equal(OyaConf.CYCLE_STANDARD);
+        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // too hot
         senseEmitter.emit(OyaReactor.SENSE_TEMP_INTERNAL, reactor.oyaConf.fanThreshold+1);
-        should(reactor.vessel.nextCycle).equal(OyaConf.CYCLE_FAN);
+        should(reactor.vessel.nextCycle).equal(OyaVessel.CYCLE_FAN);
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;

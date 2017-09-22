@@ -1,5 +1,4 @@
 (function(exports) {
-    const OyaConf = require("../src/oya-conf");
     const EventEmitter = require("events");
     const winston = require("winston");
 
@@ -10,11 +9,11 @@
             // serializable toJSON() properties
             this.name = `vessel${id++}`;
             this.enabled = true; // can be activated
-            this.startCycle = OyaConf.CYCLE_STANDARD;
-            this.hotCycle = OyaConf.CYCLE_FAN;
+            this.startCycle = OyaVessel.CYCLE_STANDARD;
+            this.hotCycle = OyaVessel.CYCLE_FAN;
             this.fanThreshold = 80;
             this.maxCycles = 0;
-            this.cycles = OyaConf.DEFAULT_CYCLES,
+            this.cycles = OyaVessel.DEFAULT_CYCLES,
             OyaVessel.applyDelta(this, opts);
 
             this._cycle = this.startCycle,
@@ -36,6 +35,38 @@
             }, 1000);
         }
 
+        static get DEFAULT_CYCLES() { return {
+            [OyaVessel.CYCLE_STANDARD]: {
+                name: "Standard",
+                desc: "Standard cycle for all phases of plant growth",
+                on: 30,
+                off: 60,
+            },
+            [OyaVessel.CYCLE_DRAIN]: {
+                name: "Drain",
+                desc: "Partially drain reservoir and stop to add fresh nutrients",
+                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
+                off: -1,
+            },
+            [OyaVessel.CYCLE_FAN]: {
+                name: "Cool",
+                desc: "Hot day evaporative cooling cycle with fan",
+                on: 15,
+                off: 15,
+            },
+            [OyaVessel.CYCLE_CONSERVE]: {
+                name: "Conserve",
+                desc: "Conservative misting cycle for plants with good roots",
+                on: 5,
+                off: 60,
+            },
+        }}
+
+
+        static get CYCLE_STANDARD() { return "Cycle #1"; }
+        static get CYCLE_DRAIN() { return "Cycle #2"; }
+        static get CYCLE_FAN() { return "Cycle #3"; }
+        static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_PHASE() { return "event:phase"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
 
