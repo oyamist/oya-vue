@@ -2,7 +2,7 @@
 
 <div>
     <rb-about v-if="about" :name="componentName">
-        <p> OyaCycle status and configuration
+        <p> OyaReactor status and configuration
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
@@ -73,7 +73,7 @@
     </v-card>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
-            <rb-dialog-row label="Bioreactor">
+            <rb-dialog-row label="Vessel">
                 <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                     label="Name" class="input-group--focused" />
             </rb-dialog-row>
@@ -207,7 +207,7 @@ export default {
     created() {
         this.restBundleResource();
         this.rbDispatch("apiLoad").then(r => {
-            console.log("OyaCycleVue apiLoad", r);
+            console.log("OyaReactor apiLoad", r);
         });
         this.rbInitialized().then(r => {
             this.rbService.isActive != null && (this.activeToggle = this.rbService.isActive);

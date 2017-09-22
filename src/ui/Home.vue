@@ -1,6 +1,6 @@
 <template>
 
-<oya-reactor-vue service="test"></oya-reactor-vue>
+<oya-reactor service="test"></oya-reactor>
 
 </template><script>
 

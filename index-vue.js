@@ -1,7 +1,7 @@
-import OyaCycleVue from "./src/ui/OyaCycleVue.vue";
+import OyaReactor from "./src/ui/OyaReactor.vue";
 
 var components = {
-    OyaCycleVue,
+    OyaReactor,
 }
 function plugin(Vue, options) {
     Object.keys(components).forEach( key => Vue.component(key, components[key]));
