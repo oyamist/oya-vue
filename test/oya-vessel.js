@@ -23,20 +23,15 @@
 
         return vessel;
     }
-    //var testTimer = OyaConf.createTimer(0, {name: 'test0a'});
-    //testTimer.cycles[OyaConf.CYCLE_STANDARD].on = STANDARD_ON;
-    //testTimer.cycles[OyaConf.CYCLE_STANDARD].off = STANDARD_OFF;
-    //testTimer.cycles[OyaConf.CYCLE_FAN].on = FAN_ON;
-    //testTimer.cycles[OyaConf.CYCLE_FAN].off = FAN_OFF;
     var level = winston.level;
     winston.level = 'error';
 
     it ("ctor intializes cycle from provided timer", function() {
         // Default timer
-        var oc1 = new OyaVessel({
+        var vessel1 = new OyaVessel({
             name: 'test1a',
         });
-        should.deepEqual(oc1.toJSON(), {
+        should.deepEqual(vessel1.toJSON(), {
             name: 'test1a',
             type: 'OyaVessel',
             enabled: true,
@@ -46,62 +41,62 @@
             maxCycles: 0,
             cycles: OyaConf.DEFAULT_CYCLES,
         });
-        should(oc1.cycle).equal(OyaConf.CYCLE_STANDARD);
+        should(vessel1.cycle).equal(OyaConf.CYCLE_STANDARD);
 
         // Custom ctor
-        var oc2 = new OyaVessel({
+        var vessel2 = new OyaVessel({
             name: 'test1c',
             startCycle: 'fan',
         });
-        should(oc2.cycle).equal('fan');
+        should(vessel2.cycle).equal('fan');
     });
     it ("isActive property is initially false", function() {
-        var oc = createTestVessel({name:'test2b', maxCycles:1});
-        should(oc.isActive).equal(false);
-        oc.activate();
-        should(oc.isActive).equal(true);
-        var oc2 = new OyaVessel({
+        var vessel = createTestVessel({name:'test2b', maxCycles:1});
+        should(vessel.isActive).equal(false);
+        vessel.activate();
+        should(vessel.isActive).equal(true);
+        var vessel2 = new OyaVessel({
             name: 'test2c',
             maxCycles: 1,
         });
         should.throws(() => {
-            oc2.activate("should-be-a-boolean");  
+            vessel2.activate("should-be-a-boolean");  
         });
     });
     it ("isOn is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
             try {
-                var oc = createTestVessel({name:'test3a', maxCycles:2});
-                should(oc.isOn).equal(false);
-                oc.activate();
-                should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(true);
-                should(oc.isActive).equal(true);
+                var vessel = createTestVessel({name:'test3a', maxCycles:2});
+                should(vessel.isOn).equal(false);
+                vessel.activate();
+                should(vessel.cycleNumber).equal(1);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(true);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(1);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
-                should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(true);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(2);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(true);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(2);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
-                should(oc.cycleNumber).equal(3);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(false);
+                should(vessel.cycleNumber).equal(3);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(false);
 
                 done();
             } catch (err) {
@@ -114,20 +109,20 @@
     it ("on(event, cb) invokes event callback", function(done) {
         var async = function*() {
             try {
-                var oc = createTestVessel({name:'test4a', maxCycles:2});
+                var vessel = createTestVessel({name:'test4a', maxCycles:2});
                 var count = 0;
-                oc.on(OyaVessel.EVENT_PHASE, (context,event,value) => {
+                vessel.on(OyaVessel.EVENT_PHASE, (context,event,value) => {
                     count++;
-                    should(context).equal(oc);
+                    should(context).equal(vessel);
                     should(event).equal(OyaVessel.EVENT_PHASE);
-                    should(value).equal(oc.isOn);
+                    should(value).equal(vessel.isOn);
                 });
-                oc.activate();
+                vessel.activate();
                 should(count).equal(1);
-                should(oc.isOn).equal(true);
+                should(vessel.isOn).equal(true);
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(count).equal(2);
-                should(oc.isOn).equal(false);
+                should(vessel.isOn).equal(false);
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
                 should(count).equal(3);
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
@@ -145,47 +140,47 @@
     it ("cycle can be set while when misting is active", function(done) {
         var async = function*() {
             try {
-                var oc = createTestVessel({name:'test5a', maxCycles:2});
-                should(oc.isOn).equal(false);
-                oc.activate();
-                should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(true);
-                should(oc.isActive).equal(true);
+                var vessel = createTestVessel({name:'test5a', maxCycles:2});
+                should(vessel.isOn).equal(false);
+                vessel.activate();
+                should(vessel.cycleNumber).equal(1);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(true);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_STANDARD);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(1);
+                should(vessel.cycle).equal(OyaConf.CYCLE_STANDARD);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(true);
 
                 // changing the cycle re-activates
-                var to = oc._phaseTimeout;
-                oc.cycle = OyaConf.CYCLE_FAN;
+                var to = vessel._phaseTimeout;
+                vessel.cycle = OyaConf.CYCLE_FAN;
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should(oc.cycleNumber).equal(1);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(1);
+                should(vessel.cycle).equal(OyaConf.CYCLE_FAN);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isOn).equal(true);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(2);
+                should(vessel.cycle).equal(OyaConf.CYCLE_FAN);
+                should(vessel.isOn).equal(true);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should(oc.cycleNumber).equal(2);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(true);
+                should(vessel.cycleNumber).equal(2);
+                should(vessel.cycle).equal(OyaConf.CYCLE_FAN);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should(oc.cycleNumber).equal(3);
-                should(oc.cycle).equal(OyaConf.CYCLE_FAN);
-                should(oc.isOn).equal(false);
-                should(oc.isActive).equal(false);
+                should(vessel.cycleNumber).equal(3);
+                should(vessel.cycle).equal(OyaConf.CYCLE_FAN);
+                should(vessel.isOn).equal(false);
+                should(vessel.isActive).equal(false);
 
                 done();
             } catch (err) {
@@ -198,8 +193,8 @@
     it ("state property provides vessel state", function(done) {
         var async = function*() {
             try {
-                var oc = createTestVessel({name:'test6a', maxCycles:1});
-                should.deepEqual(oc.state, {
+                var vessel = createTestVessel({name:'test6a', maxCycles:1});
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_STANDARD,
                     isActive: false,
                     isOn: false,
@@ -209,8 +204,8 @@
                 });
 
                 // activation turns stuff on
-                oc.activate();
-                should.deepEqual(oc.state, {
+                vessel.activate();
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_STANDARD,
                     isActive: true,
                     isOn: true,
@@ -220,8 +215,8 @@
                 });
 
                 // setting nextCycle has no immediate effect
-                oc.nextCycle = OyaConf.CYCLE_FAN;
-                should.deepEqual(oc.state, {
+                vessel.nextCycle = OyaConf.CYCLE_FAN;
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_STANDARD,
                     isActive: true,
                     isOn: true,
@@ -232,7 +227,7 @@
 
                 // nextCycle has no effect during off phase
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should.deepEqual(oc.state, {
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_STANDARD,
                     isActive: true,
                     isOn: false,
@@ -243,7 +238,7 @@
 
                 // nextCycle takes effect after off phase
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should.deepEqual(oc.state, {
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_FAN,
                     isActive: true,
                     isOn: true,
@@ -254,7 +249,7 @@
 
                 // off phase of new cycle
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should.deepEqual(oc.state, {
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_FAN,
                     isActive: true,
                     isOn: false,
@@ -265,7 +260,7 @@
 
                 // all done
                 yield setTimeout(() => async.next(true), FAN_ON*1000+SETTLE_MS);
-                should.deepEqual(oc.state, {
+                should.deepEqual(vessel.state, {
                     cycle: OyaConf.CYCLE_FAN,
                     isActive: false,
                     isOn: false,
@@ -282,16 +277,16 @@
         async.next();
     });
     it ("emit(event, ...) emits event", function() {
-        var oc = new OyaVessel({
+        var vessel = new OyaVessel({
             name: "test6a",
         });
         var eventValue = null;
         var count = 0;
-        oc.on(OyaVessel.EVENT_PHASE, (context,event,value) => {
+        vessel.on(OyaVessel.EVENT_PHASE, (context,event,value) => {
             count++;
             eventValue = value;
         });
-        oc.emit(OyaVessel.EVENT_PHASE, 'hello');
+        vessel.emit(OyaVessel.EVENT_PHASE, 'hello');
         should(eventValue).equal('hello');
         should(count).equal(1);
     });

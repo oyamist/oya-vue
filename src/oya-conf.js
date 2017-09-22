@@ -6,23 +6,23 @@
             this.update(opts);
         }
         
-        _updateTimer(index, newTimer) {
+        updateVessel(index, delta) {
             var defTimer = OyaConf.createTimer(index);
             var curTimer = this.vessels[index] || {};
-            ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay', 'pin', 'fanThreshold']
+            ['name', 'type', 'enabled', 'startCycle', 'hotCycle', 'cycleDelay','fanThreshold']
             .forEach(prop => {
-                curTimer[prop] = newTimer[prop] == null 
+                curTimer[prop] = delta[prop] == null 
                     ? (curTimer[prop] == null ? defTimer[prop] : curTimer[prop])
-                    : newTimer[prop];
+                    : delta[prop];
             });
-            if (newTimer.cycles) {
+            if (delta.cycles) {
                 Object.keys(curTimer.cycles).forEach(key => {
-                    if (!newTimer.cycles.hasOwnProperty(key)) {
+                    if (!delta.cycles.hasOwnProperty(key)) {
                         delete curTimer.cycles[key];
                     }
                 });
-                Object.keys(newTimer.cycles).forEach(key => {
-                    curTimer.cycles[key] = Object.assign(curTimer.cycles[key], newTimer.cycles[key]);
+                Object.keys(delta.cycles).forEach(key => {
+                    curTimer.cycles[key] = Object.assign(curTimer.cycles[key], delta.cycles[key]);
                 });
             }
         }
@@ -69,7 +69,7 @@
                 fanThreshold: opts.fanThreshold || 80,
                 maxCycles: opts.maxCycles || 0,
                 cycleDelay: opts.cycleDelay || 0,
-                pin: opts.pin == null ?  (defaultPins[index] || -1) : opts.pin,
+                //pin: opts.pin == null ?  (defaultPins[index] || -1) : opts.pin,
                 cycles: opts.cycles || this.DEFAULT_CYCLES,
             }
         }
@@ -87,14 +87,13 @@
                     ];
                 }
             }
-            opts.vessels && opts.vessels.forEach((newTimer, i) => {
-                this._updateTimer(i, newTimer);
+            opts.vessels && opts.vessels.forEach((delta, i) => {
+                this.updateVessel(i, delta);
             });
 
             this.startCycle = opts.startCycle || this.startCycle || OyaConf.CYCLE_STANDARD;
             this.hotCycle = opts.hotCycle || this.hotCycle || OyaConf.CYCLE_FAN;
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
-            this.fanThreshold = opts.fanThreshold == null ? (this.fanThreshold || 80) : opts.fanThreshold;
 
             return this;
         }
@@ -117,7 +116,6 @@
                 name: this.name,
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
-                fanThreshold: this.fanThreshold,
                 startCycle: this.startCycle,
                 hotCycle: this.hotCycle,
                 vessels: this.vessels,

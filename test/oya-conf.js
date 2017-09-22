@@ -11,7 +11,7 @@
         startCycle: OyaConf.CYCLE_STANDARD,
         hotCycle: OyaConf.CYCLE_FAN,
         tempUnit: 'F',
-        fanThreshold: 80,
+//        fanThreshold: 80,
         vessels: [
             OyaConf.createTimer(0),
             OyaConf.createTimer(1),
@@ -36,7 +36,6 @@
                     hotCycle: OyaConf.CYCLE_FAN,
                     enabled: false,
                     cycleDelay: 2,
-                    pin: 27,
                     fanThreshold: 72,
                     cycles: {
                         [OyaConf.CYCLE_FAN]: {
@@ -46,35 +45,15 @@
                         }
                     },
             })],
-            /*
-            vessels: [{
-                name: 'test1',
-                type: 'new-type',
-                startCycle: OyaConf.CYCLE_FAN,
-                hotCycle: OyaConf.CYCLE_FAN,
-                enabled: false,
-                cycleDelay: 2,
-                pin: 27,
-                fanThreshold: 72,
-                cycles: {
-                    [OyaConf.CYCLE_FAN]: {
-                        desc: 'fans are cool',
-                        on: 10,
-                        off: 23,
-                    }
-                },
-            }],
-            */
         }
-        var updatedTimer = OyaConf.createTimer();
-        updatedTimer.name = 'test1';
-        updatedTimer.type = 'new-type';
-        updatedTimer.enabled = false;
-        updatedTimer.startCycle = OyaConf.CYCLE_FAN;
-        updatedTimer.cycleDelay = 2;
-        updatedTimer.pin = 27;
-        updatedTimer.fanThreshold = 72;
-        updatedTimer.cycles = {
+        var updatedVessel = OyaConf.createTimer();
+        updatedVessel.name = 'test1';
+        updatedVessel.type = 'new-type';
+        updatedVessel.enabled = false;
+        updatedVessel.startCycle = OyaConf.CYCLE_FAN;
+        updatedVessel.cycleDelay = 2;
+        updatedVessel.fanThreshold = 72;
+        updatedVessel.cycles = {
             [OyaConf.CYCLE_FAN]: {
                 name: "Cool",
                 desc: 'fans are cool',
@@ -88,9 +67,8 @@
             startCycle: OyaConf.CYCLE_FAN,
             hotCycle: OyaConf.CYCLE_FAN,
             tempUnit: 'C',
-            fanThreshold: 80,
             vessels: [
-                updatedTimer,
+                updatedVessel,
             ],
         });
     });
@@ -104,7 +82,6 @@
             fanThreshold: 80,
             cycleDelay: 0,
             maxCycles: 0,
-            pin: 33,
             cycles: defaultCycles,
         });
         should.deepEqual(OyaConf.createTimer(1), {
@@ -116,7 +93,6 @@
             fanThreshold: 80,
             maxCycles: 0,
             cycleDelay: 0,
-            pin: 35,
             cycles: defaultCycles,
         });
         var opts = {
@@ -128,7 +104,6 @@
             fanThreshold: 81,
             maxCycles: 2,
             cycleDelay: 3,
-            pin: 39,
             cycles: defaultCycles,
         }
         should.deepEqual(OyaConf.createTimer(1, opts), {
@@ -140,7 +115,6 @@
             fanThreshold: 81,
             maxCycles: 2,
             cycleDelay: 3,
-            pin: 39,
             cycles: defaultCycles,
         });
         var opts = { 
@@ -150,20 +124,18 @@
             name: "vessel3",
             type: "some-type",
             enabled: true,
-            pin: 36,
             startCycle: OyaConf.CYCLE_STANDARD,
             hotCycle: OyaConf.CYCLE_FAN,
             fanThreshold: 80,
             cycleDelay: 0,
             maxCycles: 0,
-            pin: 36,
             cycles: defaultCycles,
         });
     });
     it("update(opts) updates configuration ", function() {
-        var oc = new OyaConf();
-        var timer0 = oc.vessels[0];
-        oc.update({
+        var ov = new OyaConf();
+        var timer0 = ov.vessels[0];
+        ov.update({
             name: 'foo',
             type: 'bad-type', // ignored
             startCycle: OyaConf.CYCLE_FAN,
@@ -177,7 +149,6 @@
                 hotCycle: OyaConf.CYCLE_STANDARD,
                 enabled: false,
                 cycleDelay: 2,
-                pin: 27,
                 fanThreshold: 72,
                 cycles: {
                     [OyaConf.CYCLE_FAN]: {
@@ -189,18 +160,17 @@
         });
 
         // vessels are not changed by update
-        should.equal(timer0, oc.vessels[0]);
+        should.equal(timer0, ov.vessels[0]);
 
-        var updatedTimer = OyaConf.createTimer(1);
-        updatedTimer.name = 'test2';
-        updatedTimer.type = 'new-type';
-        updatedTimer.enabled = false;
-        updatedTimer.startCycle = OyaConf.CYCLE_FAN;
-        updatedTimer.hotCycle = OyaConf.CYCLE_STANDARD;
-        updatedTimer.cycleDelay = 2;
-        updatedTimer.pin = 27;
-        updatedTimer.fanThreshold = 72;
-        updatedTimer.cycles = {
+        var updatedVessel = OyaConf.createTimer(1);
+        updatedVessel.name = 'test2';
+        updatedVessel.type = 'new-type';
+        updatedVessel.enabled = false;
+        updatedVessel.startCycle = OyaConf.CYCLE_FAN;
+        updatedVessel.hotCycle = OyaConf.CYCLE_STANDARD;
+        updatedVessel.cycleDelay = 2;
+        updatedVessel.fanThreshold = 72;
+        updatedVessel.cycles = {
             [OyaConf.CYCLE_FAN]: {
                 name: "Cool",
                 desc: defaultCycles[OyaConf.CYCLE_FAN].desc,
@@ -210,18 +180,17 @@
         };
 
         // vessels are not changed by update
-        should.equal(timer0, oc.vessels[0]);
+        should.equal(timer0, ov.vessels[0]);
 
-        should.deepEqual(oc.toJSON(), {
+        should.deepEqual(ov.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
             startCycle: OyaConf.CYCLE_FAN,
             hotCycle: OyaConf.CYCLE_STANDARD,
             tempUnit: 'C',
-            fanThreshold: 80,
             vessels: [
                 OyaConf.createTimer(0),
-                updatedTimer,
+                updatedVessel,
                 OyaConf.createTimer(2),
             ],
         });

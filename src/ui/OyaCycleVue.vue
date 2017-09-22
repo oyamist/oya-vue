@@ -6,7 +6,7 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
-        <rb-about-item name="timerIndex" value="0" slot="prop">
+        <rb-about-item name="vesselIndex" value="0" slot="prop">
             Index (0-based) of timer for component</rb-about-item>
     </rb-about>
 
@@ -74,7 +74,7 @@
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
             <rb-dialog-row label="Bioreactor">
-                <v-text-field v-model='apiModelCopy.vessels[timerIndex].name' 
+                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                     label="Name" class="input-group--focused" />
             </rb-dialog-row>
             <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
@@ -92,9 +92,9 @@
                 </v-layout>
             </rb-dialog-row>
             <rb-dialog-row label="Advanced">
-                <v-text-field v-model='apiModelCopy.vessels[timerIndex].fanThreshold' 
+                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].fanThreshold' 
                     :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
-                <v-text-field v-model='apiModelCopy.vessels[timerIndex].pin' 
+                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].pin' 
                     label="MCU Pin" class="input-group--focused" />
             </rb-dialog-row>
     </rb-api-dialog>
@@ -115,7 +115,7 @@ export default {
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),
     ],
     props: {
-        timerIndex: {
+        vesselIndex: {
             default: 0,
         },
     },
@@ -174,7 +174,7 @@ export default {
     computed: {
         timer() {
             var vessels = this.apiModel && this.apiModel.vessels;
-            return vessels && vessels[this.timerIndex];
+            return vessels && vessels[this.vesselIndex];
         },
         name() {
             return this.timer && this.timer.name;
@@ -191,7 +191,7 @@ export default {
         },
         editCycles() {
             var cycleNames = Object.keys(this.timer.cycles).sort();
-            var timer = this.apiModelCopy.vessels[this.timerIndex];
+            var timer = this.apiModelCopy.vessels[this.vesselIndex];
             return cycleNames.map(name => {
                 return {
                     name: name,
