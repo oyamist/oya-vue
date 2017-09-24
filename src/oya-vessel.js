@@ -28,7 +28,7 @@
 
             this._cycle = this.startCycle,
             this.nextCycle = this._cycle,
-            this._active = false,
+            this._state.active = false,
             this.emitter = new EventEmitter(),
             this._on = false,
             this._phaseTimeout = false;
@@ -131,7 +131,7 @@
         }
 
         get isActive() {
-            return this._active;
+            return this._state.active;
         }
 
         onTempInternal(value) {
@@ -152,12 +152,12 @@
             if (this.isActive === value) {
                 winston.debug(`${this.name} redundant activate ignored`);
             } else if (value === true) {
-                this._active = value;
+                this._state.active = value;
                 this.cycleNumber = 0;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
-                this._active = value;
+                this._state.active = value;
                 this.countdown = 0;
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
@@ -189,7 +189,6 @@
         get state() {
             return Object.assign({
                 type: "OyaVessel",
-                isActive: this.isActive,
                 cycle: this.cycle,
                 nextCycle: this.nextCycle,
                 cycleNumber: this.cycleNumber,
