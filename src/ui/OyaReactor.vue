@@ -20,9 +20,9 @@
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
                 <div style="display:flex; flex-direction: column">
                     <div>
-                        <img v-show="rbService.isActive && rbService.isOn" 
+                        <img v-show="rbService.isActive && rbService.pump1" 
                             src="/assets/mist-on.svg" height=200px/>
-                        <img v-show="rbService.isActive && !rbService.isOn" 
+                        <img v-show="rbService.isActive && !rbService.pump1" 
                             src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.isActive" src="/assets/inactive.svg" height=200px/>
                         <h5>{{rbService.countdown}}</h5>

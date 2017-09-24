@@ -15,19 +15,19 @@
         actuators: [
             OyaConf.createActuatorConfig(0, {
                 vesselIndex: 0,
-                emit: OyaVessel.EVENT_PUMP1}),
+                activationSink: OyaVessel.EVENT_PUMP1}),
             OyaConf.createActuatorConfig(1, {
                 vesselIndex: 0,
-                emit: OyaVessel.EVENT_FAN1}),
+                activationSink: OyaVessel.EVENT_FAN1}),
             OyaConf.createActuatorConfig(2, {
                 vesselIndex: 1,
-                emit: OyaVessel.EVENT_PUMP1}),
+                activationSink: OyaVessel.EVENT_PUMP1}),
             OyaConf.createActuatorConfig(3, {
                 vesselIndex: 1,
-                emit: OyaVessel.EVENT_FAN1}),
+                activationSink: OyaVessel.EVENT_FAN1}),
         ],
     };
-    winston.level = 'warn';
+    winston.level = 'error';
 
     it("toJSON() serializes configuration", function() {
         should.deepEqual(new OyaConf().toJSON(), defaultConf);
@@ -47,7 +47,7 @@
                     cycles: {
                         [OyaVessel.CYCLE_FAN]: {
                             desc: 'fans are cool',
-                            emit: OyaVessel.EVENT_FAN1,
+                            activationSource: OyaVessel.EVENT_FAN1,
                             on: 10,
                             off: 23,
                         }
@@ -56,11 +56,11 @@
             actuators: [
                 OyaConf.createActuatorConfig(0, {
                     vesselIndex: 0,
-                    emit: OyaVessel.EVENT_PUMP1,
+                    activationSink: OyaVessel.EVENT_PUMP1,
                 }),
                 OyaConf.createActuatorConfig(1, {
                     vesselIndex: 0,
-                    emit: OyaVessel.EVENT_FAN1,
+                    activationSink: OyaVessel.EVENT_FAN1,
                 }),
             ],
         }
@@ -73,7 +73,7 @@
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: 'fans are cool',
-                emit: OyaVessel.EVENT_FAN1,
+                activationSource: OyaVessel.EVENT_FAN1,
                 on: 10,
                 off: 23,
             }
@@ -89,7 +89,7 @@
                 OyaConf.createActuatorConfig(0),
                 OyaConf.createActuatorConfig(1, {
                     vesselIndex: 0,
-                    emit: OyaVessel.EVENT_FAN1,
+                    activationSink: OyaVessel.EVENT_FAN1,
                 }),
             ],
         });
@@ -188,7 +188,7 @@
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: defaultCycles[OyaVessel.CYCLE_FAN].desc,
-                emit: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_PUMP1,
                 on: 10,
                 off: 23,
             }
@@ -208,19 +208,19 @@
             actuators: [
                 OyaConf.createActuatorConfig(0, {
                     vesselIndex: 0,
-                    emit: OyaVessel.EVENT_PUMP1,
+                    activationSink: OyaVessel.EVENT_PUMP1,
                 }),
                 OyaConf.createActuatorConfig(1, {
                     vesselIndex: 0,
-                    emit: OyaVessel.EVENT_FAN1,
+                    activationSink: OyaVessel.EVENT_FAN1,
                 }),
                 OyaConf.createActuatorConfig(2, {
                     vesselIndex: 1,
-                    emit: OyaVessel.EVENT_PUMP1,
+                    activationSink: OyaVessel.EVENT_PUMP1,
                 }),
                 OyaConf.createActuatorConfig(3, {
                     vesselIndex: 1,
-                    emit: OyaVessel.EVENT_FAN1,
+                    activationSink: OyaVessel.EVENT_FAN1,
                 }),
             ],
         });

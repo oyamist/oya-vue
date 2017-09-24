@@ -19,7 +19,7 @@
                 name: opts.name || `actuator${index}`,
                 type: opts.type || OyaConf.ACTUATOR_SPST_NO,
                 vesselIndex: opts.vesselIndex || 0,
-                emit: opts.emit || OyaVessel.EVENT_PUMP1,
+                activationSink: opts.activationSink || OyaVessel.EVENT_PUMP1,
                 pin: opts.pin || index, // MCU control pin
             }
         }
@@ -50,12 +50,12 @@
                         this.actuators.push(
                             OyaConf.createActuatorConfig(this.actuators.length, {
                                 vesselIndex: iVessel,
-                                emit: OyaVessel.EVENT_PUMP1,
+                                activationSink: OyaVessel.EVENT_PUMP1,
                         }));
                         this.actuators.push(
                             OyaConf.createActuatorConfig(this.actuators.length, {
                                 vesselIndex: iVessel,
-                                emit: OyaVessel.EVENT_FAN1,
+                                activationSink: OyaVessel.EVENT_FAN1,
                         }));
                     }
                 }
