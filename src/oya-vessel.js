@@ -32,7 +32,6 @@
             this.nextCycle = this._state.cycle,
             this._state.active = false,
             this.emitter = new EventEmitter(),
-            this._on = false,
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
             this.emitter.on(OyaVessel.EVENT_PUMP1, (value) => {
