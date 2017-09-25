@@ -34,7 +34,7 @@
             this.emitter = new EventEmitter(),
             this._on = false,
             this._phaseTimeout = false;
-            this.cycleNumber = 0;
+            this._state.cycleNumber = 0;
             this.emitter.on(OyaVessel.EVENT_PUMP1, (value) => {
                 this._state.pump1 = value;
             });
@@ -127,7 +127,7 @@
 
         get summary() { 
             return `${this.name} ` +
-                `cycle:"${this.cycle}" ${this.cycleNumber} ` +
+                `cycle:"${this.cycle}" ${this._state.cycleNumber} ` +
                 `active:${this.isActive?1:0} ${this.state.pump1?'on':'off'}`;
         }
 
@@ -154,7 +154,7 @@
                 winston.debug(`${this.name} redundant activate ignored`);
             } else if (value === true) {
                 this._state.active = value;
-                this.cycleNumber = 0;
+                this._state.cycleNumber = 0;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
@@ -191,7 +191,6 @@
             return Object.assign({
                 cycle: this.cycle,
                 nextCycle: this.nextCycle,
-                cycleNumber: this.cycleNumber,
             }, this._state);
         }
 
@@ -204,10 +203,10 @@
             return;
         }
         if (value) {
-            if (!self.maxCycles || self.cycleNumber <= self.maxCycles) {
-                self.cycleNumber++;
+            if (!self.maxCycles || self._state.cycleNumber <= self.maxCycles) {
+                self._state.cycleNumber++;
             }
-            if (self.maxCycles && self.cycleNumber > self.maxCycles) {
+            if (self.maxCycles && self._state.cycleNumber > self.maxCycles) {
                 self.activate(false);
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);

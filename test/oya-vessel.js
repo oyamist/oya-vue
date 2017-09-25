@@ -98,31 +98,31 @@
                 var vessel = createTestVessel({name:'test3a', maxCycles:2});
                 should(vessel.state.pump1).equal(false);
                 vessel.activate();
-                should(vessel.cycleNumber).equal(1);
+                should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(vessel.cycleNumber).equal(1);
+                should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
-                should(vessel.cycleNumber).equal(2);
+                should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(vessel.cycleNumber).equal(2);
+                should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
-                should(vessel.cycleNumber).equal(3);
+                should(vessel.state.cycleNumber).equal(3);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(false);
@@ -141,13 +141,13 @@
                 var vessel = createTestVessel({name:'test5a', maxCycles:2});
                 should(vessel.state.pump1).equal(false);
                 vessel.activate();
-                should(vessel.cycleNumber).equal(1);
+                should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should(vessel.cycleNumber).equal(1);
+                should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(true);
@@ -157,25 +157,25 @@
                 vessel.cycle = OyaVessel.CYCLE_FAN;
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should(vessel.cycleNumber).equal(1);
+                should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should(vessel.cycleNumber).equal(2);
+                should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(vessel.state.pump1).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should(vessel.cycleNumber).equal(2);
+                should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should(vessel.cycleNumber).equal(3);
+                should(vessel.state.cycleNumber).equal(3);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
                 should(vessel.state.pump1).equal(false);
                 should(vessel.isActive).equal(false);
