@@ -115,7 +115,6 @@
         getState() {
             return Object.assign(this.vessel.state, {
                 api: 'oya-reactor',
-                countdown: this.vessel.countdown,
             });
         }
 

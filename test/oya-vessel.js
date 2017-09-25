@@ -61,6 +61,7 @@
             name: 'test1c',
             startCycle: 'fan',
         });
+        should(vessel2.startCycle).equal('fan');
         should(vessel2.cycle).equal('fan');
     });
     it ("vessel responds to emitter sensor events", function() {
@@ -193,6 +194,7 @@
                 var vessel = createTestVessel({name:'test6a', maxCycles:1});
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_STANDARD,
+                    countdown: 0,
                     active: false,
                     pump1: false,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
@@ -204,6 +206,7 @@
                 vessel.activate();
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_STANDARD,
+                    countdown: 0,
                     active: true,
                     pump1: true,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
@@ -215,6 +218,7 @@
                 vessel.nextCycle = OyaVessel.CYCLE_FAN;
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_STANDARD,
+                    countdown: 0,
                     active: true,
                     pump1: true,
                     nextCycle: OyaVessel.CYCLE_FAN,
@@ -226,6 +230,7 @@
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_STANDARD,
+                    countdown: 0,
                     active: true,
                     pump1: false,
                     nextCycle: OyaVessel.CYCLE_FAN,
@@ -237,6 +242,7 @@
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_FAN,
+                    countdown: 0,
                     active: true,
                     pump1: true,
                     nextCycle: OyaVessel.CYCLE_FAN,
@@ -248,6 +254,7 @@
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_FAN,
+                    countdown: 0,
                     active: true,
                     pump1: false,
                     nextCycle: OyaVessel.CYCLE_FAN,
@@ -259,6 +266,7 @@
                 yield setTimeout(() => async.next(true), FAN_ON*1000+SETTLE_MS);
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
                     cycle: OyaVessel.CYCLE_FAN,
+                    countdown: 0,
                     active: false,
                     nextCycle: OyaVessel.CYCLE_FAN,
                     type: "OyaVessel",

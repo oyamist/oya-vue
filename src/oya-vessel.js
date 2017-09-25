@@ -15,8 +15,10 @@
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
+                type: "OyaVessel",
                 pump1: false,
                 fan1: false,
+                countdown: 0,
                 tempInternal: null,
                 tempExternal: null,
                 tempAmbient: null,
@@ -25,14 +27,13 @@
                 humidityAmbient: null,
             };
             OyaVessel.applyDelta(this, opts);
+            this._state.cycle = this.startCycle;
 
-            this._cycle = this.startCycle,
-            this.nextCycle = this._cycle,
+            this.nextCycle = this._state.cycle,
             this._state.active = false,
             this.emitter = new EventEmitter(),
             this._on = false,
             this._phaseTimeout = false;
-            this.countdown = 0;
             this.cycleNumber = 0;
             this.emitter.on(OyaVessel.EVENT_PUMP1, (value) => {
                 this._state.pump1 = value;
@@ -44,7 +45,7 @@
                 (value) => this.onTempInternal(value)
             );
             this._countdownId = setInterval(() => {
-                this.countdown = this.countdown <= 0 ? 0 : (this.countdown-1);
+                this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
         }
 
@@ -158,7 +159,7 @@
                 updatePhase(this, true);
             } else if (value === false) {
                 this._state.active = value;
-                this.countdown = 0;
+                this._state.countdown = 0;
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
@@ -171,24 +172,23 @@
         }
 
         get cycle() {
-            return this._cycle;
+            return this._state.cycle;
         }
 
         set cycle(value) {
             if (this.isActive) {
                 this.activate(false);
-                this._cycle = value;
+                this._state.cycle = value;
                 this.activate(true);
             } else {
-                this._cycle = value;
+                this._state.cycle = value;
             }
-            this.nextCycle = this._cycle;
+            this.nextCycle = this._state.cycle;
             return this;
         }
 
         get state() {
             return Object.assign({
-                type: "OyaVessel",
                 cycle: this.cycle,
                 nextCycle: this.nextCycle,
                 cycleNumber: this.cycleNumber,
@@ -199,7 +199,7 @@
 
     function updatePhase(self, value) {
         var cycle = self.cycles[self.cycle];
-        self.countdown = 0;
+        self._state.countdown = 0;
         if (!cycle || !self.isActive) {
             return;
         }
@@ -210,9 +210,9 @@
             if (self.maxCycles && self.cycleNumber > self.maxCycles) {
                 self.activate(false);
             } else { 
+                self._state.countdown = Math.trunc(cycle.on);
                 self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
                 var msOn = Number(cycle.on) * 1000;
-                self.countdown = Math.trunc(cycle.on);
                 if (msOn > 0) {
                     self._phaseTimeout = setTimeout(() => {
                         self._phaseTimeout = null;
@@ -221,9 +221,9 @@
                }
            }
         } else {
+            self._state.countdown = Math.trunc(cycle.off);
             self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
             var msOff = Number(cycle.off) * 1000;
-            self.countdown = Math.trunc(cycle.off);
             if (msOff > 0) {
                 self._phaseTimeout = setTimeout(() => {
                     self._phaseTimeout = null;
