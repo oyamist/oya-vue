@@ -7,7 +7,7 @@
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="vesselIndex" value="0" slot="prop">
-            Index (0-based) of timer for component</rb-about-item>
+            Index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
@@ -18,36 +18,65 @@
         </v-toolbar> 
         <v-card-text class="text-xs-center">
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
-                <div style="display:flex; flex-direction: column">
+                <div style="display:flex; flex-direction: column; justify-content: center">
                     <div>
-                        <img v-show="rbService.isActive && rbService.pump1" 
+                        <img v-show="rbService.active && rbService.Pump1" 
                             src="/assets/mist-on.svg" height=200px/>
-                        <img v-show="rbService.isActive && !rbService.pump1" 
+                        <img v-show="rbService.active && !rbService.Pump1" 
                             src="/assets/mist-off.svg" height=200px/>
-                        <img v-show="!rbService.isActive" src="/assets/inactive.svg" height=200px/>
-                        <h5>{{rbService.countdown}}</h5>
+                        <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
                     </div>
-                    <div>
-                        <v-btn v-show="!rbService.isActive" @click="clickActivate()" 
-                            class="green darken-3" dark>
-                            Run
-                        </v-btn>
-                        <v-btn error v-show="rbService.isActive" @click="clickActivate()">
-                            Stop
-                        </v-btn>
+                    <div class="pl-2">
+                        <v-switch label="Bioreactor is on" v-show="rbService.active"
+                            value input-value="true"
+                            color="green darken-3"
+                            v-on:click.native.stop="clickActivate()"></v-switch>
+                        <v-switch label="Bioreactor is off" v-show="!rbService.active"
+                            v-on:click.native.stop="clickActivate()"></v-switch>
                     </div>
                 </div>
-                <v-list v-show="timer" subheader>
-                    <v-subheader >Mist cycle </v-subheader>
+                <v-list v-show="vessel" subheader>
+                    <v-subheader>Actuators</v-subheader>
+                    <v-list-tile v-for="actuator in actuators" key="actuator.name" 
+                        @click="clickActuator(actuator)"
+                        >
+                        <v-list-tile-action v-show='rbService[actuator.name]' >
+                            <v-icon class='green--text text--darken-3'>pets</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-action v-show='!rbService[actuator.name]' >
+                            <v-icon class='grey--text text--lighten-1'>not_interested</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content >
+                            <v-list-tile-title>
+                                {{actuator.name}}
+                            </v-list-tile-title>
+                        </v-list-tile-content >
+                    </v-list-tile>
+                </v-list>
+                <v-list v-show="vessel" subheader>
+                    <v-subheader > Mist cycle </v-subheader>
                     <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
                         unused-v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
                         >
                         <v-list-tile-action v-show='cycle===rbService.cycle' >
-                            <v-icon class='green--text text--darken-3'>face</v-icon>
+                            <div class='caption'>
+                                <v-progress-circular v-bind:value="cycleProgress" 
+                                    v-bind:rotate="-90"
+                                    v-show="cycle===rbService.cycle && rbService.Pump1"
+                                    class="blue--text text--darken-1">
+                                    {{rbService.countdown}}
+                                </v-progress-circular>
+                                <v-progress-circular v-bind:value="cycleProgress" 
+                                    v-bind:rotate="-90"
+                                    v-show="cycle===rbService.cycle && !rbService.Pump1"
+                                    class="amber--text text--darken-3">
+                                    {{rbService.countdown}}
+                                </v-progress-circular>
+                            </div>
                         </v-list-tile-action>
                         <v-list-tile-action 
                             v-show='cycle!==rbService.nextCycle && cycle!==rbService.cycle' >
-                            <v-icon class='grey--text text--lighten-1'>face</v-icon>
+                            <v-icon class='pl-1 grey--text text--lighten-1'>timer</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-action 
                             v-show='rbService.nextCycle!==rbService.cycle && cycle===rbService.nextCycle' >
@@ -138,9 +167,9 @@ export default {
     },
     methods: {
         cycleDef(cycle) {
-            var timer = this.timer;
+            var vessel = this.vessel;
             var cycle = cycle || this.rbService && this.rbService.cycle;
-            return timer && cycle && timer.cycles[cycle];
+            return vessel && cycle && vessel.cycles[cycle];
         },
         clickMenu() {
             this.apiEdit();
@@ -149,7 +178,7 @@ export default {
             var url = [this.restOrigin(), this.service, 'control'].join('/');
             console.log("activate");
             this.$http.post(url, {
-                activate:!this.rbService.isActive,
+                activate:!this.rbService.active,
             }).then(r => {
                 console.log("ok", r);
                 this.activeToggle = r.data.activate;
@@ -172,30 +201,39 @@ export default {
         },
     },
     computed: {
-        timer() {
+        cycleProgress() {
+            var countstart = this.rbService.countstart;
+            var countdown = this.rbService.countdown;
+            return countstart ? (countstart - countdown) * 100 / countstart : 100;
+        },
+        vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];
         },
+        actuators( ){
+            return this.apiModel && this.apiModel.actuators.filter(a => 
+                a.vesselIndex === this.vesselIndex);
+        },
         name() {
-            return this.timer && this.timer.name;
+            return this.vessel && this.vessel.name;
         },
         httpErr() {
             return this.rbResource.httpErr;
         },
         cycles() {
-            var timer = this.timer;
-            if (timer  == null) {
+            var vessel = this.vessel;
+            if (vessel  == null) {
                 return [];
             }
-            return Object.keys(this.timer.cycles).sort();
+            return Object.keys(this.vessel.cycles).sort();
         },
         editCycles() {
-            var cycleNames = Object.keys(this.timer.cycles).sort();
-            var timer = this.apiModelCopy.vessels[this.vesselIndex];
+            var cycleNames = Object.keys(this.vessel.cycles).sort();
+            var vessel = this.apiModelCopy.vessels[this.vesselIndex];
             return cycleNames.map(name => {
                 return {
                     name: name,
-                    cycle: timer.cycles[name],
+                    cycle: vessel.cycles[name],
                 }
             });
         },
@@ -210,7 +248,7 @@ export default {
             console.log("OyaReactor apiLoad", r);
         });
         this.rbInitialized().then(r => {
-            this.rbService.isActive != null && (this.activeToggle = this.rbService.isActive);
+            this.rbService.active != null && (this.activeToggle = this.rbService.active);
         }).catch(e => {
             console.error(e);
         });

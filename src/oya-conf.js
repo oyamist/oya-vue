@@ -1,5 +1,16 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
+    const ACTUATOR_USAGES = {
+        'Pump': {
+            activationSink: OyaVessel.EVENT_PUMP1,
+        },
+        'Fan': {
+            activationSink: OyaVessel.EVENT_FAN1,
+        },
+        'Valve': {
+            activationSink: OyaVessel.EVENT_VALVE1,
+        },
+    };
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -14,12 +25,23 @@
             return vessel.toJSON();
         }
 
-        static createActuatorConfig(index=0, opts={}) {
+        static createActuatorConfig(index=0, usage="Pump", opts={}) {
+            if (typeof index === 'object') {
+                opts = index;
+                index = 0;
+                usage = opts.usage || "Pump";
+            }
+            if (typeof usage === 'object') {
+                opts = usage;
+                usage = opts.usage || "Pump";
+            }
+            var nTypes = Object.keys(ACTUATOR_USAGES).length;
             return {
-                name: opts.name || `actuator${index}`,
+                name: opts.name || `${usage}${Math.trunc(index/nTypes)+1}`,
+                usage,
                 type: opts.type || OyaConf.ACTUATOR_SPST_NO,
                 vesselIndex: opts.vesselIndex || 0,
-                activationSink: opts.activationSink || OyaVessel.EVENT_PUMP1,
+                activationSink: opts.activationSink || ACTUATOR_USAGES[usage].activationSink,
                 pin: opts.pin || index, // MCU control pin
             }
         }
@@ -48,14 +70,19 @@
                     this.actuators = [];
                     for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
                         this.actuators.push(
-                            OyaConf.createActuatorConfig(this.actuators.length, {
+                            OyaConf.createActuatorConfig(this.actuators.length, 'Pump', {
                                 vesselIndex: iVessel,
                                 activationSink: OyaVessel.EVENT_PUMP1,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuatorConfig(this.actuators.length, {
+                            OyaConf.createActuatorConfig(this.actuators.length, 'Fan', {
                                 vesselIndex: iVessel,
                                 activationSink: OyaVessel.EVENT_FAN1,
+                        }));
+                        this.actuators.push(
+                            OyaConf.createActuatorConfig(this.actuators.length, 'Valve', {
+                                vesselIndex: iVessel,
+                                activationSink: OyaVessel.EVENT_VALVE1,
                         }));
                     }
                 }

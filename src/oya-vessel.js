@@ -16,9 +16,11 @@
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
                 type: "OyaVessel",
-                pump1: false,
-                fan1: false,
+                Pump1: false,
+                Fan1: false,
+                Valve1: false,
                 countdown: 0,
+                countstart: 0,
                 tempInternal: null,
                 tempExternal: null,
                 tempAmbient: null,
@@ -35,7 +37,13 @@
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
             this.emitter.on(OyaVessel.EVENT_PUMP1, (value) => {
-                this._state.pump1 = value;
+                this._state.Pump1 = value;
+            });
+            this.emitter.on(OyaVessel.EVENT_FAN1, (value) => {
+                this._state.Fan1 = value;
+            });
+            this.emitter.on(OyaVessel.EVENT_VALVE1, (value) => {
+                this._state.Valve1 = value;
             });
             this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
@@ -85,6 +93,7 @@
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_PUMP1() { return "event:pump1"; }
         static get EVENT_FAN1() { return "event:fan1"; }
+        static get EVENT_VALVE1() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
@@ -127,7 +136,7 @@
         get summary() { 
             return `${this.name} ` +
                 `cycle:"${this.cycle}" ${this._state.cycleNumber} ` +
-                `active:${this.isActive?1:0} ${this.state.pump1?'on':'off'}`;
+                `active:${this.isActive?1:0} ${this.state.Pump1?'on':'off'}`;
         }
 
         get isActive() {
@@ -159,9 +168,13 @@
             } else if (value === false) {
                 this._state.active = value;
                 this._state.countdown = 0;
+                this._state.countstart = 0;
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
+                this.emitter.emit(OyaVessel.EVENT_PUMP1, false);
+                this.emitter.emit(OyaVessel.EVENT_FAN1, false);
+                this.emitter.emit(OyaVessel.EVENT_VALVE1, false);
             } else {
                 var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);
                 winston.warn(err.stack);
@@ -209,6 +222,7 @@
                 self.activate(false);
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
+                self._state.countstart = self._state.countdown;
                 self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
                 var msOn = Number(cycle.on) * 1000;
                 if (msOn > 0) {
@@ -220,6 +234,7 @@
            }
         } else {
             self._state.countdown = Math.trunc(cycle.off);
+            self._state.countstart = self._state.countdown;
             self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
             var msOff = Number(cycle.off) * 1000;
             if (msOff > 0) {

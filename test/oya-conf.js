@@ -13,18 +13,24 @@
             OyaConf.createVesselConfig(1),
         ],
         actuators: [
-            OyaConf.createActuatorConfig(0, {
+            OyaConf.createActuatorConfig(0, 'Pump', {
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_PUMP1}),
-            OyaConf.createActuatorConfig(1, {
+            OyaConf.createActuatorConfig(1, 'Fan',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_FAN1}),
-            OyaConf.createActuatorConfig(2, {
+            OyaConf.createActuatorConfig(2, 'Valve',{
+                vesselIndex: 0,
+                activationSink: OyaVessel.EVENT_VALVE1}),
+            OyaConf.createActuatorConfig(3, 'Pump', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_PUMP1}),
-            OyaConf.createActuatorConfig(3, {
+            OyaConf.createActuatorConfig(4, 'Fan', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_FAN1}),
+            OyaConf.createActuatorConfig(5, 'Valve',{
+                vesselIndex: 1,
+                activationSink: OyaVessel.EVENT_VALVE1}),
         ],
     };
     winston.level = 'error';
@@ -32,7 +38,7 @@
     it("toJSON() serializes configuration", function() {
         should.deepEqual(new OyaConf().toJSON(), defaultConf);
     });
-    it("TESTTESTctor takes configuration options", function() {
+    it("ctor takes configuration options", function() {
         var opts = {
             name: 'foo',
             tempUnit: 'C',
@@ -150,9 +156,9 @@
         });
     });
     it("update(opts) updates configuration ", function() {
-        var ov = new OyaConf();
-        var vessel0 = ov.vessels[0];
-        ov.update({
+        var oc = new OyaConf();
+        var vessel0 = oc.vessels[0];
+        oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
             startCycle: OyaVessel.CYCLE_FAN,
@@ -176,7 +182,7 @@
         });
 
         // vessels are not changed by update
-        should.equal(vessel0, ov.vessels[0]);
+        should.equal(vessel0, oc.vessels[0]);
 
         var updatedVessel = OyaConf.createVesselConfig(1);
         updatedVessel.name = 'test2';
@@ -195,9 +201,9 @@
         };
 
         // vessels are not changed by update
-        should.equal(vessel0, ov.vessels[0]);
+        should.equal(vessel0, oc.vessels[0]);
 
-        should.deepEqual(ov.toJSON(), {
+        should.deepEqual(oc.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
             tempUnit: 'C',
@@ -206,23 +212,38 @@
                 updatedVessel,
             ],
             actuators: [
-                OyaConf.createActuatorConfig(0, {
+                OyaConf.createActuatorConfig(0, 'Pump', {
                     vesselIndex: 0,
                     activationSink: OyaVessel.EVENT_PUMP1,
                 }),
-                OyaConf.createActuatorConfig(1, {
+                OyaConf.createActuatorConfig(1, 'Fan', {
                     vesselIndex: 0,
                     activationSink: OyaVessel.EVENT_FAN1,
                 }),
-                OyaConf.createActuatorConfig(2, {
+                OyaConf.createActuatorConfig(2, 'Valve', {
+                    vesselIndex: 0,
+                    activationSink: OyaVessel.EVENT_VALVE1,
+                }),
+                OyaConf.createActuatorConfig(3, 'Pump', {
                     vesselIndex: 1,
                     activationSink: OyaVessel.EVENT_PUMP1,
                 }),
-                OyaConf.createActuatorConfig(3, {
+                OyaConf.createActuatorConfig(4, 'Fan', {
                     vesselIndex: 1,
                     activationSink: OyaVessel.EVENT_FAN1,
+                }),
+                OyaConf.createActuatorConfig(5, 'Valve', {
+                    vesselIndex: 1,
+                    activationSink: OyaVessel.EVENT_VALVE1,
                 }),
             ],
         });
+        oc.actuators[0].name.should.equal('Pump1');
+        oc.actuators[1].name.should.equal('Fan1');
+        oc.actuators[2].name.should.equal('Valve1');
+        oc.actuators[3].name.should.equal('Pump2');
+        oc.actuators[4].name.should.equal('Fan2');
+        oc.actuators[5].name.should.equal('Valve2');
+
     });
 });
