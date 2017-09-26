@@ -50,16 +50,26 @@
                             <v-list-tile-title>
                                 {{actuator.name}}
                             </v-list-tile-title>
+                            <v-list-tile-sub-title class="oya-desc">
+                                {{actuator.desc}}
+                            </v-list-tile-sub-title>
                         </v-list-tile-content >
                     </v-list-tile>
                 </v-list>
                 <v-list v-show="vessel" subheader>
-                    <v-subheader > Mist cycle </v-subheader>
-                    <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)"
-                        unused-v-tooltip:left='{ html: `${cycleDef(cycle).on}s on; ${cycleDef(cycle).off}s off`}'
-                        >
-                        <v-list-tile-action v-show='cycle===rbService.cycle' >
-                            <div class='caption'>
+                    <v-subheader > Cycles </v-subheader>
+                    <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)" >
+                        <v-list-tile-action 
+                            v-show='cycle===rbService.cycle && !rbService.active' >
+                            <v-icon class='grey--text text--darken-2'
+                                large
+                                v-show="!rbService.active">
+                                timer_off
+                            </v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-action 
+                            v-show='cycle===rbService.cycle && rbService.active' >
+                            <div class='caption' v-show="rbService.active">
                                 <v-progress-circular v-bind:value="cycleProgress" 
                                     v-bind:rotate="-90"
                                     v-show="cycle===rbService.cycle && rbService.Pump1"
@@ -86,7 +96,7 @@
                             <v-list-tile-title>
                                 {{cycleDef(cycle).name}}
                             </v-list-tile-title>
-                            <v-list-tile-sub-title class="cycle-desc">
+                            <v-list-tile-sub-title class="oya-desc">
                                 {{cycleDef(cycle).desc}}
                             </v-list-tile-sub-title>
                         </v-list-tile-content>
@@ -259,9 +269,10 @@ export default {
 
 </script>
 <style> 
-.cycle-desc {
+.oya-desc {
     font-style: italic;
+    font-size: xx-small;
 }
-.cycle-desc:hover {
+.oya-desc:hover {
 }
 </style>

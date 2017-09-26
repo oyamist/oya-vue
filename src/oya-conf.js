@@ -1,17 +1,5 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
-    const ACTUATOR_USAGES = {
-        'Pump': {
-            activationSink: OyaVessel.EVENT_PUMP1,
-        },
-        'Fan': {
-            activationSink: OyaVessel.EVENT_FAN1,
-        },
-        'Valve': {
-            activationSink: OyaVessel.EVENT_VALVE1,
-        },
-    };
-
     // OyaMist bioreactor configuration
     class OyaConf {
         constructor(opts = {}) {
@@ -35,14 +23,37 @@
                 opts = usage;
                 usage = opts.usage || "Pump";
             }
-            var nTypes = Object.keys(ACTUATOR_USAGES).length;
+            var nTypes = Object.keys(OyaConf.ACTUATOR_USAGES).length;
+            var nameId = Math.trunc(index/nTypes)+1;
+            return Object.assign(OyaConf.ACTUATOR_USAGES[usage], {
+                name: `${usage}${nameId}`,
+                pin: index, // MCU control pin
+            }, opts);
+        }
+
+        static get ACTUATOR_USAGES() {
             return {
-                name: opts.name || `${usage}${Math.trunc(index/nTypes)+1}`,
-                usage,
-                type: opts.type || OyaConf.ACTUATOR_SPST_NO,
-                vesselIndex: opts.vesselIndex || 0,
-                activationSink: opts.activationSink || ACTUATOR_USAGES[usage].activationSink,
-                pin: opts.pin || index, // MCU control pin
+                'Pump': {
+                    activationSink: OyaVessel.EVENT_PUMP1,
+                    usage: 'Pump',
+                    desc: 'Misting pump',
+                    type: OyaConf.ACTUATOR_SPST_NO,
+                    vesselIndex: 0,
+                },
+                'Fan': {
+                    activationSink: OyaVessel.EVENT_FAN1,
+                    usage: 'Fan',
+                    desc: 'Cooling fan',
+                    type: OyaConf.ACTUATOR_SPST_NO,
+                    vesselIndex: 0,
+                },
+                'Valve': {
+                    activationSink: OyaVessel.EVENT_VALVE1,
+                    usage: 'Valve',
+                    desc: 'Drain valve',
+                    type: OyaConf.ACTUATOR_SPST_NO,
+                    vesselIndex: 0,
+                },
             }
         }
 
