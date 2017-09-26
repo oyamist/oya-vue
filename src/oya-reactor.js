@@ -16,7 +16,9 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
-                    this.resourceMethod("post", "control", this.postControl),
+                    this.resourceMethod("post", "vessel", this.postVessel),
+                    this.resourceMethod("post", "reactor", this.postReactor),
+                    this.resourceMethod("post", "actuator", this.postActuator),
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
@@ -97,34 +99,43 @@
             return this.putApiModel(req, res, next, this.apiFile);
         }
 
-        postControl(req, res, next) {
+        postActuator(req, res, next) {
+            var name = req.body.name;
+            var actuator = this.oyaConf.actuators.filter(a => {
+                return a.name === name ? a : null;
+            })[0];
+            if (actuator == null) {
+                throw new Error("unknown activator: " + JSON.stringify(req.body));
+            }
+            var value = actuator && req.body.value;
+            if (value == null) {
+                throw new Error("no value provided: " + JSON.stringify(req.body));
+            }
+            this.vessel.emitter.emit(actuator.activationSink, value);
+            return {
+                name,
+                value: this.vessel.state[name],
+            }
+        }
+
+        postReactor(req, res, next) {
             if (req.body.hasOwnProperty('activate')) {
                 this.vessel.activate(req.body.activate);
                 return {
                     activate: req.body.activate,
                 }
-            } else if (req.body.hasOwnProperty('actuator')) {
-                var name = req.body.actuator.name;
-                var actuator = this.oyaConf.actuators.filter(a => {
-                    return a.name === name ? a : null;
-                })[0];
-                if (actuator) {
-                    var value = req.body.actuator.value;
-                    this.vessel.emitter.emit(actuator.activationSink, value);
-                    return {
-                        actuator: {
-                            name,
-                            value: this.vessel.state[name],
-                        }
-                    }
-                }
-            } else if (req.body.hasOwnProperty('cycle')) {
+            }
+            throw new Error("invalid reactor request: " + JSON.stringify(req.body));
+        }
+
+        postVessel(req, res, next) { // DEPRECATED
+            if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.cycle = req.body.cycle;
                 return {
                     cycle: req.body.cycle,
                 }
             }
-            throw new Error("invalid control request: " + JSON.stringify(req.body));
+            throw new Error("invalid vessel request: " + JSON.stringify(req.body));
         }
 
         getState() {

@@ -146,7 +146,7 @@
         }();
         async.next();
     });
-    it("POST /control changes vessel state", function(done) {
+    it("POST /actuator changes actuator state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -159,34 +159,104 @@
 
                 // turn on Pump1
                 var command = {
-                    actuator: {
-                        name: "Pump1",
-                        value: true,
-                    }
+                    name: "Pump1",
+                    value: true,
                 }
-                var res = yield supertest(app).post("/test/control").send(command)
+                var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
                 should(vessel.state.Pump1).equal(true);
                 should.deepEqual(res.body, {
-                    actuator: {
-                        name: 'Pump1',
-                        value: true,
-                    },
+                    name: 'Pump1',
+                    value: true,
                 });
 
                 // turn on non-existent actuator
                 var command = {
-                    actuator: {
-                        name: "invalid-actuator",
-                        value: true,
-                    }
+                    name: "invalid-actuator",
+                    value: true,
                 }
                 winston.warn("The following warning is expected");
-                var res = yield supertest(app).post("/test/control").send(command)
+                var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(500);
-                should(res.body.error).match(/invalid control request/);
+                should(res.body.error).match(/unknown activator/);
+
+                // omit value
+                var command = {
+                    name: "Pump1",
+                }
+                winston.warn("The following warning is expected");
+                var res = yield supertest(app).post("/test/actuator").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(500);
+                should(res.body.error).match(/no value provided/);
+                should(vessel.state.Pump1).equal(true);
+
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("POST /vessel changes vessel state", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                if (fs.existsSync(APIMODEL_PATH)) {
+                    fs.unlinkSync(APIMODEL_PATH);
+                }
+
+                var vessel = testReactor().vessels[0];
+                should(vessel.state.active).equal(false);
+
+                // change cycle
+                var command = {
+                    cycle: OyaVessel.CYCLE_FAN,
+                }
+                winston.level="warn";
+                should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+                var res = yield supertest(app).post("/test/vessel").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
+                should.deepEqual(res.body, {
+                    cycle: OyaVessel.CYCLE_FAN,
+                });
+
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("POST /reactor changes vessel state", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                if (fs.existsSync(APIMODEL_PATH)) {
+                    fs.unlinkSync(APIMODEL_PATH);
+                }
+
+                var vessel = testReactor().vessels[0];
+                should(vessel.state.active).equal(false);
+
+                // activate vessel
+                var command = {
+                    activate: true,
+                }
+                var res = yield supertest(app).post("/test/reactor").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.state.active).equal(true);
+                should.deepEqual(res.body, {
+                    activate: true,
+                });
+
                 done();
             } catch(err) {
                 winston.error(err.message, err.stack);

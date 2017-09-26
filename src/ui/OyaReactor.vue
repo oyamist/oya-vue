@@ -202,7 +202,7 @@ export default {
             this.apiEdit();
         },
         clickActivate() {
-            var url = [this.restOrigin(), this.service, 'control'].join('/');
+            var url = [this.restOrigin(), this.service, 'reactor'].join('/');
             console.log("activate");
             this.$http.post(url, {
                 activate:!this.rbService.active,
@@ -215,13 +215,11 @@ export default {
             });
         },
         clickActuator(actuator) {
-            var url = [this.restOrigin(), this.service, 'control'].join('/');
+            var url = [this.restOrigin(), this.service, 'actuator'].join('/');
             console.log("clicked", actuator);
             this.$http.post(url, {
-                actuator:{
-                    name: actuator.name,
-                    value: !this.rbService[actuator.name],
-                },
+                name: actuator.name,
+                value: !this.rbService[actuator.name],
             }).then(r => {
                 console.log("ok", r);
             }).catch(e => {
@@ -229,7 +227,7 @@ export default {
             });
         },
         clickCycle(cycle) {
-            var url = [this.restOrigin(), this.service, 'control'].join('/');
+            var url = [this.restOrigin(), this.service, 'vessel'].join('/');
             console.log("clicked", cycle);
             this.$http.post(url, {
                 cycle,
