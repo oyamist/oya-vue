@@ -212,7 +212,21 @@ export default {
             }).catch(e => {
                 console.error("error", e);
                 this.activeToggle = r.data.activate;
-            });;
+            });
+        },
+        clickActuator(actuator) {
+            var url = [this.restOrigin(), this.service, 'control'].join('/');
+            console.log("clicked", actuator);
+            this.$http.post(url, {
+                actuator:{
+                    name: actuator.name,
+                    value: !this.rbService[actuator.name],
+                },
+            }).then(r => {
+                console.log("ok", r);
+            }).catch(e => {
+                console.error("error", e);
+            });
         },
         clickCycle(cycle) {
             var url = [this.restOrigin(), this.service, 'control'].join('/');
@@ -224,7 +238,7 @@ export default {
                 this.rbService.cycle = r.data.cycle;
             }).catch(e => {
                 console.error("error", e);
-            });;
+            });
         },
     },
     computed: {

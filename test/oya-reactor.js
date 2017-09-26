@@ -146,6 +146,55 @@
         }();
         async.next();
     });
+    it("POST /control changes vessel state", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                if (fs.existsSync(APIMODEL_PATH)) {
+                    fs.unlinkSync(APIMODEL_PATH);
+                }
+
+                var vessel = testReactor().vessels[0];
+                should(vessel.state.Pump1).equal(false);
+
+                // turn on Pump1
+                var command = {
+                    actuator: {
+                        name: "Pump1",
+                        value: true,
+                    }
+                }
+                var res = yield supertest(app).post("/test/control").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.state.Pump1).equal(true);
+                should.deepEqual(res.body, {
+                    actuator: {
+                        name: 'Pump1',
+                        value: true,
+                    },
+                });
+
+                // turn on non-existent actuator
+                var command = {
+                    actuator: {
+                        name: "invalid-actuator",
+                        value: true,
+                    }
+                }
+                winston.warn("The following warning is expected");
+                var res = yield supertest(app).post("/test/control").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(500);
+                should(res.body.error).match(/invalid control request/);
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
         app.locals.rbServer.close();

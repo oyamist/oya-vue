@@ -103,13 +103,28 @@
                 return {
                     activate: req.body.activate,
                 }
+            } else if (req.body.hasOwnProperty('actuator')) {
+                var name = req.body.actuator.name;
+                var actuator = this.oyaConf.actuators.filter(a => {
+                    return a.name === name ? a : null;
+                })[0];
+                if (actuator) {
+                    var value = req.body.actuator.value;
+                    this.vessel.emitter.emit(actuator.activationSink, value);
+                    return {
+                        actuator: {
+                            name,
+                            value: this.vessel.state[name],
+                        }
+                    }
+                }
             } else if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.cycle = req.body.cycle;
                 return {
                     cycle: req.body.cycle,
                 }
             }
-            throw new Error("unknown control request: ", req.body);
+            throw new Error("invalid control request: " + JSON.stringify(req.body));
         }
 
         getState() {
