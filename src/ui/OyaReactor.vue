@@ -17,7 +17,7 @@
             <v-toolbar-side-icon dark @click="clickMenu"></v-toolbar-side-icon>
         </v-toolbar> 
         <v-card-text class="text-xs-center">
-            <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap">
+            <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                 <div style="display:flex; flex-direction: column; justify-content: center">
                     <div>
                         <img v-show="rbService.active && rbService.Pump1" 
@@ -35,73 +35,88 @@
                             v-on:click.native.stop="clickActivate()"></v-switch>
                     </div>
                 </div>
-                <v-list v-show="vessel" subheader>
-                    <v-subheader>Actuators</v-subheader>
-                    <v-list-tile v-for="actuator in actuators" key="actuator.name" 
-                        @click="clickActuator(actuator)"
-                        >
-                        <v-list-tile-action v-show='rbService[actuator.name]' >
-                            <v-icon class='green--text text--darken-3'>pets</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-action v-show='!rbService[actuator.name]' >
-                            <v-icon class='grey--text text--lighten-1'>not_interested</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content >
-                            <v-list-tile-title>
-                                {{actuator.name}}
-                            </v-list-tile-title>
-                            <v-list-tile-sub-title class="oya-desc">
-                                {{actuator.desc}}
-                            </v-list-tile-sub-title>
-                        </v-list-tile-content >
-                    </v-list-tile>
-                </v-list>
-                <v-list v-show="vessel" subheader>
-                    <v-subheader > Cycles </v-subheader>
-                    <v-list-tile v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)" >
-                        <v-list-tile-action 
-                            v-show='cycle===rbService.cycle && !rbService.active' >
-                            <v-icon class='grey--text text--darken-2'
-                                large
-                                v-show="!rbService.active">
-                                timer_off
-                            </v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-action 
-                            v-show='cycle===rbService.cycle && rbService.active' >
-                            <div class='caption' v-show="rbService.active">
-                                <v-progress-circular v-bind:value="cycleProgress" 
-                                    v-bind:rotate="-90"
-                                    v-show="cycle===rbService.cycle && rbService.Pump1"
-                                    class="blue--text text--darken-1">
-                                    {{rbService.countdown}}
-                                </v-progress-circular>
-                                <v-progress-circular v-bind:value="cycleProgress" 
-                                    v-bind:rotate="-90"
-                                    v-show="cycle===rbService.cycle && !rbService.Pump1"
-                                    class="amber--text text--darken-3">
-                                    {{rbService.countdown}}
-                                </v-progress-circular>
-                            </div>
-                        </v-list-tile-action>
-                        <v-list-tile-action 
-                            v-show='cycle!==rbService.nextCycle && cycle!==rbService.cycle' >
-                            <v-icon class='pl-1 grey--text text--lighten-1'>timer</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-action 
-                            v-show='rbService.nextCycle!==rbService.cycle && cycle===rbService.nextCycle' >
-                            <v-icon class='green--text text--darken-3'>hourglass_full</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content >
-                            <v-list-tile-title>
-                                {{cycleDef(cycle).name}}
-                            </v-list-tile-title>
-                            <v-list-tile-sub-title class="oya-desc">
-                                {{cycleDef(cycle).desc}}
-                            </v-list-tile-sub-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-                </v-list>
+                <div style="min-width: 20em">
+                    <v-list v-show="vessel" subheader>
+                        <v-subheader @click='actuatorToggle=!actuatorToggle'
+                            style="cursor: pointer">
+                            Actuators
+                            <v-icon v-show="actuatorToggle">keyboard_arrow_up</v-icon>
+                            <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
+                        </v-subheader>
+                        <v-list-tile v-for="actuator in actuators" key="actuator.name" 
+                            @click="clickActuator(actuator)"
+                            v-show="actuatorToggle"
+                            >
+                            <v-list-tile-action v-show='rbService[actuator.name]' >
+                                <v-icon class='green--text text--darken-3'>pets</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-action v-show='!rbService[actuator.name]' >
+                                <v-icon class='grey--text text--lighten-1'>not_interested</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content >
+                                <v-list-tile-title>
+                                    {{actuator.name}}
+                                </v-list-tile-title>
+                                <v-list-tile-sub-title class="oya-desc">
+                                    {{actuator.desc}}
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content >
+                        </v-list-tile>
+                    </v-list>
+                    <v-list v-show="vessel" subheader>
+                        <v-subheader @click='cycleToggle=!cycleToggle'
+                            style="cursor:pointer"> 
+                            Cycles 
+                            <v-icon v-show="cycleToggle">keyboard_arrow_up</v-icon>
+                            <v-icon v-show="!cycleToggle">keyboard_arrow_down</v-icon>
+                        </v-subheader>
+                        <v-list-tile 
+                            v-show='cycleToggle || cycle===rbService.cycle'
+                            v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)" >
+                            <v-list-tile-action 
+                                v-show='cycle===rbService.cycle && !rbService.active' >
+                                <v-icon class='grey--text text--darken-2'
+                                    large
+                                    v-show="!rbService.active">
+                                    timer_off
+                                </v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-action 
+                                v-show='cycle===rbService.cycle && rbService.active' >
+                                <div class='caption' v-show="rbService.active">
+                                    <v-progress-circular v-bind:value="cycleProgress" 
+                                        v-bind:rotate="-90"
+                                        v-show="cycle===rbService.cycle && rbService.Pump1"
+                                        class="blue--text text--darken-1">
+                                        {{rbService.countdown}}
+                                    </v-progress-circular>
+                                    <v-progress-circular v-bind:value="cycleProgress" 
+                                        v-bind:rotate="-90"
+                                        v-show="cycle===rbService.cycle && !rbService.Pump1"
+                                        class="amber--text text--darken-3">
+                                        {{rbService.countdown}}
+                                    </v-progress-circular>
+                                </div>
+                            </v-list-tile-action>
+                            <v-list-tile-action 
+                                v-show='cycle!==rbService.nextCycle && cycle!==rbService.cycle' >
+                                <v-icon class='pl-1 grey--text text--lighten-1'>timer</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-action 
+                                v-show='rbService.nextCycle!==rbService.cycle && cycle===rbService.nextCycle' >
+                                <v-icon class='green--text text--darken-3'>hourglass_full</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content >
+                                <v-list-tile-title>
+                                    {{cycleDef(cycle).name}}
+                                </v-list-tile-title>
+                                <v-list-tile-sub-title class="oya-desc">
+                                    {{cycleDef(cycle).desc}}
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                    </v-list>
+                </div>
             </div>
         </v-card-text>
         <v-system-bar v-if='httpErr' 
@@ -162,6 +177,8 @@ export default {
         return {
             apiEditDialog: false,
             activeToggle: false,
+            actuatorToggle: false,
+            cycleToggle: false,
             activeItems: [{
                 text: "Stop",
                 value: false,
