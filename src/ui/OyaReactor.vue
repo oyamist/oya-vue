@@ -7,7 +7,7 @@
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="vesselIndex" value="0" slot="prop">
-            Index (0-based) of vessel for component</rb-about-item>
+            bndex (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
@@ -127,30 +127,53 @@
     </v-card>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
-            <rb-dialog-row label="Vessel">
-                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
-                    label="Name" class="input-group--focused" />
-            </rb-dialog-row>
-            <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
-                <v-text-field v-model='cycleCopy.cycle.desc'
-                    label="Description" class="input-group--focused" />
-                <v-layout>
-                <v-flex xs3>
-                    <v-text-field v-model='cycleCopy.cycle.on'
-                        label="On seconds" class="input-group--focused" />
-                </v-flex>
-                <v-flex xs3>
-                    <v-text-field v-model='cycleCopy.cycle.off'
-                        label="Off seconds" class="input-group--focused" />
-                </v-flex>
-                </v-layout>
-            </rb-dialog-row>
-            <rb-dialog-row label="Advanced">
-                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].fanThreshold' 
-                    :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
-                <v-text-field v-model='apiModelCopy.vessels[vesselIndex].pin' 
-                    label="MCU Pin" class="input-group--focused" />
-            </rb-dialog-row>
+        <v-expansion-panel >
+            <v-expansion-panel-content>
+                <div slot="header">Vessel</div>
+                <v-card>
+                    <v-card-text>
+                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
+                            label="Name" class="input-group--focused" />
+                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].fanThreshold' 
+                            :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+                <div slot="header">Cycles</div>
+                <v-card>
+                    <v-card-text>
+                        <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
+                            <v-text-field v-model='cycleCopy.cycle.desc'
+                                label="Description" class="input-group--focused" />
+                            <v-layout>
+                            <v-flex xs3>
+                                <v-text-field v-model='cycleCopy.cycle.on'
+                                    label="On seconds" class="input-group--focused" />
+                            </v-flex>
+                            <v-flex xs3>
+                                <v-text-field v-model='cycleCopy.cycle.off'
+                                    label="Off seconds" class="input-group--focused" />
+                            </v-flex>
+                            </v-layout>
+                        </rb-dialog-row>
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+                <div slot="header">MCU Pin Map</div>
+                <v-card>
+                    <v-card-text>
+                        <v-text-field v-for="name in pinNames" key="name"
+                            type="number"
+                            v-model="apiModelCopy.pinMap[name]"
+                            required
+                            :rules="posIntRules(apiModelCopy.pinMap[name])"
+                            :label="name" class="input-group--focused" />
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+        </v-expansion-panel>
     </rb-api-dialog>
 
 </div>
@@ -186,13 +209,16 @@ export default {
                 text: "Run",
                 value: true,
             }],
-            apiRules: {
-                required: (value) => !!value || 'Required',
-                gt0: (value) => Number(value) > 0 || 'Positive number',
-            },
         }
     },
     methods: {
+        posIntRules(value) {
+            return [
+                () => !!value || 'This field is required',
+                () => !!value && (Math.trunc(Number(value))+"") === (value+"") || 'Expected integer',
+                () => !!value && Number(value) >= 0 || 'Expected positive number',
+            ];
+        },
         cycleDef(cycle) {
             var vessel = this.vessel;
             var cycle = cycle || this.rbService && this.rbService.cycle;
@@ -240,6 +266,13 @@ export default {
         },
     },
     computed: {
+        pinNames() {
+            var pinMap = this.apiModel && this.apiModel.pinMap;
+            if (pinMap == null) {
+                return [];
+            }
+            return Object.keys(pinMap).sort();
+        },
         cycleProgress() {
             var countstart = this.rbService.countstart;
             var countdown = this.rbService.countdown;

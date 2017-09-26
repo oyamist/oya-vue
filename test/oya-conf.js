@@ -12,6 +12,11 @@
             OyaConf.createVesselConfig(0),
             OyaConf.createVesselConfig(1),
         ],
+        pinMap: {
+            Pump1: 1,
+            Fan1: 2,
+            Valve1: 3,
+        },
         actuators: [
             OyaConf.createActuatorConfig(0, 'Pump', {
                 vesselIndex: 0,
@@ -91,6 +96,7 @@
             vessels: [
                 updatedVessel,
             ],
+            pinMap: defaultConf.pinMap,
             actuators: [
                 OyaConf.createActuatorConfig(0),
                 OyaConf.createActuatorConfig(1, {
@@ -211,32 +217,8 @@
                 OyaConf.createVesselConfig(0),
                 updatedVessel,
             ],
-            actuators: [
-                OyaConf.createActuatorConfig(0, 'Pump', {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_PUMP1,
-                }),
-                OyaConf.createActuatorConfig(1, 'Fan', {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_FAN1,
-                }),
-                OyaConf.createActuatorConfig(2, 'Valve', {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_VALVE1,
-                }),
-                OyaConf.createActuatorConfig(3, 'Pump', {
-                    vesselIndex: 1,
-                    activationSink: OyaVessel.EVENT_PUMP1,
-                }),
-                OyaConf.createActuatorConfig(4, 'Fan', {
-                    vesselIndex: 1,
-                    activationSink: OyaVessel.EVENT_FAN1,
-                }),
-                OyaConf.createActuatorConfig(5, 'Valve', {
-                    vesselIndex: 1,
-                    activationSink: OyaVessel.EVENT_VALVE1,
-                }),
-            ],
+            pinMap: defaultConf.pinMap,
+            actuators: defaultConf.actuators,
         });
         oc.actuators[0].name.should.equal('Pump1');
         oc.actuators[1].name.should.equal('Fan1');

@@ -27,7 +27,6 @@
             var nameId = Math.trunc(index/nTypes)+1;
             return Object.assign(OyaConf.ACTUATOR_USAGES[usage], {
                 name: `${usage}${nameId}`,
-                pin: index, // MCU control pin
             }, opts);
         }
 
@@ -74,6 +73,12 @@
                 OyaVessel.applyDelta(this.vessels[i], delta);
             });
 
+            this.pinMap = opts.pinMap || {
+                Pump1: 1,
+                Fan1: 2,
+                Valve1: 3,
+            };
+
             if (this.actuators == null) {
                 if (opts.actuators) {
                     this.actuators = opts.actuators.map((a,i) => OyaConf.createActuatorConfig(i));
@@ -118,6 +123,7 @@
                 tempUnit: this.tempUnit,
                 vessels: this.vessels,
                 actuators: this.actuators,
+                pinMap: this.pinMap,
             };
         }
 
