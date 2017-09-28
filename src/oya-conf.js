@@ -27,10 +27,10 @@
             }
             var nTypes = Object.keys(Actuator.USAGE_DEFAULTS).length;
             var nameId = Math.trunc(index/nTypes)+1;
-            return new Actuator({
+            return new Actuator(Object.assign({
                     usage,
                     name: `${usage}${nameId === 1 ? "" : nameId}`,
-                }, opts);
+                },opts));
         }
 
         update(opts = {}) {

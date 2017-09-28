@@ -43,6 +43,10 @@
     it("toJSON() serializes configuration", function() {
         should.deepEqual(new OyaConf().toJSON(), defaultConf);
     });
+    it("ctor creates default configuration", function() {
+        var oc = new OyaConf();
+        should.deepEqual(oc.actuators, defaultConf.actuators);
+    });
     it("ctor takes configuration options", function() {
         var opts = {
             name: 'foo',
@@ -106,7 +110,7 @@
             ],
         });
     });
-    it("createVesselConfig(index,opts) creates a custom timer", function() {
+    it("createVesselConfig(index,opts) creates a custom vessel", function() {
         should.deepEqual(OyaConf.createVesselConfig(), {
             name: "vessel1",
             type: "OyaVessel",

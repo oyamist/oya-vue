@@ -45,7 +45,7 @@
                         </v-subheader>
                         <v-list-tile v-for="actuator in actuators" key="actuator.name" 
                             @click="clickActuator(actuator)"
-                            v-show="actuatorToggle"
+                            v-show="actuatorToggle && actuator.vesselIndex === vesselIndex"
                             >
                             <v-list-tile-action v-show='rbService[actuator.name]' >
                                 <v-icon class='green--text text--darken-3'>pets</v-icon>
