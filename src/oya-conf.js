@@ -1,5 +1,7 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
+    const Actuator = require('./actuator');
+
     // OyaMist bioreactor configuration
     class OyaConf {
         constructor(opts = {}) {
@@ -13,7 +15,7 @@
             return vessel.toJSON();
         }
 
-        static createActuatorConfig(index=0, usage="Pump", opts={}) {
+        static createActuator(index=0, usage="Pump", opts={}) {
             if (typeof index === 'object') {
                 opts = index;
                 index = 0;
@@ -23,37 +25,12 @@
                 opts = usage;
                 usage = opts.usage || "Pump";
             }
-            var nTypes = Object.keys(OyaConf.ACTUATOR_USAGES).length;
+            var nTypes = Object.keys(Actuator.USAGE_DEFAULTS).length;
             var nameId = Math.trunc(index/nTypes)+1;
-            return Object.assign(OyaConf.ACTUATOR_USAGES[usage], {
-                name: `${usage}${nameId}`,
-            }, opts);
-        }
-
-        static get ACTUATOR_USAGES() {
-            return {
-                'Pump': {
-                    activationSink: OyaVessel.EVENT_PUMP1,
-                    usage: 'Pump',
-                    desc: 'Misting pump',
-                    type: OyaConf.ACTUATOR_SPST_NO,
-                    vesselIndex: 0,
-                },
-                'Fan': {
-                    activationSink: OyaVessel.EVENT_FAN1,
-                    usage: 'Fan',
-                    desc: 'Cooling fan',
-                    type: OyaConf.ACTUATOR_SPST_NO,
-                    vesselIndex: 0,
-                },
-                'Valve': {
-                    activationSink: OyaVessel.EVENT_VALVE1,
-                    usage: 'Valve',
-                    desc: 'Drain valve',
-                    type: OyaConf.ACTUATOR_SPST_NO,
-                    vesselIndex: 0,
-                },
-            }
+            return new Actuator({
+                    usage,
+                    name: `${usage}${nameId}`,
+                }, opts);
         }
 
         update(opts = {}) {
@@ -81,22 +58,22 @@
 
             if (this.actuators == null) {
                 if (opts.actuators) {
-                    this.actuators = opts.actuators.map((a,i) => OyaConf.createActuatorConfig(i));
+                    this.actuators = opts.actuators.map((a,i) => OyaConf.createActuator(i));
                 } else {
                     this.actuators = [];
                     for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
                         this.actuators.push(
-                            OyaConf.createActuatorConfig(this.actuators.length, 'Pump', {
+                            OyaConf.createActuator(this.actuators.length, 'Pump', {
                                 vesselIndex: iVessel,
                                 activationSink: OyaVessel.EVENT_PUMP1,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuatorConfig(this.actuators.length, 'Fan', {
+                            OyaConf.createActuator(this.actuators.length, 'Fan', {
                                 vesselIndex: iVessel,
                                 activationSink: OyaVessel.EVENT_FAN1,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuatorConfig(this.actuators.length, 'Valve', {
+                            OyaConf.createActuator(this.actuators.length, 'Valve', {
                                 vesselIndex: iVessel,
                                 activationSink: OyaVessel.EVENT_VALVE1,
                         }));
@@ -114,7 +91,6 @@
 
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
-        static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
 
         toJSON() {
             return {

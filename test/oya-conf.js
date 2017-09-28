@@ -18,22 +18,22 @@
             Valve1: 3,
         },
         actuators: [
-            OyaConf.createActuatorConfig(0, 'Pump', {
+            OyaConf.createActuator(0, 'Pump', {
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_PUMP1}),
-            OyaConf.createActuatorConfig(1, 'Fan',{
+            OyaConf.createActuator(1, 'Fan',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_FAN1}),
-            OyaConf.createActuatorConfig(2, 'Valve',{
+            OyaConf.createActuator(2, 'Valve',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_VALVE1}),
-            OyaConf.createActuatorConfig(3, 'Pump', {
+            OyaConf.createActuator(3, 'Pump', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_PUMP1}),
-            OyaConf.createActuatorConfig(4, 'Fan', {
+            OyaConf.createActuator(4, 'Fan', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_FAN1}),
-            OyaConf.createActuatorConfig(5, 'Valve',{
+            OyaConf.createActuator(5, 'Valve',{
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_VALVE1}),
         ],
@@ -65,11 +65,11 @@
                     },
             })],
             actuators: [
-                OyaConf.createActuatorConfig(0, {
+                OyaConf.createActuator(0, {
                     vesselIndex: 0,
                     activationSink: OyaVessel.EVENT_PUMP1,
                 }),
-                OyaConf.createActuatorConfig(1, {
+                OyaConf.createActuator(1, {
                     vesselIndex: 0,
                     activationSink: OyaVessel.EVENT_FAN1,
                 }),
@@ -98,8 +98,8 @@
             ],
             pinMap: defaultConf.pinMap,
             actuators: [
-                OyaConf.createActuatorConfig(0),
-                OyaConf.createActuatorConfig(1, {
+                OyaConf.createActuator(0),
+                OyaConf.createActuator(1, {
                     vesselIndex: 0,
                     activationSink: OyaVessel.EVENT_FAN1,
                 }),
