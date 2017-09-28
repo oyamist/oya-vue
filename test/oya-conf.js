@@ -13,23 +13,23 @@
             OyaConf.createVesselConfig(1),
         ],
         pinMap: {
-            Pump1: 1,
+            Mist1: 1,
             Fan1: 2,
             Valve1: 3,
         },
         actuators: [
-            OyaConf.createActuator(0, 'Pump', {
+            OyaConf.createActuator(0, 'Mist', {
                 vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_PUMP1}),
+                activationSink: OyaVessel.EVENT_MIST1}),
             OyaConf.createActuator(1, 'Fan',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_FAN1}),
             OyaConf.createActuator(2, 'Valve',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_VALVE1}),
-            OyaConf.createActuator(3, 'Pump', {
+            OyaConf.createActuator(3, 'Mist', {
                 vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_PUMP1}),
+                activationSink: OyaVessel.EVENT_MIST1}),
             OyaConf.createActuator(4, 'Fan', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_FAN1}),
@@ -67,7 +67,7 @@
             actuators: [
                 OyaConf.createActuator(0, {
                     vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_PUMP1,
+                    activationSink: OyaVessel.EVENT_MIST1,
                 }),
                 OyaConf.createActuator(1, {
                     vesselIndex: 0,
@@ -200,7 +200,7 @@
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: defaultCycles[OyaVessel.CYCLE_FAN].desc,
-                activationSource: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_MIST1,
                 on: 10,
                 off: 23,
             }
@@ -220,10 +220,10 @@
             pinMap: defaultConf.pinMap,
             actuators: defaultConf.actuators,
         });
-        oc.actuators[0].name.should.equal('Pump1');
+        oc.actuators[0].name.should.equal('Mist1');
         oc.actuators[1].name.should.equal('Fan1');
         oc.actuators[2].name.should.equal('Valve1');
-        oc.actuators[3].name.should.equal('Pump2');
+        oc.actuators[3].name.should.equal('Mist2');
         oc.actuators[4].name.should.equal('Fan2');
         oc.actuators[5].name.should.equal('Valve2');
 

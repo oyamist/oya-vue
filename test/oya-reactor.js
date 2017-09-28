@@ -155,19 +155,19 @@
                 }
 
                 var vessel = testReactor().vessels[0];
-                should(vessel.state.Pump1).equal(false);
+                should(vessel.state.Mist1).equal(false);
 
-                // turn on Pump1
+                // turn on Mist1
                 var command = {
-                    name: "Pump1",
+                    name: "Mist1",
                     value: true,
                 }
                 var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
-                should(vessel.state.Pump1).equal(true);
+                should(vessel.state.Mist1).equal(true);
                 should.deepEqual(res.body, {
-                    name: 'Pump1',
+                    name: 'Mist1',
                     value: true,
                 });
 
@@ -184,14 +184,14 @@
 
                 // omit value
                 var command = {
-                    name: "Pump1",
+                    name: "Mist1",
                 }
                 winston.warn("The following warning is expected");
                 var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(500);
                 should(res.body.error).match(/no value provided/);
-                should(vessel.state.Pump1).equal(true);
+                should(vessel.state.Mist1).equal(true);
 
                 done();
             } catch(err) {

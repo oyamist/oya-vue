@@ -15,15 +15,15 @@
             return vessel.toJSON();
         }
 
-        static createActuator(index=0, usage="Pump", opts={}) {
+        static createActuator(index=0, usage="Mist", opts={}) {
             if (typeof index === 'object') {
                 opts = index;
                 index = 0;
-                usage = opts.usage || "Pump";
+                usage = opts.usage || "Mist";
             }
             if (typeof usage === 'object') {
                 opts = usage;
-                usage = opts.usage || "Pump";
+                usage = opts.usage || "Mist";
             }
             var nTypes = Object.keys(Actuator.USAGE_DEFAULTS).length;
             var nameId = Math.trunc(index/nTypes)+1;
@@ -51,7 +51,7 @@
             });
 
             this.pinMap = opts.pinMap || {
-                Pump1: 1,
+                Mist1: 1,
                 Fan1: 2,
                 Valve1: 3,
             };
@@ -63,9 +63,9 @@
                     this.actuators = [];
                     for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Pump', {
+                            OyaConf.createActuator(this.actuators.length, 'Mist', {
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_PUMP1,
+                                activationSink: OyaVessel.EVENT_MIST1,
                         }));
                         this.actuators.push(
                             OyaConf.createActuator(this.actuators.length, 'Fan', {

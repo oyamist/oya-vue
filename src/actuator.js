@@ -4,7 +4,7 @@
 
     class Actuator {
         constructor(opts = {}) {
-            const usage = opts.usage || Actuator.USAGE_PUMP;
+            const usage = opts.usage || Actuator.USAGE_MIST;
             const actDefault = Actuator.USAGE_DEFAULTS.filter(
                 ud => (ud.usage===usage))[0] || {};
 
@@ -19,24 +19,24 @@
         }
 
         static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
-        static get USAGE_PUMP() { return "Pump"; }
+        static get USAGE_MIST() { return "Mist"; }
         static get USAGE_FAN() { return "Fan"; }
         static get USAGE_VALVE() { return "Valve"; }
         static get USAGE_DEFAULTS() { 
             return [{
-                usage: 'Pump', 
-                activationSink: OyaVessel.EVENT_PUMP1,
-                desc: 'Misting pump',
+                usage: 'Mist', 
+                activationSink: OyaVessel.EVENT_MIST1,
+                desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: 'Fan', 
                 activationSink: OyaVessel.EVENT_FAN1,
-                desc: 'Cooling fan',
+                desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: 'Valve',
                 activationSink: OyaVessel.EVENT_VALVE1,
-                desc: 'Drain valve',
+                desc: 'Drain reservoir ',
                 type: Actuator.ACTUATOR_SPST_NO,
             }];
         }

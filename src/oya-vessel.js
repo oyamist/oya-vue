@@ -16,7 +16,7 @@
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
                 type: "OyaVessel",
-                Pump1: false,
+                Mist1: false,
                 Fan1: false,
                 Valve1: false,
                 countdown: 0,
@@ -36,8 +36,8 @@
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
-            this.emitter.on(OyaVessel.EVENT_PUMP1, (value) => {
-                this._state.Pump1 = value;
+            this.emitter.on(OyaVessel.EVENT_MIST1, (value) => {
+                this._state.Mist1 = value;
             });
             this.emitter.on(OyaVessel.EVENT_FAN1, (value) => {
                 this._state.Fan1 = value;
@@ -60,28 +60,28 @@
             [OyaVessel.CYCLE_STANDARD]: {
                 name: "Standard",
                 desc: "Standard cycle for all phases of plant growth",
-                activationSource: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_MIST1,
                 on: 30,
                 off: 60,
             },
             [OyaVessel.CYCLE_DRAIN]: {
                 name: "Drain",
                 desc: "Partially drain reservoir and stop to add fresh nutrients",
-                activationSource: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_MIST1,
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
             },
             [OyaVessel.CYCLE_FAN]: {
                 name: "Cool",
                 desc: "Hot day evaporative cooling cycle with fan",
-                activationSource: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_MIST1,
                 on: 15,
                 off: 15,
             },
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
                 desc: "Conservative misting cycle for plants with good roots",
-                activationSource: OyaVessel.EVENT_PUMP1,
+                activationSource: OyaVessel.EVENT_MIST1,
                 on: 5,
                 off: 60,
             },
@@ -91,7 +91,7 @@
         static get CYCLE_DRAIN() { return "Cycle #2"; }
         static get CYCLE_FAN() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
-        static get EVENT_PUMP1() { return "event:pump1"; }
+        static get EVENT_MIST1() { return "event:pump1"; }
         static get EVENT_FAN1() { return "event:fan1"; }
         static get EVENT_VALVE1() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
@@ -136,7 +136,7 @@
         get summary() { 
             return `${this.name} ` +
                 `cycle:"${this.cycle}" ${this._state.cycleNumber} ` +
-                `active:${this.isActive?1:0} ${this.state.Pump1?'on':'off'}`;
+                `active:${this.isActive?1:0} ${this.state.Mist1?'on':'off'}`;
         }
 
         get isActive() {
@@ -172,7 +172,7 @@
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
-                this.emitter.emit(OyaVessel.EVENT_PUMP1, false);
+                this.emitter.emit(OyaVessel.EVENT_MIST1, false);
                 this.emitter.emit(OyaVessel.EVENT_FAN1, false);
                 this.emitter.emit(OyaVessel.EVENT_VALVE1, false);
             } else {
@@ -223,7 +223,7 @@
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
                 self._state.countstart = self._state.countdown;
-                self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
+                self.emitter.emit(OyaVessel.EVENT_MIST1, value);
                 var msOn = Number(cycle.on) * 1000;
                 if (msOn > 0) {
                     self._phaseTimeout = setTimeout(() => {
@@ -235,7 +235,7 @@
         } else {
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
-            self.emitter.emit(OyaVessel.EVENT_PUMP1, value);
+            self.emitter.emit(OyaVessel.EVENT_MIST1, value);
             var msOff = Number(cycle.off) * 1000;
             if (msOff > 0) {
                 self._phaseTimeout = setTimeout(() => {
