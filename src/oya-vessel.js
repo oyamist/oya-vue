@@ -10,14 +10,14 @@
             this.name = `vessel${id++}`;
             this.enabled = true; // can be activated
             this.startCycle = OyaVessel.CYCLE_STANDARD;
-            this.hotCycle = OyaVessel.CYCLE_FAN;
-            this.fanThreshold = 80;
+            this.hotCycle = OyaVessel.CYCLE_COOL;
+            this.coolThreshold = 80;
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
                 type: "OyaVessel",
                 Mist1: false,
-                Fan1: false,
+                Cool1: false,
                 Valve1: false,
                 countdown: 0,
                 countstart: 0,
@@ -39,8 +39,8 @@
             this.emitter.on(OyaVessel.EVENT_MIST1, (value) => {
                 this._state.Mist1 = value;
             });
-            this.emitter.on(OyaVessel.EVENT_FAN1, (value) => {
-                this._state.Fan1 = value;
+            this.emitter.on(OyaVessel.EVENT_COOL, (value) => {
+                this._state.Cool1 = value;
             });
             this.emitter.on(OyaVessel.EVENT_VALVE1, (value) => {
                 this._state.Valve1 = value;
@@ -71,7 +71,7 @@
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
             },
-            [OyaVessel.CYCLE_FAN]: {
+            [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
                 desc: "Hot day evaporative cooling cycle with fan",
                 activationSource: OyaVessel.EVENT_MIST1,
@@ -89,10 +89,10 @@
 
         static get CYCLE_STANDARD() { return "Cycle #1"; }
         static get CYCLE_DRAIN() { return "Cycle #2"; }
-        static get CYCLE_FAN() { return "Cycle #3"; }
+        static get CYCLE_COOL() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_MIST1() { return "event:pump1"; }
-        static get EVENT_FAN1() { return "event:fan1"; }
+        static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_VALVE1() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
@@ -110,14 +110,14 @@
                 enabled: this.enabled,
                 startCycle: this.startCycle,
                 hotCycle: this.hotCycle,
-                fanThreshold: this.fanThreshold,
+                coolThreshold: this.coolThreshold,
                 maxCycles: this.maxCycles,
                 cycles: this.cycles,
             }
         }
 
         static applyDelta(vessel, delta={}) {
-            ['name', 'enabled', 'startCycle', 'hotCycle', 'fanThreshold', 'maxCycles']
+            ['name', 'enabled', 'startCycle', 'hotCycle', 'coolThreshold', 'maxCycles']
             .forEach(prop => {
                 vessel[prop] = delta[prop] == null ? vessel[prop] : delta[prop];
             });
@@ -145,7 +145,7 @@
 
         onTempInternal(value) {
             winston.debug(`onTempInternal ${value}`);
-            if (value < this.fanThreshold) {
+            if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
                     winston.info("onTempInternal: reverting to default cycle");
                     // cancel cooling and revert to default cycle
@@ -173,7 +173,7 @@
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 this.emitter.emit(OyaVessel.EVENT_MIST1, false);
-                this.emitter.emit(OyaVessel.EVENT_FAN1, false);
+                this.emitter.emit(OyaVessel.EVENT_COOL, false);
                 this.emitter.emit(OyaVessel.EVENT_VALVE1, false);
             } else {
                 var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);

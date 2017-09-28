@@ -52,7 +52,7 @@
 
             this.pinMap = opts.pinMap || {
                 Mist1: 1,
-                Fan1: 2,
+                Cool1: 2,
                 Valve1: 3,
             };
 
@@ -68,9 +68,9 @@
                                 activationSink: OyaVessel.EVENT_MIST1,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Fan', {
+                            OyaConf.createActuator(this.actuators.length, 'Cool', {
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_FAN1,
+                                activationSink: OyaVessel.EVENT_COOL,
                         }));
                         this.actuators.push(
                             OyaConf.createActuator(this.actuators.length, 'Valve', {

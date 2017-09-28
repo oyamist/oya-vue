@@ -20,7 +20,7 @@
 
         static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
         static get USAGE_MIST() { return "Mist"; }
-        static get USAGE_FAN() { return "Fan"; }
+        static get USAGE_FAN() { return "Cool"; }
         static get USAGE_VALVE() { return "Valve"; }
         static get USAGE_DEFAULTS() { 
             return [{
@@ -29,8 +29,8 @@
                 desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
-                usage: 'Fan', 
-                activationSink: OyaVessel.EVENT_FAN1,
+                usage: 'Cool', 
+                activationSink: OyaVessel.EVENT_COOL,
                 desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{

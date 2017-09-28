@@ -22,8 +22,8 @@
     var testTimer = OyaConf.createVesselConfig();
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
-    testTimer.cycles[OyaVessel.CYCLE_FAN].on = FAN_ON;
-    testTimer.cycles[OyaVessel.CYCLE_FAN].off = FAN_OFF;
+    testTimer.cycles[OyaVessel.CYCLE_COOL].on = FAN_ON;
+    testTimer.cycles[OyaVessel.CYCLE_COOL].off = FAN_OFF;
     var level = winston.level;
     winston.level = 'warn';
 
@@ -80,7 +80,7 @@
                         tempUnit: 'F',
                     });
                     should(apiModel.vessels[0].cycles).properties([
-                        OyaVessel.CYCLE_FAN,
+                        OyaVessel.CYCLE_COOL,
                         OyaVessel.CYCLE_STANDARD,
                         OyaVessel.CYCLE_DRAIN,
                     ]);
@@ -121,7 +121,7 @@
                     apiModel: newConf,
                 };
                 newConf.name = 'OyaMist01';
-                newConf.vessels[0].fanThreshold = 81;
+                newConf.vessels[0].coolThreshold = 81;
                 newConf.vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on = 3;
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
@@ -129,13 +129,13 @@
                     should.ok(apiModel);
                     apiModel.type.should.equal("OyaConf");
                     apiModel.name.should.equal("OyaMist01");
-                    apiModel.vessels[0].fanThreshold.should.equal(81);
+                    apiModel.vessels[0].coolThreshold.should.equal(81);
                     should.deepEqual(apiModel, Object.assign({},newConf,{
                         rbHash: rbh.hash(newConf),
                     }));
                     should(testReactor().vessels[0].name).equal('vessel1');
                     should(testReactor().vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on).equal(3);
-                    should(testReactor().vessels[0].fanThreshold).equal(81);
+                    should(testReactor().vessels[0].coolThreshold).equal(81);
                     should.ok(apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -214,16 +214,16 @@
 
                 // change cycle
                 var command = {
-                    cycle: OyaVessel.CYCLE_FAN,
+                    cycle: OyaVessel.CYCLE_COOL,
                 }
                 winston.level="warn";
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
                 var res = yield supertest(app).post("/test/vessel").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
-                should(vessel.cycle).equal(OyaVessel.CYCLE_FAN);
+                should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
                 should.deepEqual(res.body, {
-                    cycle: OyaVessel.CYCLE_FAN,
+                    cycle: OyaVessel.CYCLE_COOL,
                 });
 
                 done();

@@ -134,8 +134,8 @@
                     <v-card-text>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                             label="Name" class="input-group--focused" />
-                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].fanThreshold' 
-                            :label="`Fan threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].coolThreshold' 
+                            :label="`Cool threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
