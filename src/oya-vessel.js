@@ -16,9 +16,9 @@
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
                 type: "OyaVessel",
-                Mist1: false,
-                Cool1: false,
-                Valve1: false,
+                Mist: false,
+                Cool: false,
+                Drain: false,
                 countdown: 0,
                 countstart: 0,
                 tempInternal: null,
@@ -37,13 +37,13 @@
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
             this.emitter.on(OyaVessel.EVENT_MIST1, (value) => {
-                this._state.Mist1 = value;
+                this._state.Mist = value;
             });
             this.emitter.on(OyaVessel.EVENT_COOL, (value) => {
-                this._state.Cool1 = value;
+                this._state.Cool = value;
             });
-            this.emitter.on(OyaVessel.EVENT_VALVE1, (value) => {
-                this._state.Valve1 = value;
+            this.emitter.on(OyaVessel.EVENT_DRAIN, (value) => {
+                this._state.Drain = value;
             });
             this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
@@ -93,7 +93,7 @@
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_MIST1() { return "event:pump1"; }
         static get EVENT_COOL() { return "event:Cool"; }
-        static get EVENT_VALVE1() { return "event:valve1"; }
+        static get EVENT_DRAIN() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
@@ -136,7 +136,7 @@
         get summary() { 
             return `${this.name} ` +
                 `cycle:"${this.cycle}" ${this._state.cycleNumber} ` +
-                `active:${this.isActive?1:0} ${this.state.Mist1?'on':'off'}`;
+                `active:${this.isActive?1:0} ${this.state.Mist?'on':'off'}`;
         }
 
         get isActive() {
@@ -174,7 +174,7 @@
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 this.emitter.emit(OyaVessel.EVENT_MIST1, false);
                 this.emitter.emit(OyaVessel.EVENT_COOL, false);
-                this.emitter.emit(OyaVessel.EVENT_VALVE1, false);
+                this.emitter.emit(OyaVessel.EVENT_DRAIN, false);
             } else {
                 var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);
                 winston.warn(err.stack);

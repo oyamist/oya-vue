@@ -29,7 +29,7 @@
             var nameId = Math.trunc(index/nTypes)+1;
             return new Actuator({
                     usage,
-                    name: `${usage}${nameId}`,
+                    name: `${usage}${nameId === 1 ? "" : nameId}`,
                 }, opts);
         }
 
@@ -51,9 +51,9 @@
             });
 
             this.pinMap = opts.pinMap || {
-                Mist1: 1,
-                Cool1: 2,
-                Valve1: 3,
+                Mist: 1,
+                Cool: 2,
+                Drain: 3,
             };
 
             if (this.actuators == null) {
@@ -73,9 +73,9 @@
                                 activationSink: OyaVessel.EVENT_COOL,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Valve', {
+                            OyaConf.createActuator(this.actuators.length, 'Drain', {
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_VALVE1,
+                                activationSink: OyaVessel.EVENT_DRAIN,
                         }));
                     }
                 }

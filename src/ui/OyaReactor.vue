@@ -20,9 +20,9 @@
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                 <div style="display:flex; flex-direction: column; justify-content: center">
                     <div>
-                        <img v-show="rbService.active && rbService.Mist1" 
+                        <img v-show="rbService.active && rbService.Mist" 
                             src="/assets/mist-on.svg" height=200px/>
-                        <img v-show="rbService.active && !rbService.Mist1" 
+                        <img v-show="rbService.active && !rbService.Mist" 
                             src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
                     </div>
@@ -86,13 +86,13 @@
                                 <div class='caption' v-show="rbService.active">
                                     <v-progress-circular v-bind:value="cycleProgress" 
                                         v-bind:rotate="-90"
-                                        v-show="cycle===rbService.cycle && rbService.Mist1"
+                                        v-show="cycle===rbService.cycle && rbService.Mist"
                                         class="blue--text text--darken-1">
                                         {{rbService.countdown}}
                                     </v-progress-circular>
                                     <v-progress-circular v-bind:value="cycleProgress" 
                                         v-bind:rotate="-90"
-                                        v-show="cycle===rbService.cycle && !rbService.Mist1"
+                                        v-show="cycle===rbService.cycle && !rbService.Mist"
                                         class="amber--text text--darken-3">
                                         {{rbService.countdown}}
                                     </v-progress-circular>

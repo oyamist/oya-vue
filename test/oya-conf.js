@@ -13,9 +13,9 @@
             OyaConf.createVesselConfig(1),
         ],
         pinMap: {
-            Mist1: 1,
-            Cool1: 2,
-            Valve1: 3,
+            Mist: 1,
+            Cool: 2,
+            Drain: 3,
         },
         actuators: [
             OyaConf.createActuator(0, 'Mist', {
@@ -24,18 +24,18 @@
             OyaConf.createActuator(1, 'Cool',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_COOL}),
-            OyaConf.createActuator(2, 'Valve',{
+            OyaConf.createActuator(2, 'Drain',{
                 vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_VALVE1}),
+                activationSink: OyaVessel.EVENT_DRAIN}),
             OyaConf.createActuator(3, 'Mist', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_MIST1}),
             OyaConf.createActuator(4, 'Cool', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_COOL}),
-            OyaConf.createActuator(5, 'Valve',{
+            OyaConf.createActuator(5, 'Drain',{
                 vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_VALVE1}),
+                activationSink: OyaVessel.EVENT_DRAIN}),
         ],
     };
     winston.level = 'error';
@@ -220,12 +220,12 @@
             pinMap: defaultConf.pinMap,
             actuators: defaultConf.actuators,
         });
-        oc.actuators[0].name.should.equal('Mist1');
-        oc.actuators[1].name.should.equal('Cool1');
-        oc.actuators[2].name.should.equal('Valve1');
+        oc.actuators[0].name.should.equal('Mist');
+        oc.actuators[1].name.should.equal('Cool');
+        oc.actuators[2].name.should.equal('Drain');
         oc.actuators[3].name.should.equal('Mist2');
         oc.actuators[4].name.should.equal('Cool2');
-        oc.actuators[5].name.should.equal('Valve2');
+        oc.actuators[5].name.should.equal('Drain2');
 
     });
 });

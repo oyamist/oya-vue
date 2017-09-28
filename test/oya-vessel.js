@@ -10,9 +10,9 @@
     const SETTLE_MS = 5;
     function sensorDefaults() {
         return {
-            Mist1: false,
-            Cool1: false,
-            Valve1: false,
+            Mist: false,
+            Cool: false,
+            Drain: false,
             tempInternal: null,
             tempExternal: null,
             tempAmbient: null,
@@ -93,39 +93,39 @@
             vessel2.activate("should-be-a-boolean");  
         });
     });
-    it ("state.Mist1 is true when cycle is active and the phase is on", function(done) {
+    it ("state.Mist is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
             try {
                 var vessel = createTestVessel({name:'test3a', maxCycles:2});
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 vessel.activate();
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(true);
+                should(vessel.state.Mist).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
                 should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(true);
+                should(vessel.state.Mist).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
                 should(vessel.state.cycleNumber).equal(3);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(false);
 
                 done();
@@ -140,17 +140,17 @@
         var async = function*() {
             try {
                 var vessel = createTestVessel({name:'test5a', maxCycles:2});
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 vessel.activate();
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(true);
+                should(vessel.state.Mist).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(true);
 
                 // changing the cycle re-activates
@@ -160,25 +160,25 @@
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
-                should(vessel.state.Mist1).equal(true);
+                should(vessel.state.Mist).equal(true);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should(vessel.state.cycleNumber).equal(2);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(true);
 
                 yield setTimeout(() => async.next(true), FAN_OFF*1000);
                 should(vessel.state.cycleNumber).equal(3);
                 should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
-                should(vessel.state.Mist1).equal(false);
+                should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(false);
 
                 done();
@@ -198,7 +198,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: false,
-                    Mist1: false,
+                    Mist: false,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
                     type: "OyaVessel",
                     cycleNumber: 0,
@@ -211,7 +211,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: true,
-                    Mist1: true,
+                    Mist: true,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
                     type: "OyaVessel",
                     cycleNumber: 1,
@@ -224,7 +224,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: true,
-                    Mist1: true,
+                    Mist: true,
                     nextCycle: OyaVessel.CYCLE_COOL,
                     type: "OyaVessel",
                     cycleNumber: 1,
@@ -237,7 +237,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: true,
-                    Mist1: false,
+                    Mist: false,
                     nextCycle: OyaVessel.CYCLE_COOL,
                     type: "OyaVessel",
                     cycleNumber: 1,
@@ -250,7 +250,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: true,
-                    Mist1: true,
+                    Mist: true,
                     nextCycle: OyaVessel.CYCLE_COOL,
                     type: "OyaVessel",
                     cycleNumber: 1, // first iteration of new cycle
@@ -263,7 +263,7 @@
                     countdown: 0,
                     countstart: 0,
                     active: true,
-                    Mist1: false,
+                    Mist: false,
                     nextCycle: OyaVessel.CYCLE_COOL,
                     type: "OyaVessel",
                     cycleNumber: 1, 
