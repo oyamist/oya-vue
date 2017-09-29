@@ -50,12 +50,6 @@
                 OyaVessel.applyDelta(this.vessels[i], delta);
             });
 
-            this.pinMap = opts.pinMap || {
-                Mist: 1,
-                Cool: 2,
-                Drain: 3,
-            };
-
             if (this.actuators == null) {
                 if (opts.actuators) {
                     this.actuators = opts.actuators.map((a,i) => OyaConf.createActuator(i));
@@ -99,7 +93,6 @@
                 tempUnit: this.tempUnit,
                 vessels: this.vessels,
                 actuators: this.actuators,
-                pinMap: this.pinMap,
             };
         }
 

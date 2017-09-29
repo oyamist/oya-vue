@@ -12,11 +12,6 @@
             OyaConf.createVesselConfig(0),
             OyaConf.createVesselConfig(1),
         ],
-        pinMap: {
-            Mist: 1,
-            Cool: 2,
-            Drain: 3,
-        },
         actuators: [
             OyaConf.createActuator(0, 'Mist', {
                 vesselIndex: 0,
@@ -100,7 +95,6 @@
             vessels: [
                 updatedVessel,
             ],
-            pinMap: defaultConf.pinMap,
             actuators: [
                 OyaConf.createActuator(0),
                 OyaConf.createActuator(1, {
@@ -221,7 +215,6 @@
                 OyaConf.createVesselConfig(0),
                 updatedVessel,
             ],
-            pinMap: defaultConf.pinMap,
             actuators: defaultConf.actuators,
         });
         oc.actuators[0].name.should.equal('Mist');

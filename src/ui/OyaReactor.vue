@@ -161,15 +161,18 @@
                 </v-card>
             </v-expansion-panel-content>
             <v-expansion-panel-content>
-                <div slot="header">MCU Pin Map</div>
+                <div slot="header">Actuators</div>
                 <v-card>
                     <v-card-text>
-                        <v-text-field v-for="name in pinNames" key="name"
-                            type="number"
-                            v-model="apiModelCopy.pinMap[name]"
-                            required
-                            :rules="posIntRules(apiModelCopy.pinMap[name])"
-                            :label="name" class="input-group--focused" />
+                        <rb-dialog-row v-for="actuator in mutableActuators" key="name"
+                            :label="actuator.name" >
+                            <v-text-field 
+                                type="number"
+                                v-model="actuator.pin"
+                                required
+                                :rules="posIntRules(actuator.pin)"
+                                label="MCU Pin" class="input-group--focused" />
+                        </rb-dialog-row>
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -266,13 +269,6 @@ export default {
         },
     },
     computed: {
-        pinNames() {
-            var pinMap = this.apiModel && this.apiModel.pinMap;
-            if (pinMap == null) {
-                return [];
-            }
-            return Object.keys(pinMap).sort();
-        },
         cycleProgress() {
             var countstart = this.rbService.countstart;
             var countdown = this.rbService.countdown;
@@ -281,6 +277,10 @@ export default {
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];
+        },
+        mutableActuators( ){
+            return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
+                a.vesselIndex === this.vesselIndex);
         },
         actuators( ){
             return this.apiModel && this.apiModel.actuators.filter(a => 

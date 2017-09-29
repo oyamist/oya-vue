@@ -15,10 +15,11 @@
             this.usage = usage;
             this.vesselIndex = opts.vesselIndex || 0;
             this.desc = opts.desc || actDefault.desc || 'generic actuator';
-            this.pin = opts.pin || -1;
+            this.pin = opts.pin || Actuator.NOPIN;
             this.activationSink = opts.activationSink || actDefault.activationSink;
         }
 
+        static get NOPIN() { return -1; }
         static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
         static get USAGE_MIST() { return "Mist"; }
         static get USAGE_FAN() { return "Cool"; }
