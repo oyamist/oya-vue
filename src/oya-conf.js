@@ -32,37 +32,34 @@
                 OyaVessel.applyDelta(this.vessels[i], delta);
             });
 
-            if (this.actuators == null) {
-                if (opts.actuators) {
-                    this.actuators = opts.actuators.map((a,i) => {
-                        var actuator = new Actuator();
-                        Object.assign(actuator, a);
-                        return actuator;
-                    });
-                } else {
-                    this.actuators = [];
-                    for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
-                        var suffix = iVessel ? iVessel+1 : "";
-                        this.actuators.push(
-                            new Actuator({
-                                name: `${Actuator.USAGE_MIST}${suffix}`,
-                                usage: Actuator.USAGE_MIST,
-                                vesselIndex: iVessel,
-                        }));
-                        this.actuators.push(
-                            new Actuator({
-                                name: `${Actuator.USAGE_COOL}${suffix}`,
-                                usage: Actuator.USAGE_COOL,
-                                vesselIndex: iVessel,
-                        }));
-                        this.actuators.push(
-                            new Actuator({
-                                name: `${Actuator.USAGE_DRAIN}${suffix}`,
-                                usage: Actuator.USAGE_DRAIN,
-                                vesselIndex: iVessel,
-                        }));
-                    }
+            if (this.actuators == null && opts.actuators == null) {
+                this.actuators = [];
+                for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
+                    var suffix = iVessel ? iVessel+1 : "";
+                    this.actuators.push(
+                        new Actuator({
+                            name: `${Actuator.USAGE_MIST}${suffix}`,
+                            usage: Actuator.USAGE_MIST,
+                            vesselIndex: iVessel,
+                    }));
+                    this.actuators.push(
+                        new Actuator({
+                            name: `${Actuator.USAGE_COOL}${suffix}`,
+                            usage: Actuator.USAGE_COOL,
+                            vesselIndex: iVessel,
+                    }));
+                    this.actuators.push(
+                        new Actuator({
+                            name: `${Actuator.USAGE_DRAIN}${suffix}`,
+                            usage: Actuator.USAGE_DRAIN,
+                            vesselIndex: iVessel,
+                    }));
                 }
+            }
+            if (opts.actuators) {
+                this.actuators = opts.actuators.map((a,i) => {
+                    return new Actuator(a);
+                });
             }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;

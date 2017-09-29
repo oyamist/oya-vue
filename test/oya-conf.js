@@ -163,6 +163,16 @@
     it("update(opts) updates configuration ", function() {
         var oc = new OyaConf();
         var vessel0 = oc.vessels[0];
+        var actuators = [
+            new Actuator({
+                usage: Actuator.USAGE_MIST,
+                pin: 2
+            }),
+            new Actuator({
+                usage: Actuator.USAGE_COOL,
+                pin: 3
+            }),
+        ];
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
@@ -184,6 +194,7 @@
                     }
                 },
             }],
+            actuators,
         });
 
         // vessels are not changed by update
@@ -216,14 +227,8 @@
                 OyaConf.createVesselConfig(0),
                 updatedVessel,
             ],
-            actuators: defaultConf.actuators,
+            actuators,
         });
-        oc.actuators[0].name.should.equal('Mist');
-        oc.actuators[1].name.should.equal('Cool');
-        oc.actuators[2].name.should.equal('Drain');
-        oc.actuators[3].name.should.equal('Mist2');
-        oc.actuators[4].name.should.equal('Cool2');
-        oc.actuators[5].name.should.equal('Drain2');
 
     });
 });
