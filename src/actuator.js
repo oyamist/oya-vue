@@ -25,7 +25,7 @@
         static get USAGE_DEFAULTS() { 
             return [{
                 usage: 'Mist', 
-                activationSink: OyaVessel.EVENT_MIST1,
+                activationSink: OyaVessel.EVENT_MIST,
                 desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{

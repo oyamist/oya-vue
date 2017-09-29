@@ -36,7 +36,7 @@
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
-            this.emitter.on(OyaVessel.EVENT_MIST1, (value) => {
+            this.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                 this._state.Mist = value;
             });
             this.emitter.on(OyaVessel.EVENT_COOL, (value) => {
@@ -60,28 +60,28 @@
             [OyaVessel.CYCLE_STANDARD]: {
                 name: "Standard",
                 desc: "Standard cycle for all phases of plant growth",
-                activationSource: OyaVessel.EVENT_MIST1,
+                activationSource: OyaVessel.EVENT_MIST,
                 on: 30,
                 off: 60,
             },
             [OyaVessel.CYCLE_DRAIN]: {
                 name: "Drain",
                 desc: "Partially drain reservoir and stop to add fresh nutrients",
-                activationSource: OyaVessel.EVENT_MIST1,
+                activationSource: OyaVessel.EVENT_MIST,
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
             },
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
                 desc: "Hot day evaporative cooling cycle with fan",
-                activationSource: OyaVessel.EVENT_MIST1,
+                activationSource: OyaVessel.EVENT_MIST,
                 on: 15,
                 off: 15,
             },
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
                 desc: "Conservative misting cycle for plants with good roots",
-                activationSource: OyaVessel.EVENT_MIST1,
+                activationSource: OyaVessel.EVENT_MIST,
                 on: 5,
                 off: 60,
             },
@@ -91,10 +91,11 @@
         static get CYCLE_DRAIN() { return "Cycle #2"; }
         static get CYCLE_COOL() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
-        static get EVENT_MIST1() { return "event:pump1"; }
+        static get EVENT_MIST() { return "event:pump1"; }
         static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_DRAIN() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
+        static get EVENT_RELAY() { return "event:relay"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
@@ -172,7 +173,7 @@
                 this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
-                this.emitter.emit(OyaVessel.EVENT_MIST1, false);
+                this.emitter.emit(OyaVessel.EVENT_MIST, false);
                 this.emitter.emit(OyaVessel.EVENT_COOL, false);
                 this.emitter.emit(OyaVessel.EVENT_DRAIN, false);
             } else {
@@ -223,7 +224,7 @@
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
                 self._state.countstart = self._state.countdown;
-                self.emitter.emit(OyaVessel.EVENT_MIST1, value);
+                self.emitter.emit(OyaVessel.EVENT_MIST, value);
                 var msOn = Number(cycle.on) * 1000;
                 if (msOn > 0) {
                     self._phaseTimeout = setTimeout(() => {
@@ -235,7 +236,7 @@
         } else {
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
-            self.emitter.emit(OyaVessel.EVENT_MIST1, value);
+            self.emitter.emit(OyaVessel.EVENT_MIST, value);
             var msOff = Number(cycle.off) * 1000;
             if (msOff > 0) {
                 self._phaseTimeout = setTimeout(() => {

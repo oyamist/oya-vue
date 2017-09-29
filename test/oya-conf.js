@@ -20,7 +20,7 @@
         actuators: [
             OyaConf.createActuator(0, 'Mist', {
                 vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_MIST1}),
+                activationSink: OyaVessel.EVENT_MIST}),
             OyaConf.createActuator(1, 'Cool',{
                 vesselIndex: 0,
                 activationSink: OyaVessel.EVENT_COOL}),
@@ -29,7 +29,7 @@
                 activationSink: OyaVessel.EVENT_DRAIN}),
             OyaConf.createActuator(3, 'Mist', {
                 vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_MIST1}),
+                activationSink: OyaVessel.EVENT_MIST}),
             OyaConf.createActuator(4, 'Cool', {
                 vesselIndex: 1,
                 activationSink: OyaVessel.EVENT_COOL}),
@@ -71,7 +71,7 @@
             actuators: [
                 OyaConf.createActuator(0, {
                     vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_MIST1,
+                    activationSink: OyaVessel.EVENT_MIST,
                 }),
                 OyaConf.createActuator(1, {
                     vesselIndex: 0,
@@ -204,7 +204,7 @@
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
                 desc: defaultCycles[OyaVessel.CYCLE_COOL].desc,
-                activationSource: OyaVessel.EVENT_MIST1,
+                activationSource: OyaVessel.EVENT_MIST,
                 on: 10,
                 off: 23,
             }

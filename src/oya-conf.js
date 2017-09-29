@@ -65,7 +65,7 @@
                         this.actuators.push(
                             OyaConf.createActuator(this.actuators.length, 'Mist', {
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_MIST1,
+                                activationSink: OyaVessel.EVENT_MIST,
                         }));
                         this.actuators.push(
                             OyaConf.createActuator(this.actuators.length, 'Cool', {
