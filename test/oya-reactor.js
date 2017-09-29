@@ -10,6 +10,7 @@
     const app = require("../scripts/server.js");
     const EventEmitter = require("events");
     const winston = require('winston');
+    const Actuator = exports.Actuator || require("../index").Actuator;
     const OyaReactor = exports.OyaReactor || require("../index").OyaReactor;
     const OyaConf = require("../index").OyaConf;
     const OyaVessel = require("../index").OyaVessel;
@@ -43,6 +44,60 @@
             done();
         }();
         async.next();
+    });
+    it("EVENT_RELAY notifies client to change a relay actuator", function() {
+        var reactor = new OyaReactor('test', {
+            actuators: [
+                new Actuator({
+                    usage: Actuator.USAGE_MIST,
+                    pin: 2,
+                    vesselIndex: 0,
+                }),
+                new Actuator({
+                    usage: Actuator.USAGE_COOL,
+                    pin: 3,
+                }),
+                new Actuator({
+                    usage: Actuator.USAGE_DRAIN,
+                    pin: 4,
+                }),
+            ],
+        });
+        should(reactor.oyaConf.actuators[0].pin).equal(2);
+        should(reactor.oyaConf.actuators[1].pin).equal(3);
+        var relayValue = null;
+        var expectedPin = 2;
+
+        // Clients can listen to EVENT_RELAY
+        var clientListener = (value, pin) => {
+            // example of a client relay listener
+            relayValue = value;
+            should(pin).equal(expectedPin);
+        }
+        reactor.emitter.on(OyaReactor.EVENT_RELAY, clientListener);
+
+        // test MIST
+        relayValue = null;
+        should(reactor.vessels[0].state.Mist).equal(false);
+        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_MIST, true);
+        should(reactor.vessels[0].state.Mist).equal(true);
+        should(relayValue).equal(true);
+
+        // test COOL
+        expectedPin = 3;
+        relayValue = null;
+        should(reactor.vessels[0].state.Cool).equal(false);
+        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_COOL, true);
+        should(reactor.vessels[0].state.Cool).equal(true);
+        should(relayValue).equal(true);
+
+        // test DRAIN
+        expectedPin = 4;
+        relayValue = null;
+        should(reactor.vessels[0].state.Drain).equal(false);
+        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_DRAIN, true);
+        should(reactor.vessels[0].state.Drain).equal(true);
+        should(relayValue).equal(true);
     });
     it("GET /identity returns reactor identity", function(done) {
         var async = function* () {

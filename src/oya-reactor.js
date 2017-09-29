@@ -1,7 +1,9 @@
 (function(exports) {
     const winston = require('winston');
+    const EventEmitter = require("events");
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
+    const Actuator = require("./actuator");
     const OyaVessel = require("./oya-vessel");
     const path = require("path");
     const rb = require("rest-bundle");
@@ -23,26 +25,45 @@
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
+            this.emitter = new EventEmitter(),
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 var vessel = new OyaVessel(Object.assign({
                     name: `${name}-vessel${iv}`,
                 }, vconf));
                 vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
-                    var actuators = this.oyaConf.actuators.filter(a => {
-                        return a.activationSink ===OyaVessel.EVENT_MIST &&
-                            a.vesselIndex === iv;
-                    });
+                    this.onActuator(OyaVessel.EVENT_MIST, value, iv);
+                });
+                vessel.emitter.on(OyaVessel.EVENT_COOL, (value) => {
+                    this.onActuator(OyaVessel.EVENT_COOL, value, iv);
+                });
+                vessel.emitter.on(OyaVessel.EVENT_DRAIN, (value) => {
+                    this.onActuator(OyaVessel.EVENT_DRAIN, value, iv);
                 });
                 return vessel;
             });
             this.vessel = this.vessels[0];
         }
 
+        static get EVENT_RELAY() { return "event:relay"; }
         static get DEFAULT_PINS() { return [ 
             33, // Pimoroni Automation Hat relay 1
             35, // Pimoroni Automation Hat relay 2
             36, // Pimoroni Automation Hat relay 3
         ]};
+
+        onActuator(event, value, vesselIndex) {
+            var vessel = this.vessels[vesselIndex];
+            this.oyaConf.actuators.map((a,ia) => {
+                if (event === a.activationSink && a.vesselIndex === vesselIndex) {
+                    if (a.pin === Actuator.NOPIN) {
+                        winston.debug(`${vessel.name} onActuator ${event}:${value} ignored (no pin)`);
+                    } else {
+                        winston.debug(`${vessel.name} onActuator ${event}:${value} pin:${a.pin}`);
+                        this.emitter.emit(OyaReactor.EVENT_RELAY, value, a.pin);
+                    }
+                }
+            });
+        }
 
         updateConf(conf) {
             var that = this;

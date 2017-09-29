@@ -15,24 +15,6 @@
             return vessel.toJSON();
         }
 
-        static createActuator(index=0, usage="Mist", opts={}) {
-            if (typeof index === 'object') {
-                opts = index;
-                index = 0;
-                usage = opts.usage || "Mist";
-            }
-            if (typeof usage === 'object') {
-                opts = usage;
-                usage = opts.usage || "Mist";
-            }
-            var nTypes = Object.keys(Actuator.USAGE_DEFAULTS).length;
-            var nameId = Math.trunc(index/nTypes)+1;
-            return new Actuator(Object.assign({
-                    usage,
-                    name: `${usage}${nameId === 1 ? "" : nameId}`,
-                },opts));
-        }
-
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
 
@@ -52,31 +34,36 @@
 
             if (this.actuators == null) {
                 if (opts.actuators) {
-                    this.actuators = opts.actuators.map((a,i) => OyaConf.createActuator(i));
+                    this.actuators = opts.actuators.map((a,i) => {
+                        var actuator = new Actuator();
+                        Object.assign(actuator, a);
+                        return actuator;
+                    });
                 } else {
                     this.actuators = [];
                     for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
+                        var suffix = iVessel ? iVessel+1 : "";
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Mist', {
+                            new Actuator({
+                                name: `${Actuator.USAGE_MIST}${suffix}`,
+                                usage: Actuator.USAGE_MIST,
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_MIST,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Cool', {
+                            new Actuator({
+                                name: `${Actuator.USAGE_COOL}${suffix}`,
+                                usage: Actuator.USAGE_COOL,
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_COOL,
                         }));
                         this.actuators.push(
-                            OyaConf.createActuator(this.actuators.length, 'Drain', {
+                            new Actuator({
+                                name: `${Actuator.USAGE_DRAIN}${suffix}`,
+                                usage: Actuator.USAGE_DRAIN,
                                 vesselIndex: iVessel,
-                                activationSink: OyaVessel.EVENT_DRAIN,
                         }));
                     }
                 }
             }
-            opts.actuators && opts.actuators.forEach((delta, i) => {
-                Object.assign(this.actuators[i], delta);
-            });
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
 

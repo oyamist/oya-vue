@@ -1,16 +1,21 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
-    var id = 0;
 
     class Actuator {
         constructor(opts = {}) {
-            const usage = opts.usage || Actuator.USAGE_MIST;
-            const actDefault = Actuator.USAGE_DEFAULTS.filter(
+            if (opts.hasOwnProperty('usage')) {
+                if (0>Actuator.USAGE_DEFAULTS.findIndex(ud => (ud.usage === opts.usage))) {
+                    throw new Error(`Unknown usage:${opts.usage}`);
+                }
+                var usage = opts.usage;
+            } else {
+                var usage = Actuator.USAGE_MIST;
+            }
+            var actDefault = Actuator.USAGE_DEFAULTS.filter(
                 ud => (ud.usage===usage))[0] || {};
 
             // serializable toJSON() properties
-            id++;
-            this.name = opts.name || `Actuator${id}`;
+            this.name = opts.name || `${usage}`;
             this.type = opts.type || actDefault.type || Actuator.ACTUATOR_SPST_NO;
             this.usage = usage;
             this.vesselIndex = opts.vesselIndex || 0;
@@ -22,21 +27,21 @@
         static get NOPIN() { return -1; }
         static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
         static get USAGE_MIST() { return "Mist"; }
-        static get USAGE_FAN() { return "Cool"; }
-        static get USAGE_VALVE() { return "Drain"; }
+        static get USAGE_COOL() { return "Cool"; }
+        static get USAGE_DRAIN() { return "Drain"; }
         static get USAGE_DEFAULTS() { 
             return [{
-                usage: 'Mist', 
+                usage: Actuator.USAGE_MIST,
                 activationSink: OyaVessel.EVENT_MIST,
                 desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
-                usage: 'Cool', 
+                usage: Actuator.USAGE_COOL,
                 activationSink: OyaVessel.EVENT_COOL,
                 desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
-                usage: 'Drain',
+                usage: Actuator.USAGE_DRAIN,
                 activationSink: OyaVessel.EVENT_DRAIN,
                 desc: 'Drain reservoir ',
                 type: Actuator.ACTUATOR_SPST_NO,

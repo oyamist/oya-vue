@@ -2,6 +2,7 @@
     const should = require("should");
     const winston = require('winston');
     const OyaConf = require("../index").OyaConf;
+    const Actuator = require("../index").Actuator;
     const OyaVessel = require("../index").OyaVessel;
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
@@ -13,24 +14,24 @@
             OyaConf.createVesselConfig(1),
         ],
         actuators: [
-            OyaConf.createActuator(0, 'Mist', {
-                vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_MIST}),
-            OyaConf.createActuator(1, 'Cool',{
-                vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_COOL}),
-            OyaConf.createActuator(2, 'Drain',{
-                vesselIndex: 0,
-                activationSink: OyaVessel.EVENT_DRAIN}),
-            OyaConf.createActuator(3, 'Mist', {
-                vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_MIST}),
-            OyaConf.createActuator(4, 'Cool', {
-                vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_COOL}),
-            OyaConf.createActuator(5, 'Drain',{
-                vesselIndex: 1,
-                activationSink: OyaVessel.EVENT_DRAIN}),
+            new Actuator({usage:Actuator.USAGE_MIST}),
+            new Actuator({usage:Actuator.USAGE_COOL}),
+            new Actuator({usage:Actuator.USAGE_DRAIN}),
+            new Actuator({
+                name: "Mist2",
+                usage:Actuator.USAGE_MIST,
+                vesselIndex: 1
+            }),
+            new Actuator({
+                name: "Cool2",
+                usage:Actuator.USAGE_COOL,
+                vesselIndex: 1
+            }),
+            new Actuator({
+                name: "Drain2",
+                usage:Actuator.USAGE_DRAIN,
+                vesselIndex: 1
+            }),
         ],
     };
     winston.level = 'error';
@@ -43,6 +44,21 @@
         should.deepEqual(oc.actuators, defaultConf.actuators);
     });
     it("ctor takes configuration options", function() {
+        var actuators = [
+            new Actuator({
+                vesselIndex: 0,
+                usage: Actuator.USAGE_MIST,
+            }),
+            new Actuator({
+                vesselIndex: 0,
+                usage: Actuator.USAGE_COOL,
+                pin:3, 
+            }),
+        ];
+        should(actuators[0].pin).equal(Actuator.NOPIN);
+        should(actuators[0].usage).equal(Actuator.USAGE_MIST);
+        should(actuators[1].pin).equal(3);
+        should(actuators[1].usage).equal(Actuator.USAGE_COOL);
         var opts = {
             name: 'foo',
             tempUnit: 'C',
@@ -63,16 +79,7 @@
                         }
                     },
             })],
-            actuators: [
-                OyaConf.createActuator(0, {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_MIST,
-                }),
-                OyaConf.createActuator(1, {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_COOL,
-                }),
-            ],
+            actuators,
         }
         var updatedVessel = OyaConf.createVesselConfig();
         updatedVessel.name = 'test1';
@@ -95,13 +102,7 @@
             vessels: [
                 updatedVessel,
             ],
-            actuators: [
-                OyaConf.createActuator(0),
-                OyaConf.createActuator(1, {
-                    vesselIndex: 0,
-                    activationSink: OyaVessel.EVENT_COOL,
-                }),
-            ],
+            actuators,
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {

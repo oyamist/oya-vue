@@ -95,7 +95,6 @@
         static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_DRAIN() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
-        static get EVENT_RELAY() { return "event:relay"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
