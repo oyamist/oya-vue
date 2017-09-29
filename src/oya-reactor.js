@@ -24,9 +24,16 @@
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
-                return new OyaVessel(Object.assign({
+                var vessel = new OyaVessel(Object.assign({
                     name: `${name}-vessel${iv}`,
                 }, vconf));
+                vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
+                    var actuators = this.oyaConf.actuators.filter(a => {
+                        return a.activationSink ===OyaVessel.EVENT_MIST &&
+                            a.vesselIndex === iv;
+                    });
+                });
+                return vessel;
             });
             this.vessel = this.vessels[0];
         }

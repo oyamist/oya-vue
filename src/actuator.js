@@ -15,6 +15,7 @@
             this.usage = usage;
             this.vesselIndex = opts.vesselIndex || 0;
             this.desc = opts.desc || actDefault.desc || 'generic actuator';
+            this.pin = opts.pin || -1;
             this.activationSink = opts.activationSink || actDefault.activationSink;
         }
 
