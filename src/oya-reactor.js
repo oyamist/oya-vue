@@ -42,6 +42,7 @@
                 return vessel;
             });
             this.vessel = this.vessels[0];
+            this.vessel.activate(true);
         }
 
         static get EVENT_RELAY() { return "event:relay"; }
