@@ -66,38 +66,42 @@
         should(reactor.oyaConf.actuators[0].pin).equal(2);
         should(reactor.oyaConf.actuators[1].pin).equal(3);
         var relayValue = null;
-        var expectedPin = 2;
+        var relayPin = null;
 
         // Clients can listen to EVENT_RELAY
         var clientListener = (value, pin) => {
             // example of a client relay listener
             relayValue = value;
-            should(pin).equal(expectedPin);
+            relayPin = pin;
         }
         reactor.emitter.on(OyaReactor.EVENT_RELAY, clientListener);
 
         // test MIST
         relayValue = null;
+        relayPin = null;
         should(reactor.vessels[0].state.Mist).equal(false);
         reactor.vessels[0].emitter.emit(OyaVessel.EVENT_MIST, true);
         should(reactor.vessels[0].state.Mist).equal(true);
         should(relayValue).equal(true);
+        should(relayPin).equal(2);
 
         // test COOL
-        expectedPin = 3;
         relayValue = null;
+        relayPin = null;
         should(reactor.vessels[0].state.Cool).equal(false);
         reactor.vessels[0].emitter.emit(OyaVessel.EVENT_COOL, true);
         should(reactor.vessels[0].state.Cool).equal(true);
         should(relayValue).equal(true);
+        should(relayPin).equal(3);
 
         // test DRAIN
-        expectedPin = 4;
         relayValue = null;
+        relayPin = null;
         should(reactor.vessels[0].state.Drain).equal(false);
         reactor.vessels[0].emitter.emit(OyaVessel.EVENT_DRAIN, true);
         should(reactor.vessels[0].state.Drain).equal(true);
         should(relayValue).equal(true);
+        should(relayPin).equal(4);
     });
     it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
@@ -113,7 +117,7 @@
                 done();
             } catch(err) {
                 winston.error(err.message, err.stack);
-                throw(err);
+                done(err);
             }
         }();
         async.next();
@@ -210,6 +214,7 @@
                 }
 
                 var vessel = testReactor().vessels[0];
+                vessel.activate(false);
                 should(vessel.state.Mist).equal(false);
 
                 // turn on Mist
@@ -265,6 +270,7 @@
                 }
 
                 var vessel = testReactor().vessels[0];
+                vessel.activate(false);
                 should(vessel.state.active).equal(false);
 
                 // change cycle
@@ -298,6 +304,7 @@
                 }
 
                 var vessel = testReactor().vessels[0];
+                vessel.activate(false);
                 should(vessel.state.active).equal(false);
 
                 // activate vessel
