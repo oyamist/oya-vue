@@ -18,6 +18,10 @@
         update(opts = {}) {
             this.name = opts.name || this.name || 'test';
 
+            this.relayController = opts.relayController || "pmi-automation";
+            this.tempProbe = opts.tempProbe || "AM2315";
+            this.humidityProbe = opts.humidityProbe || "AM2315";
+
             if (this.vessels == null) {
                 if (opts.vessels) {
                     this.vessels = opts.vessels.map((a,i) => OyaConf.createVesselConfig(i));
