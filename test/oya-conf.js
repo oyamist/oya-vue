@@ -89,6 +89,7 @@
         updatedVessel.cycles = {
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
+                key: OyaVessel.CYCLE_COOL,
                 desc: 'fans are cool',
                 activationSource: OyaVessel.EVENT_COOL,
                 on: 10,
@@ -209,6 +210,7 @@
         updatedVessel.cycles = {
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
+                key: OyaVessel.CYCLE_COOL,
                 desc: defaultCycles[OyaVessel.CYCLE_COOL].desc,
                 activationSource: OyaVessel.EVENT_MIST,
                 on: 10,

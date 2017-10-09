@@ -59,6 +59,7 @@
         static get DEFAULT_CYCLES() { return {
             [OyaVessel.CYCLE_STANDARD]: {
                 name: "Standard",
+                key: OyaVessel.CYCLE_STANDARD,
                 desc: "Standard cycle for all phases of plant growth",
                 activationSource: OyaVessel.EVENT_MIST,
                 on: 30,
@@ -66,6 +67,7 @@
             },
             [OyaVessel.CYCLE_DRAIN]: {
                 name: "Drain",
+                key: OyaVessel.CYCLE_DRAIN,
                 desc: "Partially drain reservoir and stop to add fresh nutrients",
                 activationSource: OyaVessel.EVENT_MIST,
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
@@ -73,6 +75,7 @@
             },
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
+                key: OyaVessel.CYCLE_COOL,
                 desc: "Hot day evaporative cooling cycle with fan",
                 activationSource: OyaVessel.EVENT_MIST,
                 on: 15,
@@ -80,6 +83,7 @@
             },
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
+                key: OyaVessel.CYCLE_CONSERVE,
                 desc: "Conservative misting cycle for plants with good roots",
                 activationSource: OyaVessel.EVENT_MIST,
                 on: 5,

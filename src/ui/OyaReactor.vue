@@ -19,12 +19,26 @@
         <v-card-text class="text-xs-center">
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                 <div style="display:flex; flex-direction: column; justify-content: center">
-                    <div>
+                    <div style="position:relative">
                         <img v-show="rbService.active && rbService.Mist" 
                             src="/assets/mist-on.svg" height=200px/>
                         <img v-show="rbService.active && !rbService.Mist" 
                             src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
+                        <div class='caption' v-show="rbService.active" style="position:absolute; top:0">
+                            <v-progress-circular v-bind:value="cycleProgress" 
+                                v-bind:rotate="-90"
+                                v-show="rbService.Mist"
+                                class="blue--text text--darken-1">
+                                {{rbService.countdown}}
+                            </v-progress-circular>
+                            <v-progress-circular v-bind:value="cycleProgress" 
+                                v-bind:rotate="-90"
+                                v-show="!rbService.Mist"
+                                class="amber--text text--darken-3">
+                                {{rbService.countdown}}
+                            </v-progress-circular>
+                        </div>
                     </div>
                     <div class="pl-2">
                         <v-switch label="Bioreactor is on" v-show="rbService.active"
@@ -36,6 +50,19 @@
                     </div>
                 </div>
                 <div style="min-width: 20em">
+                    <div v-if="selCycle " class="pl-3">
+                        <v-select
+                          v-bind:items="cycles"
+                          v-model="selCycle"
+                          label="Active cycle"
+                          item-text="name"
+                          @input="clickCycle(selCycle.key)"
+                          item-value="key"
+                          return-object
+                          :hint="`${selCycle.desc}`"
+                          persistent-hint
+                         ></v-select>
+                    </div>
                     <v-list v-show="vessel" subheader>
                         <v-subheader @click='actuatorToggle=!actuatorToggle'
                             style="cursor: pointer">
@@ -61,71 +88,6 @@
                                     {{actuator.desc}}
                                 </v-list-tile-sub-title>
                             </v-list-tile-content >
-                        </v-list-tile>
-                    </v-list>
-           <v-select
-              v-if="selCycle"
-              v-bind:items="cycles"
-              v-model="selCycle"
-              label="Select"
-              single-line
-              item-text="name"
-              item-value="name"
-              return-object
-              :hint="`${selCycle.desc}`"
-              persistent-hint
-            ></v-select>
-                    <v-list v-show="vessel" subheader>
-                        <v-subheader @click='cycleToggle=!cycleToggle'
-                            style="cursor:pointer"> 
-                            Cycles 
-                            <v-icon v-show="cycleToggle">keyboard_arrow_up</v-icon>
-                            <v-icon v-show="!cycleToggle">keyboard_arrow_down</v-icon>
-                        </v-subheader>
-                        <v-list-tile 
-                            v-show='cycleToggle || cycle===rbService.cycle'
-                            v-for="cycle in cycleKeys" key="cycle" @click="clickCycle(cycle)" >
-                            <v-list-tile-action 
-                                v-show='cycle===rbService.cycle && !rbService.active' >
-                                <v-icon class='grey--text text--darken-2'
-                                    large
-                                    v-show="!rbService.active">
-                                    timer_off
-                                </v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-action 
-                                v-show='cycle===rbService.cycle && rbService.active' >
-                                <div class='caption' v-show="rbService.active">
-                                    <v-progress-circular v-bind:value="cycleProgress" 
-                                        v-bind:rotate="-90"
-                                        v-show="cycle===rbService.cycle && rbService.Mist"
-                                        class="blue--text text--darken-1">
-                                        {{rbService.countdown}}
-                                    </v-progress-circular>
-                                    <v-progress-circular v-bind:value="cycleProgress" 
-                                        v-bind:rotate="-90"
-                                        v-show="cycle===rbService.cycle && !rbService.Mist"
-                                        class="amber--text text--darken-3">
-                                        {{rbService.countdown}}
-                                    </v-progress-circular>
-                                </div>
-                            </v-list-tile-action>
-                            <v-list-tile-action 
-                                v-show='cycle!==rbService.nextCycle && cycle!==rbService.cycle' >
-                                <v-icon class='pl-1 grey--text text--lighten-1'>timer</v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-action 
-                                v-show='rbService.nextCycle!==rbService.cycle && cycle===rbService.nextCycle' >
-                                <v-icon class='green--text text--darken-3'>hourglass_full</v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-content >
-                                <v-list-tile-title>
-                                    {{cycleDef(cycle).name}}
-                                </v-list-tile-title>
-                                <v-list-tile-sub-title class="oya-desc">
-                                    {{cycleDef(cycle).desc}}
-                                </v-list-tile-sub-title>
-                            </v-list-tile-content>
                         </v-list-tile>
                     </v-list>
                 </div>
@@ -338,7 +300,7 @@ export default {
         });
         this.rbInitialized().then(r => {
             this.rbService.active != null && (this.activeToggle = this.rbService.active);
-            this.selCycle = this.rbService.cycle;
+            this.selCycle = this.vessel.cycles[this.rbService.cycle];
         }).catch(e => {
             console.error(e);
         });
