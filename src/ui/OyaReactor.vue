@@ -63,6 +63,18 @@
                             </v-list-tile-content >
                         </v-list-tile>
                     </v-list>
+           <v-select
+              v-if="selCycle"
+              v-bind:items="cycles"
+              v-model="selCycle"
+              label="Select"
+              single-line
+              item-text="name"
+              item-value="name"
+              return-object
+              :hint="`${selCycle.desc}`"
+              persistent-hint
+            ></v-select>
                     <v-list v-show="vessel" subheader>
                         <v-subheader @click='cycleToggle=!cycleToggle'
                             style="cursor:pointer"> 
@@ -72,7 +84,7 @@
                         </v-subheader>
                         <v-list-tile 
                             v-show='cycleToggle || cycle===rbService.cycle'
-                            v-for="cycle in cycles" key="cycle" @click="clickCycle(cycle)" >
+                            v-for="cycle in cycleKeys" key="cycle" @click="clickCycle(cycle)" >
                             <v-list-tile-action 
                                 v-show='cycle===rbService.cycle && !rbService.active' >
                                 <v-icon class='grey--text text--darken-2'
@@ -204,6 +216,7 @@ export default {
             apiEditDialog: false,
             activeToggle: false,
             actuatorToggle: false,
+            selCycle: null,
             cycleToggle: false,
             activeItems: [{
                 text: "Stop",
@@ -292,12 +305,16 @@ export default {
         httpErr() {
             return this.rbResource.httpErr;
         },
-        cycles() {
+        cycleKeys() {
             var vessel = this.vessel;
             if (vessel  == null) {
                 return [];
             }
             return Object.keys(this.vessel.cycles).sort();
+        },
+        cycles() {
+            var keys = this.cycleKeys;
+            return this.cycleKeys.map(key => this.vessel.cycles[key]);
         },
         editCycles() {
             var cycleNames = Object.keys(this.vessel.cycles).sort();
@@ -321,6 +338,7 @@ export default {
         });
         this.rbInitialized().then(r => {
             this.rbService.active != null && (this.activeToggle = this.rbService.active);
+            this.selCycle = this.rbService.cycle;
         }).catch(e => {
             console.error(e);
         });
