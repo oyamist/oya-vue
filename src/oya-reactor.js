@@ -7,6 +7,10 @@
     const OyaVessel = require("./oya-vessel");
     const path = require("path");
     const rb = require("rest-bundle");
+    const SENSOR_EVENTS = {
+        tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
+        humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+    };
 
     class OyaReactor extends rb.RestBundle {
         constructor(name = "test", opts = {}) {
@@ -21,6 +25,7 @@
                     this.resourceMethod("post", "vessel", this.postVessel),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "actuator", this.postActuator),
+                    this.resourceMethod("post", "sensor", this.postSensor),
                 ]),
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
@@ -145,6 +150,19 @@
                 name,
                 value: this.vessel.state[name],
             }
+        }
+
+        postSensor(req, res, next) {
+            var keys = Object.keys(req.body);
+            keys.forEach(key => {
+                var event = SENSOR_EVENTS[key];
+                if (event) {
+                    this.vessel.emitter.emit(event, req.body[key]);
+                } else {
+                    throw new Error(`Unknown sensor: ${key}`);
+                }
+            });
+            return req.body;
         }
 
         postReactor(req, res, next) {

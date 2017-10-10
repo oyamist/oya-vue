@@ -261,6 +261,51 @@
         }();
         async.next();
     });
+    it("POST /sensor changes sensor state", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var vessel = testReactor().vessels[0];
+                vessel.activate(false);
+                should(vessel.state.tempInternal).equal(null);
+                should(vessel.state.humidityInternal).equal(null);
+
+                var command = {
+                    tempInternal: 72,
+                    humidityInternal: 0.64,
+                }
+                var res = yield supertest(app).post("/test/sensor").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.state.tempInternal).equal(72);
+                should(vessel.state.humidityInternal).equal(0.64);
+                should.deepEqual(res.body, {
+                    tempInternal: 72,
+                    humidityInternal: 0.64,
+                });
+
+                var command = {
+                    tempInternal: 73,
+                    humidityInternal: 0.74,
+                }
+                var res = yield supertest(app).post("/test/sensor").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.state.tempInternal).equal(73);
+                should(vessel.state.humidityInternal).equal(0.74);
+                should.deepEqual(res.body, {
+                    tempInternal: 73,
+                    humidityInternal: 0.74,
+                });
+
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
     it("POST /vessel changes vessel state", function(done) {
         var async = function* () {
             try {

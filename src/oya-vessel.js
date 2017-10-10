@@ -51,6 +51,9 @@
             this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, 
                 (value) => this.onTempInternal(value)
             );
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, 
+                (value) => this.onHumidityInternal(value)
+            );
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
@@ -104,6 +107,7 @@
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
         static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
         static get SENSE_HUMIDITY_ExTERNAL() { return "sense: humidity-external"; }
+        static get SENSE_HUMIDITY_AMBIENT() { return "sense: humidity-ambient"; }
         static get SENSE_PH() { return "sense: pH"; }
         static get SENSE_PPM() { return "sense: ppm"; }
 
@@ -147,6 +151,11 @@
             return this._state.active;
         }
 
+        onHumidityInternal(value) {
+            winston.debug(`onHumidityInternal ${value}`);
+            this._state.humidityInternal = value;
+        }
+
         onTempInternal(value) {
             winston.debug(`onTempInternal ${value}`);
             if (value < this.coolThreshold) {
@@ -159,6 +168,7 @@
                 winston.info("onTempInternal: next cycle will be cooling cycle");
                 this.nextCycle = this.hotCycle;
             }
+            this._state.tempInternal = value;
         }
 
         activate(value=true) {
