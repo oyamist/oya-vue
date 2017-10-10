@@ -74,11 +74,15 @@
                             @click="clickActuator(actuator)"
                             v-show="actuatorToggle && actuator.vesselIndex === vesselIndex"
                             >
-                            <v-list-tile-action v-show='rbService[actuator.name]' >
-                                <v-icon class='green--text text--darken-3'>pets</v-icon>
+                            <v-list-tile-action v-show='actuator.pin < 0' 
+                                v-tooltip:left='{html:"Not connected"}'>
+                                <v-icon class="grey--text text--lighten-1" >not_interested</v-icon>
                             </v-list-tile-action>
-                            <v-list-tile-action v-show='!rbService[actuator.name]' >
-                                <v-icon class='grey--text text--lighten-1'>not_interested</v-icon>
+                            <v-list-tile-action v-show='actuator.pin >= 0 && rbService[actuator.name]' >
+                                &#x1f33f;
+                            </v-list-tile-action>
+                            <v-list-tile-action v-show='actuator.pin >= 0 && !rbService[actuator.name]' >
+                                &#x1f33f;
                             </v-list-tile-action>
                             <v-list-tile-content >
                                 <v-list-tile-title>
