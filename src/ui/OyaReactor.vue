@@ -16,7 +16,21 @@
             <v-spacer></v-spacer>
             <v-toolbar-side-icon dark @click="clickMenu"></v-toolbar-side-icon>
         </v-toolbar> 
-        <v-card-text class="text-xs-center">
+        <v-card-text class="text-xs-center" style="position:relative">
+            <div class='caption oya-progress' v-show="rbService.active" >
+                <v-progress-circular v-bind:value="cycleProgress" 
+                    v-bind:rotate="-90"
+                    v-show="rbService.Mist"
+                    class="blue--text text--darken-1">
+                    {{rbService.countdown}}
+                </v-progress-circular>
+                <v-progress-circular v-bind:value="cycleProgress" 
+                    v-bind:rotate="-90"
+                    v-show="!rbService.Mist"
+                    class="amber--text text--darken-3">
+                    {{rbService.countdown}}
+                </v-progress-circular>
+            </div>
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                 <div style="display:flex; flex-direction: column; justify-content: center">
                     <div style="position:relative">
@@ -25,25 +39,11 @@
                         <img v-show="rbService.active && !rbService.Mist" 
                             src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
-                        <div class='caption' v-show="rbService.active" style="position:absolute; top:0">
-                            <v-progress-circular v-bind:value="cycleProgress" 
-                                v-bind:rotate="-90"
-                                v-show="rbService.Mist"
-                                class="blue--text text--darken-1">
-                                {{rbService.countdown}}
-                            </v-progress-circular>
-                            <v-progress-circular v-bind:value="cycleProgress" 
-                                v-bind:rotate="-90"
-                                v-show="!rbService.Mist"
-                                class="amber--text text--darken-3">
-                                {{rbService.countdown}}
-                            </v-progress-circular>
-                        </div>
                     </div>
                     <div class="pl-2">
                         <v-switch label="Bioreactor is on" v-show="rbService.active"
                             value input-value="true"
-                            color="green darken-3"
+                            color="blue darken-2"
                             v-on:click.native.stop="clickActivate()"></v-switch>
                         <v-switch label="Bioreactor is off" v-show="!rbService.active"
                             v-on:click.native.stop="clickActivate()"></v-switch>
@@ -71,35 +71,33 @@
                             <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
                         </v-subheader>
                         <v-list-tile v-for="actuator in actuators" key="actuator.name" 
-                            @click="clickActuator(actuator)"
+                            @click="actuator.pin >= 0 && clickActuator(actuator)"
                             v-show="actuatorToggle && actuator.vesselIndex === vesselIndex"
                             >
-                            <v-list-tile-action v-show='actuator.pin < 0' 
-                                v-tooltip:left='{html:"Not connected"}'>
-                                <v-icon class="grey--text text--lighten-1" >not_interested</v-icon>
+                            <v-list-tile-action v-show='actuator.pin < 0' >
+                                <v-icon class="pl-1 grey--text text--lighten-1">do_not_disturb_alt</v-icon>
                             </v-list-tile-action>
                             <v-list-tile-action v-show='actuator.pin >= 0 && rbService[actuator.name]' >
-                                &#x1f33f;
+                                <v-switch value input-value="true" color="blue darken-2" ></v-switch>
                             </v-list-tile-action>
                             <v-list-tile-action v-show='actuator.pin >= 0 && !rbService[actuator.name]' >
-                                &#x1f33f;
+                                <v-switch ></v-switch>
                             </v-list-tile-action>
-                            <v-list-tile-content >
-                                <v-list-tile-title>
+                            <v-list-tile-content>
+                                <v-list-tile-title v-show="actuator.pin >= 0">
                                     {{actuator.name}}
                                 </v-list-tile-title>
-                                <v-list-tile-sub-title class="oya-desc">
-                                    {{actuator.desc}}
-                                </v-list-tile-sub-title>
-                            </v-list-tile-content >
+                                <v-list-tile-title v-show="actuator.pin < 0" class="body-1 grey--text text--lighten-1">
+                                    {{actuator.name}}
+                                    <span v-show="actuator.pin < 0">(not connected)</span>
+                                </v-list-tile-title>
+                            </v-list-tile-content>
                         </v-list-tile>
                     </v-list>
                 </div>
             </div>
         </v-card-text>
-        <v-system-bar v-if='httpErr' 
-            v-tooltip:above='{html:`${httpErr.config.url} \u2794 HTTP${httpErr.response.status} ${httpErr.response.statusText}`}'
-            class='error' dark>
+        <v-system-bar v-if='httpErr' class='error' dark>
             <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
         </v-system-bar>
     </v-card>
@@ -320,5 +318,9 @@ export default {
     font-size: xx-small;
 }
 .oya-desc:hover {
+}
+.oya-progress {
+    position: absolute;
+    top: 1.5em;
 }
 </style>

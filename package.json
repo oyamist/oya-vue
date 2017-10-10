@@ -9,7 +9,7 @@
     "src": "src"
   },
   "dependencies": {
-    "rest-bundle": "^0.21.16",
+    "rest-bundle": "^0.22.0",
     "rimraf": "^2.6.1"
   },
   "devDependencies": {
