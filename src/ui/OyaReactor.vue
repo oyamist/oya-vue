@@ -63,35 +63,31 @@
                           persistent-hint
                          ></v-select>
                     </div>
-                    <v-list v-show="vessel" subheader>
+                    <v-list v-show="vessel" dense subheader>
                         <v-subheader @click='actuatorToggle=!actuatorToggle'
                             style="cursor: pointer">
-                            Actuators
+                            Advanced...
+                            <v-spacer/>
                             <v-icon v-show="actuatorToggle">keyboard_arrow_up</v-icon>
                             <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
                         </v-subheader>
                         <v-list-tile v-for="actuator in actuators" key="actuator.name" 
                             @click="actuator.pin >= 0 && clickActuator(actuator)"
-                            v-show="actuatorToggle && actuator.vesselIndex === vesselIndex"
+                            v-show="actuatorToggle && actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
                             >
-                            <v-list-tile-action v-show='actuator.pin < 0' >
-                                <v-icon class="pl-1 grey--text text--lighten-1">do_not_disturb_alt</v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-action v-show='actuator.pin >= 0 && rbService[actuator.name]' >
-                                <v-switch value input-value="true" color="blue darken-2" ></v-switch>
-                            </v-list-tile-action>
-                            <v-list-tile-action v-show='actuator.pin >= 0 && !rbService[actuator.name]' >
-                                <v-switch ></v-switch>
-                            </v-list-tile-action>
+                            <v-list-tile-action >
+                            </v-list-tile-action >
                             <v-list-tile-content>
                                 <v-list-tile-title v-show="actuator.pin >= 0">
                                     {{actuator.name}}
                                 </v-list-tile-title>
-                                <v-list-tile-title v-show="actuator.pin < 0" class="body-1 grey--text text--lighten-1">
-                                    {{actuator.name}}
-                                    <span v-show="actuator.pin < 0">(not connected)</span>
-                                </v-list-tile-title>
                             </v-list-tile-content>
+                            <v-list-tile-action v-show='rbService[actuator.name]' >
+                                <v-switch value input-value="true" color="blue darken-2" ></v-switch>
+                            </v-list-tile-action>
+                            <v-list-tile-action v-show='!rbService[actuator.name]' >
+                                <v-switch ></v-switch>
+                            </v-list-tile-action>
                         </v-list-tile>
                     </v-list>
                 </div>
