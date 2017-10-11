@@ -7,30 +7,16 @@
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="vesselIndex" value="0" slot="prop">
-            bndex (0-based) of vessel for component</rb-about-item>
+            index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
     <v-card hover>
-        <v-toolbar class="green darken-3">
+        <v-toolbar class="green darken-3" flat>
             <v-toolbar-title class="white--text">{{name}}</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-side-icon dark @click="clickMenu"></v-toolbar-side-icon>
         </v-toolbar> 
         <v-card-text class="text-xs-center" style="position:relative">
-            <div class='caption oya-progress' v-show="rbService.active" >
-                <v-progress-circular v-bind:value="cycleProgress" 
-                    v-bind:rotate="-90"
-                    v-show="rbService.Mist"
-                    class="blue--text text--darken-1">
-                    {{rbService.countdown}}
-                </v-progress-circular>
-                <v-progress-circular v-bind:value="cycleProgress" 
-                    v-bind:rotate="-90"
-                    v-show="!rbService.Mist"
-                    class="amber--text text--darken-3">
-                    {{rbService.countdown}}
-                </v-progress-circular>
-            </div>
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                 <div style="display:flex; flex-direction: column; justify-content: center">
                     <div style="position:relative">
@@ -40,13 +26,32 @@
                             src="/assets/mist-off.svg" height=200px/>
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
                     </div>
-                    <div class="pl-2">
-                        <v-switch label="Bioreactor is on" v-show="rbService.active"
+                    <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
+                        <telemetry sensorProp="tempInternal"/>
+                        <v-spacer/>
+                        <telemetry sensorProp="humidityInternal"/>
+                    </div>
+                    <div class="pl-2" style="display:flex; flex-direction: row">
+                        <v-switch label="Bioreactor" v-show="rbService.active"
                             value input-value="true"
                             color="blue darken-2"
                             v-on:click.native.stop="clickActivate()"></v-switch>
-                        <v-switch label="Bioreactor is off" v-show="!rbService.active"
+                        <v-switch label="Bioreactor" v-show="!rbService.active"
                             v-on:click.native.stop="clickActivate()"></v-switch>
+                        <div class='caption ' v-show="rbService.active" >
+                            <v-progress-circular v-bind:value="cycleProgress" 
+                                v-bind:rotate="-90"
+                                v-show="rbService.Mist"
+                                class="blue--text text--darken-1">
+                                {{rbService.countdown}}
+                            </v-progress-circular>
+                            <v-progress-circular v-bind:value="cycleProgress" 
+                                v-bind:rotate="-90"
+                                v-show="!rbService.Mist"
+                                class="amber--text text--darken-3">
+                                {{rbService.countdown}}
+                            </v-progress-circular>
+                        </div>
                     </div>
                 </div>
                 <div style="min-width: 20em">
@@ -151,9 +156,6 @@
         </v-expansion-panel>
     </rb-api-dialog>
     <v-btn class="amber" v-show="about" @click="mockSensors()">Mock Sensors </v-btn>
-    {{rbService.tempInternal != null && rbService.tempInternal.toFixed(1)}}&deg;C
-    &nbsp;
-    {{rbService.humidityInternal != null && rbService.humidityInternal.toFixed(1)}}%RH
 </div>
 
 </template>
@@ -163,6 +165,7 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
+import Telemetry from "./Telemetry.vue";
 
 export default {
     mixins: [ 
@@ -304,6 +307,7 @@ export default {
     components: {
         RbApiDialog,
         RbDialogRow,
+        Telemetry,
     },
     created() {
         this.restBundleResource();
