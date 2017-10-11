@@ -151,9 +151,9 @@
         </v-expansion-panel>
     </rb-api-dialog>
     <v-btn class="amber" v-show="about" @click="mockSensors()">Mock Sensors </v-btn>
-    {{rbService.tempInternal.toFixed(1)}}&deg;C
+    {{rbService.tempInternal != null && rbService.tempInternal.toFixed(1)}}&deg;C
     &nbsp;
-    {{rbService.humidityInternal.toFixed(1)}}%RH
+    {{rbService.humidityInternal != null && rbService.humidityInternal.toFixed(1)}}%RH
 </div>
 
 </template>
@@ -309,10 +309,10 @@ export default {
         this.restBundleResource();
         this.rbDispatch("apiLoad").then(r => {
             console.log("OyaReactor apiLoad", r);
+            this.selCycle = this.vessel.cycles[this.rbService.cycle];
         });
         this.rbInitialized().then(r => {
             this.rbService.active != null && (this.activeToggle = this.rbService.active);
-            this.selCycle = this.vessel.cycles[this.rbService.cycle];
         }).catch(e => {
             console.error(e);
         });
