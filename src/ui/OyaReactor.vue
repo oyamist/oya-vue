@@ -150,7 +150,10 @@
             </v-expansion-panel-content>
         </v-expansion-panel>
     </rb-api-dialog>
-
+    <v-btn class="amber" v-show="about" @click="mockSensors()">Mock Sensors </v-btn>
+    {{rbService.tempInternal.toFixed(1)}}&deg;C
+    &nbsp;
+    {{rbService.humidityInternal.toFixed(1)}}%RH
 </div>
 
 </template>
@@ -224,6 +227,17 @@ export default {
                 value: !this.rbService[actuator.name],
             }).then(r => {
                 console.log("ok", r);
+            }).catch(e => {
+                console.error("error", e);
+            });
+        },
+        mockSensors() {
+            var url = [this.restOrigin(), this.service, 'sensor'].join('/');
+            this.$http.post(url, {
+                tempInternal: Math.random() * 5 + 20,
+                humidityInternal: Math.random(),
+            }).then(r => {
+                this.rbService.cycle = r.data.cycle;
             }).catch(e => {
                 console.error("error", e);
             });
