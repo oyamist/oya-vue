@@ -1,6 +1,7 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
     const Actuator = require('./actuator');
+    const Sensor = require('./sensor');
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -69,6 +70,16 @@
                 this.sensors = opts.sensors.map((s,i) => {
                     return new Sensor(s);
                 });
+            } else if (this.sensors == null) {
+                this.sensors = [];
+                for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
+                    var suffix = iVessel ? iVessel+1 : "";
+                    this.sensors.push(
+                        new Sensor({
+                            usage: Sensor.USAGE_I2C_TEMP_RH,
+                            vesselIndex: iVessel,
+                    }));
+                }
             }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
@@ -86,6 +97,7 @@
                 tempUnit: this.tempUnit,
                 vessels: this.vessels,
                 actuators: this.actuators,
+                sensors: this.sensors,
             };
         }
 

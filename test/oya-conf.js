@@ -3,6 +3,7 @@
     const winston = require('winston');
     const OyaConf = require("../index").OyaConf;
     const Actuator = require("../index").Actuator;
+    const Sensor = require("../index").Sensor;
     const OyaVessel = require("../index").OyaVessel;
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
@@ -31,6 +32,14 @@
                 name: "Drain2",
                 usage:Actuator.USAGE_DRAIN,
                 vesselIndex: 1
+            }),
+        ],
+        sensors: [
+            new Sensor({
+                vesselIndex: 0,
+            }),
+            new Sensor({
+                vesselIndex: 1,
             }),
         ],
     };
@@ -104,6 +113,9 @@
                 updatedVessel,
             ],
             actuators,
+            sensors: [
+                defaultConf.sensors[0],
+            ],
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
@@ -230,6 +242,7 @@
                 updatedVessel,
             ],
             actuators,
+            sensors: defaultConf.sensors,
         });
 
     });

@@ -15,8 +15,8 @@
                 ud => (ud.usage===usage))[0] || {};
 
             // serializable toJSON() properties
-            this.name = opts.name || `${usage}`;
             this.usage = usage;
+            this.name = opts.name || sensorDefault.name;
             this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : opts.vesselIndex;
             this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
             this.pin = opts.pin == null ? sensorDefault.pin : opts.pin;
@@ -33,8 +33,13 @@
                 temp: null,
                 humidity: null,
             };
+            this.serializableKeys = Object.keys(this);
+
+            // other properties
+            this.emitter = opts.emitter;
         }
 
+        static get USAGE_NONE() { return "Unused"; }
         static get USAGE_I2C_TEMP_RH() { return "I\u00B2C Temperature/Humidity Sensor"; }
         static get USAGE_I2C_TEMP() { return "I\u00B2C Temperature Sensor"; }
         static get USAGE_I2C_RH() { return "I\u00B2C Humidity Sensor"; }
@@ -74,7 +79,11 @@
                 ],
                 tempScale: 0.1,
                 humidityScale: 0.1,
-                address: 0x54,
+                address: 0x5C,
+            }, {
+                usage: Sensor.USAGE_NONE,
+                name: "(none)",
+                desc: "No sensor",
             }];
         }
         static crcModbus(buf, length=buf.length) {
@@ -95,10 +104,12 @@
         }
 
         toJSON() {
-            return this;
+            var result = {};
+            this.serializableKeys.forEach(key => (result[key] = this[key]));
+            return result;
         }
 
-        parseBuffer(buf) {
+        parseData(buf) {
             var temp = null;
             var humidity = null;
             var crc = null;
@@ -138,10 +149,33 @@
                     }
                 }
             }
+            if (temp != null) {
+                temp = temp * this.tempScale;
+                this.emit({
+                    [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
+                    [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
+                    [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
+                }, temp);
+            }
+            if (humidity != null) {
+                humidity = humidity * this.humidityScale;
+                this.emit({
+                    [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+                    [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
+                    [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+                }, humidity);
+            }
             return this.data = {
-                temp: temp*this.tempScale,
-                humidity: humidity*this.humidityScale,
+                temp,
+                humidity,
                 timestamp: new Date(),
+            }
+        }
+
+        emit(eventMap, value) {
+            var event = eventMap[this.loc];
+            if (event && this.emitter) {
+                this.emitter.emit(event, value);
             }
         }
 
@@ -150,14 +184,64 @@
     module.exports = exports.Sensor = Sensor;
 })(typeof exports === "object" ? exports : (exports = {}));
 
-//var RH = (inBuf[2]<<8) | inBuf[3];
-//var Temp = (inBuf[4]<<8) | inBuf[5];
-//var CRC = (inBuf[7]<<8) | inBuf[6];
-
 (typeof describe === 'function') && describe("Sensor", function() {
     const should = require("should");
     const Sensor = exports.Sensor || require("../index")/Sensor;
+    const OyaVessel = require('./oya-vessel');
+    const EventEmitter = require("events");
 
+    it("default sensor is AM2315", function() {
+        var sensor = new Sensor();
+        should(sensor.name).equal("AM2315");
+        should(sensor.usage).equal(Sensor.USAGE_I2C_TEMP_RH);
+        should(sensor.address).equal(0x5c);
+        should.deepEqual(sensor.cmdWakeup, [ 3, 0, 4 ]);
+        should.deepEqual(sensor.cmdRead, [ 3, 0, 4 ]);
+        should.deepEqual(sensor.dataRead, [
+            Sensor.BYTE_IGNORE,
+            Sensor.BYTE_IGNORE,
+            Sensor.BYTE_RH_HIGH,
+            Sensor.BYTE_RH_LOW,
+            Sensor.BYTE_TEMP_HIGH,
+            Sensor.BYTE_TEMP_LOW,
+            Sensor.BYTE_CRC_LOW,
+            Sensor.BYTE_CRC_HIGH,
+        ]);
+        should(sensor.tempScale).equal(0.1);
+        should(sensor.humidityScale).equal(0.1);
+        should(sensor.pin).equal(null);
+        should(sensor.loc).equal(Sensor.LOC_INTERNAL);
+        should(sensor.comm).equal(Sensor.COMM_I2C);
+        should(sensor.crc).equal(Sensor.CRC_MODBUS);
+        should(sensor.vesselIndex).equal(0);
+    });
+    it("ctor defaults can be overridden", function() {
+        var sensor = new Sensor({
+            loc: Sensor.LOC_EXTERNAL,
+        });
+        should(sensor.name).equal("AM2315");
+        should(sensor.usage).equal(Sensor.USAGE_I2C_TEMP_RH);
+        should(sensor.address).equal(0x5c);
+        should.deepEqual(sensor.cmdWakeup, [ 3, 0, 4 ]);
+        should.deepEqual(sensor.cmdRead, [ 3, 0, 4 ]);
+        should.deepEqual(sensor.dataRead, [
+            Sensor.BYTE_IGNORE,
+            Sensor.BYTE_IGNORE,
+            Sensor.BYTE_RH_HIGH,
+            Sensor.BYTE_RH_LOW,
+            Sensor.BYTE_TEMP_HIGH,
+            Sensor.BYTE_TEMP_LOW,
+            Sensor.BYTE_CRC_LOW,
+            Sensor.BYTE_CRC_HIGH,
+        ]);
+        should(sensor.tempScale).equal(0.1);
+        should(sensor.humidityScale).equal(0.1);
+        should(sensor.pin).equal(null);
+        should(sensor.loc).equal(Sensor.LOC_EXTERNAL);
+        should(sensor.comm).equal(Sensor.COMM_I2C);
+        should(sensor.crc).equal(Sensor.CRC_MODBUS);
+        should(sensor.vesselIndex).equal(0);
+    });
     it("crcModbus() computes Modbus CRC value", function() {
         var buf = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3]);
         should(Sensor.crcModbus(buf)).equal(37185);
@@ -171,17 +255,53 @@
         should(Sensor.crcModbus(buf,buf.length-2)).equal(34817);
         should(Sensor.crcModbus(buf)).equal(0); // zero if CRC data is included
     });
-    it("parseBuffer() parses data buffer", function() {
+    it("parseData() parses data buffer", function() {
         var buf = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
-        var sensor = new Sensor();
-        var data = sensor.parseBuffer(buf);
+        var emitter = new EventEmitter();
+        var sensor = new Sensor({
+            emitter,
+        });
+        var temp_event = null;
+        var temp_eventValue = null;
+        emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (value) => {
+            temp_event = OyaVessel.SENSE_TEMP_INTERNAL;
+            temp_eventValue = value;
+        });
+        var humidity_event = null;
+        var humidity_eventValue = null;
+        emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (value) => {
+            humidity_event = OyaVessel.SENSE_HUMIDITY_INTERNAL;
+            humidity_eventValue = value;
+        });
+
+        should.deepEqual(sensor.data, {
+            temp: null,
+            humidity: null,
+        });
+
+        // parse data, update sensor and fire events
+        var data = sensor.parseData(buf);
         data.temp.should.approximately(19.5, 0.01); // Centigrade
         data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
-        should(data.timestamp - new Date()).approximately(0, 0.1);
+        should(data.timestamp - new Date()).approximately(0, 1);
+        should.deepEqual(sensor.data, data);
+        should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
+        should(temp_eventValue).equal(data.temp);
+        should(humidity_event).equal(OyaVessel.SENSE_HUMIDITY_INTERNAL);
+        should(humidity_eventValue).equal(data.humidity);
+
+        // events are suppressed if emitter is not provided
+        var sensor = new Sensor();
+        var data = sensor.parseData(buf);
+        data.temp.should.approximately(19.5, 0.01); // Centigrade
+        data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
+        should(data.timestamp - new Date()).approximately(0, 1);
+        should.deepEqual(sensor.data, data);
 
         var buf = Buffer.from([0xFF,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
         should.throws(() => {
-            var data = sensor.parseBuffer(buf);
+            var data = sensor.parseData(buf);
         });
+        should.deepEqual(sensor.data, data); // last good data
     });
 })

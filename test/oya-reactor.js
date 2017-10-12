@@ -7,6 +7,9 @@
     const supertest = require('supertest');
     const fs = require('fs');
     const APIMODEL_PATH = `api-model/${srcPkg.name}.test.oya-conf.json`;
+    if (fs.existsSync(APIMODEL_PATH)) {
+        fs.unlinkSync(APIMODEL_PATH);
+    }
     const app = require("../scripts/server.js");
     const EventEmitter = require("events");
     const winston = require('winston');
@@ -20,6 +23,7 @@
     const FAN_OFF = 2*STANDARD_OFF;
     const DEFAULT_CONF = new OyaConf().toJSON();
     const DEFAULT_APIMODEL = Object.assign({}, DEFAULT_CONF );
+
     var testTimer = OyaConf.createVesselConfig();
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
     testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
@@ -125,11 +129,10 @@
     it("GET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
-                var app = testInit();
-
                 if (fs.existsSync(APIMODEL_PATH)) {
                     fs.unlinkSync(APIMODEL_PATH);
                 }
+                var app = testInit();
                 var response = yield supertest(app).get("/test/oya-conf").expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;
@@ -155,10 +158,10 @@
     it("PUT /oya-conf updates OyaConf apiModel", function(done) {
         var async = function* () {
             try {
-                var app = testInit();
                 if (fs.existsSync(APIMODEL_PATH)) {
                     fs.unlinkSync(APIMODEL_PATH);
                 }
+                var app = testInit();
 
                 // request without rbHash should be rejected and current model returned
                 var badData = {
@@ -209,9 +212,6 @@
         var async = function* () {
             try {
                 var app = testInit();
-                if (fs.existsSync(APIMODEL_PATH)) {
-                    fs.unlinkSync(APIMODEL_PATH);
-                }
 
                 var vessel = testReactor().vessels[0];
                 vessel.activate(false);
@@ -310,9 +310,6 @@
         var async = function* () {
             try {
                 var app = testInit();
-                if (fs.existsSync(APIMODEL_PATH)) {
-                    fs.unlinkSync(APIMODEL_PATH);
-                }
 
                 var vessel = testReactor().vessels[0];
                 vessel.activate(false);
@@ -343,10 +340,10 @@
     it("POST /reactor changes vessel state", function(done) {
         var async = function* () {
             try {
-                var app = testInit();
                 if (fs.existsSync(APIMODEL_PATH)) {
-                    fs.unlinkSync(APIMODEL_PATH);
+                    //fs.unlinkSync(APIMODEL_PATH);
                 }
+                var app = testInit();
 
                 var vessel = testReactor().vessels[0];
                 vessel.activate(false);
