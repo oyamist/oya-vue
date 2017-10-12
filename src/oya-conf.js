@@ -65,6 +65,11 @@
                     return new Actuator(a);
                 });
             }
+            if (opts.sensors) {
+                this.sensors = opts.sensors.map((s,i) => {
+                    return new Sensor(s);
+                });
+            }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
 
