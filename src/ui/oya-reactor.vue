@@ -140,6 +140,18 @@
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
+            <v-expansion-panel-content>
+                <div slot="header">Sensors</div>
+                <v-card>
+                    <v-card-text>
+                        <rb-dialog-row v-for="sensor in mutableSensors" key="name"
+                            :label="sensor.loc" >
+                            <div>{{sensor.name}}</div>
+                            <div>{{sensor.desc}}</div>
+                        </rb-dialog-row>
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
         </v-expansion-panel>
     </rb-api-dialog>
     <v-btn class="amber" v-show="about" @click="mockSensors()">Mock Sensors </v-btn>
@@ -253,6 +265,10 @@ export default {
         },
         mutableActuators( ){
             return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
+                a.vesselIndex === this.vesselIndex);
+        },
+        mutableSensors( ){
+            return this.apiModelCopy && this.apiModelCopy.sensors.filter(a => 
                 a.vesselIndex === this.vesselIndex);
         },
         actuators( ){
