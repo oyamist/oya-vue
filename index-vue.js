@@ -1,4 +1,4 @@
-import OyaReactor from "./src/ui/OyaReactor.vue";
+import OyaReactor from "./src/ui/oya-reactor.vue";
 import OyaSensor from "./src/ui/oya-sensor.vue";
 
 var components = {
