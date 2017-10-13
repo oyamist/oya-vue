@@ -1,7 +1,18 @@
 <template>
 
-<div class="subheading primary--text oya-sensor">
-    {{sensorDisplay()}}
+<div>
+    <rb-about v-if="about" :name="componentName">
+        <p> Display sensor value
+        </p>
+        <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
+        <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="sensorProp" value='"tempInternal"' slot="prop">
+            property name of sensor</rb-about-item>
+    </rb-about>
+
+    <div class="subheading primary--text oya-sensor">
+        {{sensorDisplay()}}
+    </div>
 </div>
 
 </template>

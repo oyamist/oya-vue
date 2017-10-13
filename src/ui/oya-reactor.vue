@@ -27,9 +27,9 @@
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
                     </div>
                     <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
-                        <oya-sensor sensorProp="tempInternal"/>
+                        <oya-sensor :service='service' sensorProp="tempInternal"/>
                         <v-spacer/>
-                        <oya-sensor sensorProp="humidityInternal"/>
+                        <oya-sensor :service='service' sensorProp="humidityInternal"/>
                     </div>
                     <div class="pl-2" style="display:flex; flex-direction: row">
                         <v-switch label="Bioreactor" v-show="rbService.active"
@@ -38,20 +38,7 @@
                             v-on:click.native.stop="clickActivate()"></v-switch>
                         <v-switch label="Bioreactor" v-show="!rbService.active"
                             v-on:click.native.stop="clickActivate()"></v-switch>
-                        <div class='caption ' v-show="rbService.active" >
-                            <v-progress-circular v-bind:value="cycleProgress" 
-                                v-bind:rotate="-90"
-                                v-show="rbService.Mist"
-                                class="blue--text text--darken-1">
-                                {{rbService.countdown}}
-                            </v-progress-circular>
-                            <v-progress-circular v-bind:value="cycleProgress" 
-                                v-bind:rotate="-90"
-                                v-show="!rbService.Mist"
-                                class="amber--text text--darken-3">
-                                {{rbService.countdown}}
-                            </v-progress-circular>
-                        </div>
+                        <oya-progress :service='service'/>
                     </div>
                 </div>
                 <div style="min-width: 20em">
@@ -166,6 +153,7 @@ import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
 import OyaSensor from "./oya-sensor.vue";
+import OyaProgress from "./oya-progress.vue";
 
 export default {
     mixins: [ 
@@ -259,11 +247,6 @@ export default {
         },
     },
     computed: {
-        cycleProgress() {
-            var countstart = this.rbService.countstart;
-            var countdown = this.rbService.countdown;
-            return countstart ? (countstart - countdown) * 100 / countstart : 100;
-        },
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];
@@ -308,6 +291,7 @@ export default {
         RbApiDialog,
         RbDialogRow,
         OyaSensor,
+        OyaProgress,
     },
     created() {
         this.restBundleResource();
@@ -332,9 +316,5 @@ export default {
     font-size: xx-small;
 }
 .oya-desc:hover {
-}
-.oya-progress {
-    position: absolute;
-    top: 1.5em;
 }
 </style>

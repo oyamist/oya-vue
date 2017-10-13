@@ -1,9 +1,11 @@
 import OyaReactor from "./src/ui/oya-reactor.vue";
 import OyaSensor from "./src/ui/oya-sensor.vue";
+import OyaProgress from "./src/ui/oya-progress.vue";
 
 var components = {
     OyaReactor,
     OyaSensor,
+    OyaProgress,
 }
 function plugin(Vue, options) {
     Object.keys(components).forEach( key => Vue.component(key, components[key]));
