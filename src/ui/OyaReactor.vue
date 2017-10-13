@@ -27,9 +27,9 @@
                         <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
                     </div>
                     <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
-                        <telemetry sensorProp="tempInternal"/>
+                        <oya-sensor sensorProp="tempInternal"/>
                         <v-spacer/>
-                        <telemetry sensorProp="humidityInternal"/>
+                        <oya-sensor sensorProp="humidityInternal"/>
                     </div>
                     <div class="pl-2" style="display:flex; flex-direction: row">
                         <v-switch label="Bioreactor" v-show="rbService.active"
@@ -165,7 +165,7 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
-import Telemetry from "./Telemetry.vue";
+import OyaSensor from "./oya-sensor.vue";
 
 export default {
     mixins: [ 
@@ -307,7 +307,7 @@ export default {
     components: {
         RbApiDialog,
         RbDialogRow,
-        Telemetry,
+        OyaSensor,
     },
     created() {
         this.restBundleResource();

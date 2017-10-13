@@ -1,6 +1,6 @@
 <template>
 
-<div class="subheading primary--text oya-telemetry">
+<div class="subheading primary--text oya-sensor">
     {{sensorDisplay()}}
 </div>
 
@@ -27,20 +27,24 @@ export default {
     methods: {
         sensorDisplay(propName = this.sensorProp) {
             var value = this.rbService[propName];
-            if (value == null) {
-                return "n/a";
-            }
+            var result = '\u254d';
+            var suffix = '';
             if (propName.startsWith('temp')) {
-                var temp = value;
-                if (this.rbService.tempUnit === 'F') {
-                    temp = temp*1.8+32;
-                    return `${temp.toFixed(1)}\u2109`;
+                suffix = this.rbService.tempUnit === 'F' ? '\u2109' : '\u2103';
+                if (value == null) {
+                    // do nothing
+                } else if (this.rbService.tempUnit === 'F') {
+                    result = (value * 1.8 + 32).toFixed(1);
+                } else {
+                    result = value.toFixed(1);
                 }
-                return `${temp.toFixed(1)}\u2103`;
             } else if (propName.startsWith('humidity')) {
-                var rh = value;
-                return `${(rh*100).toFixed(1)}%RH`;
+                suffix = '%RH';
+                value != null && (result = (value*100).toFixed(1));
+            } else {
+                result = value.toFixed(1);
             }
+            return result + suffix;
         },
     },
     computed: {
@@ -55,7 +59,7 @@ export default {
 
 </script>
 <style> 
-.oya-telemetry {
+.oya-sensor {
     padding: 0.2em;
     text-align: center;
 }
