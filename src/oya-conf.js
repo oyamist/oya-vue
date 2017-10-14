@@ -75,10 +75,9 @@
                 for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
                     var suffix = iVessel ? iVessel+1 : "";
                     this.sensors.push(
-                        new Sensor({
-                            usage: Sensor.USAGE_I2C_TEMP_RH,
+                        new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                             vesselIndex: iVessel,
-                    }));
+                    })));
                 }
             }
 

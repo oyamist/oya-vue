@@ -3,19 +3,19 @@
 
     class Sensor {
         constructor(opts = {}) {
-            if (opts.hasOwnProperty('usage')) {
-                if (0>Sensor.USAGE_DEFAULTS.findIndex(ud => (ud.usage === opts.usage))) {
-                    throw new Error(`Unknown usage:${opts.usage}`);
+            if (opts.hasOwnProperty('type')) {
+                if (0>Sensor.TYPE_LIST.findIndex(ud => (ud.type === opts.type))) {
+                    throw new Error(`Unknown type:${opts.type}`);
                 }
-                var usage = opts.usage;
+                var type = opts.type;
             } else {
-                var usage = Sensor.USAGE_I2C_TEMP_RH;
+                var type = Sensor.TYPE_AM2315.type;
             }
-            var sensorDefault = Sensor.USAGE_DEFAULTS.filter(
-                ud => (ud.usage===usage))[0] || {};
+            var sensorDefault = Sensor.TYPE_LIST.filter(
+                ud => (ud.type===type))[0] || {};
 
             // serializable toJSON() properties
-            this.usage = usage;
+            this.type = type;
             this.name = opts.name || sensorDefault.name;
             this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : opts.vesselIndex;
             this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
@@ -28,6 +28,8 @@
             this.address = opts.address || sensorDefault.address;
             this.tempScale = opts.tempScale || sensorDefault.tempScale;
             this.humidityScale = opts.humidityScale || sensorDefault.humidityScale;
+            this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
+            this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.crc = opts.crc || sensorDefault.crc;
             this.data = {
                 temp: null,
@@ -39,25 +41,9 @@
             this.emitter = opts.emitter;
         }
 
-        static get USAGE_NONE() { return "Unused"; }
-        static get USAGE_I2C_TEMP_RH() { return "I\u00B2C Temperature/Humidity Sensor"; }
-        static get USAGE_I2C_TEMP() { return "I\u00B2C Temperature Sensor"; }
-        static get USAGE_I2C_RH() { return "I\u00B2C Humidity Sensor"; }
-        static get LOC_INTERNAL() { return "Vessel Internal"; }
-        static get LOC_EXTERNAL() { return "Vessel External"; }
-        static get LOC_AMBIENT() { return "Ambient"; }
-        static get COMM_I2C() { return "I\u00B2C"; }
-        static get BYTE_IGNORE() { return "Ignored byte"; }
-        static get BYTE_CRC_HIGH() { return "CRC high byte"; }
-        static get BYTE_CRC_LOW() { return "CRC low byte"; }
-        static get BYTE_TEMP_HIGH() { return "Temperature high byte"; }
-        static get BYTE_TEMP_LOW() { return "Temperature low byte"; }
-        static get BYTE_RH_HIGH() { return "Relative Humidity high byte"; }
-        static get BYTE_RH_LOW() { return "Relative Humidity low byte"; }
-        static get CRC_MODBUS() { return "Modbus CRC"; }
-        static get USAGE_DEFAULTS() { 
-            return [{
-                usage: Sensor.USAGE_I2C_TEMP_RH,
+        static get TYPE_AM2315() {
+            return {
+                type: "AM2315",
                 name: "AM2315",
                 desc: "AM2315 Temperature/Humidity I2C sensor",
                 comm: Sensor.COMM_I2C,
@@ -80,11 +66,38 @@
                 tempScale: 0.1,
                 humidityScale: 0.1,
                 address: 0x5C,
-            }, {
-                usage: Sensor.USAGE_NONE,
-                name: "(none)",
-                desc: "No sensor",
-            }];
+                readTemp: true,
+                readHumidity: true,
+            }
+        }
+        static get TYPE_CUSTOM() {
+            return {
+                type: "Custom sensor",
+                name: "Custom",
+                desc: "Custom sensor",
+                loc: Sensor.LOC_INTERNAL,
+                vesselIndex: 0,
+                readTemp: false,
+                readHumidity: false,
+            }
+        }
+        static get LOC_INTERNAL() { return "Vessel Internal"; }
+        static get LOC_EXTERNAL() { return "Vessel External"; }
+        static get LOC_AMBIENT() { return "Ambient"; }
+        static get COMM_I2C() { return "I\u00B2C"; }
+        static get BYTE_IGNORE() { return "Ignored byte"; }
+        static get BYTE_CRC_HIGH() { return "CRC high byte"; }
+        static get BYTE_CRC_LOW() { return "CRC low byte"; }
+        static get BYTE_TEMP_HIGH() { return "Temperature high byte"; }
+        static get BYTE_TEMP_LOW() { return "Temperature low byte"; }
+        static get BYTE_RH_HIGH() { return "Relative Humidity high byte"; }
+        static get BYTE_RH_LOW() { return "Relative Humidity low byte"; }
+        static get CRC_MODBUS() { return "Modbus CRC"; }
+        static get TYPE_LIST() { 
+            return [
+                Sensor.TYPE_AM2315, 
+                Sensor.TYPE_CUSTOM, 
+            ];
         }
         static crcModbus(buf, length=buf.length) {
             var crc = 0xffff;
@@ -150,20 +163,28 @@
                 }
             }
             if (temp != null) {
-                temp = temp * this.tempScale;
-                this.emit({
-                    [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
-                    [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
-                    [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
-                }, temp);
+                if (this.readTemp) {
+                    temp = temp * this.tempScale;
+                    this.emit({
+                        [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
+                        [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
+                        [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
+                    }, temp);
+                } else {
+                    temp = null;
+                }
             }
             if (humidity != null) {
-                humidity = humidity * this.humidityScale;
-                this.emit({
-                    [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                    [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
-                    [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
-                }, humidity);
+                if (this.readHumidity) {
+                    humidity = humidity * this.humidityScale;
+                    this.emit({
+                        [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+                        [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
+                        [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+                    }, humidity);
+                } else {
+                    humidity = null;
+                }
             }
             return this.data = {
                 temp,
@@ -193,7 +214,7 @@
     it("default sensor is AM2315", function() {
         var sensor = new Sensor();
         should(sensor.name).equal("AM2315");
-        should(sensor.usage).equal(Sensor.USAGE_I2C_TEMP_RH);
+        should(sensor.type).equal(Sensor.TYPE_AM2315.type);
         should(sensor.address).equal(0x5c);
         should.deepEqual(sensor.cmdWakeup, [ 3, 0, 4 ]);
         should.deepEqual(sensor.cmdRead, [ 3, 0, 4 ]);
@@ -220,7 +241,7 @@
             loc: Sensor.LOC_EXTERNAL,
         });
         should(sensor.name).equal("AM2315");
-        should(sensor.usage).equal(Sensor.USAGE_I2C_TEMP_RH);
+        should(sensor.type).equal(Sensor.TYPE_AM2315.type);
         should(sensor.address).equal(0x5c);
         should.deepEqual(sensor.cmdWakeup, [ 3, 0, 4 ]);
         should.deepEqual(sensor.cmdRead, [ 3, 0, 4 ]);
@@ -289,6 +310,44 @@
         should(temp_eventValue).equal(data.temp);
         should(humidity_event).equal(OyaVessel.SENSE_HUMIDITY_INTERNAL);
         should(humidity_eventValue).equal(data.humidity);
+
+        // temp events are suppressed if readTemp is false
+        var sensor = new Sensor({
+            emitter,
+            readTemp: false,
+        });
+        temp_event = null;
+        temp_eventValue = null;
+        humidity_event = null;
+        humidity_eventValue = null;
+        var data = sensor.parseData(buf);
+        should(data.temp).equal(null);
+        data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
+        should(data.timestamp - new Date()).approximately(0, 1);
+        should.deepEqual(sensor.data, data);
+        should(temp_event).equal(null); // no event
+        should(temp_eventValue).equal(null); // no event
+        should(humidity_event).equal(OyaVessel.SENSE_HUMIDITY_INTERNAL);
+        should(humidity_eventValue).equal(data.humidity);
+
+        // humidity events are suppressed if readHumidity is false
+        var sensor = new Sensor({
+            emitter,
+            readHumidity: false,
+        });
+        temp_event = null;
+        temp_eventValue = null;
+        humidity_event = null;
+        humidity_eventValue = null;
+        var data = sensor.parseData(buf);
+        data.temp.should.approximately(19.5, 0.01); // Centigrade
+        should(data.humidity).equal(null);
+        should(data.timestamp - new Date()).approximately(0, 1);
+        should.deepEqual(sensor.data, data);
+        should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
+        should(temp_eventValue).equal(data.temp);
+        should(humidity_event).equal(null);
+        should(humidity_eventValue).equal(null);
 
         // events are suppressed if emitter is not provided
         var sensor = new Sensor();
