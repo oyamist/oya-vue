@@ -39,6 +39,12 @@
 
             // other properties
             this.emitter = opts.emitter;
+            this.i2cRead = opts.i2cRead || (() => { 
+                throw new Error("no I2C driver");
+            });
+            this.i2cWrite = opts.i2cWrite || (() => {
+                throw new Error("no I2C driver");
+            });
         }
 
         static get TYPE_AM2315() {
@@ -75,7 +81,7 @@
                 type: "Custom sensor",
                 name: "Custom",
                 desc: "Custom sensor",
-                loc: Sensor.LOC_INTERNAL,
+                loc: Sensor.LOC_NOT_CONNECTED,
                 vesselIndex: 0,
                 readTemp: false,
                 readHumidity: false,
@@ -84,6 +90,7 @@
         static get LOC_INTERNAL() { return "Vessel Internal"; }
         static get LOC_EXTERNAL() { return "Vessel External"; }
         static get LOC_AMBIENT() { return "Ambient"; }
+        static get LOC_NOT_CONNECTED() { return "Not connected"; }
         static get COMM_I2C() { return "I\u00B2C"; }
         static get BYTE_IGNORE() { return "Ignored byte"; }
         static get BYTE_CRC_HIGH() { return "CRC high byte"; }
@@ -120,6 +127,27 @@
             var result = {};
             this.serializableKeys.forEach(key => (result[key] = this[key]));
             return result;
+        }
+
+        read() {
+            return new Promise((resolve, reject) => {
+                try {
+                    if (this.comm === Sensor.COMM_I2C) {
+                        if (this.cmdWakeup) {
+                            this.i2cWrite(Buffer.from(this.cmdWakeup));
+                        }
+                        this.i2cWrite(Buffer.from(this.cmdRead));
+                        var buf = Buffer.alloc(this.dataRead.length);
+                        this.i2cRead(buf);
+                        var data = this.parseData(buf);
+                        resolve(data);
+                    } else {
+                        throw new Error("Could not read. Unknown communication protocol");
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            });
         }
 
         parseData(buf) {
@@ -362,5 +390,32 @@
             var data = sensor.parseData(buf);
         });
         should.deepEqual(sensor.data, data); // last good data
+    });
+    it("read() returns a promise resolved with data read", function(done) {
+        var async = function*() {
+            try {
+                // The AM2315 sensor is an i2c sensor. 
+                // Client provides i2c read/write implementations.
+                var opts = Sensor.TYPE_AM2315;
+                var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
+                var i2cOut = [];
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+                    i2cRead: (buf) => testData.copy(buf),
+                    i2cWrite: (buf) => i2cOut.push(Buffer.from(buf)),
+                }));
+
+                // read() returns a promise that resolves to the data read
+                var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(data.temp).approximately(19.5, 0.01);
+                should(data.humidity).approximately(32.3, 0.01);
+                should(data.timestamp - Date.now()).approximately(0,1);
+                should.deepEqual(data, sensor.data);
+
+                done();
+            } catch(err) {
+                done(err);
+            }
+        }();
+        async.next();
     });
 })
