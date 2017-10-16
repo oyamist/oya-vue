@@ -39,10 +39,10 @@
 
             // other properties
             this.emitter = opts.emitter;
-            this.i2cRead = opts.i2cRead || (() => { 
+            this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
             });
-            this.i2cWrite = opts.i2cWrite || (() => {
+            this.i2cWrite = opts.i2cWrite || ((i2cAddr, dataBuf) => {
                 throw new Error("no I2C driver");
             });
         }
@@ -134,11 +134,11 @@
                 try {
                     if (this.comm === Sensor.COMM_I2C) {
                         if (this.cmdWakeup) {
-                            this.i2cWrite(Buffer.from(this.cmdWakeup));
+                            this.i2cWrite(this.address, Buffer.from(this.cmdWakeup));
                         }
-                        this.i2cWrite(Buffer.from(this.cmdRead));
+                        this.i2cWrite(this.address, Buffer.from(this.cmdRead));
                         var buf = Buffer.alloc(this.dataRead.length);
-                        this.i2cRead(buf);
+                        this.i2cRead(this.address, buf);
                         var data = this.parseData(buf);
                         resolve(data);
                     } else {
@@ -400,8 +400,8 @@
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
                 var i2cOut = [];
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    i2cRead: (buf) => testData.copy(buf),
-                    i2cWrite: (buf) => i2cOut.push(Buffer.from(buf)),
+                    i2cRead: (addr, buf) => testData.copy(buf),
+                    i2cWrite: (addr, buf) => i2cOut.push(Buffer.from(buf)),
                 }));
 
                 // read() returns a promise that resolves to the data read
