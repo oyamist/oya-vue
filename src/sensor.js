@@ -30,6 +30,7 @@
             this.humidityScale = opts.humidityScale || sensorDefault.humidityScale;
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
+            this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.data = {
                 temp: null,
@@ -72,25 +73,28 @@
                 tempScale: 0.1,
                 humidityScale: 0.1,
                 address: 0x5C,
+                addresses: [0x5C],
                 readTemp: true,
                 readHumidity: true,
             }
         }
-        static get TYPE_CUSTOM() {
+        static get TYPE_NONE() {
             return {
-                type: "Custom sensor",
-                name: "Custom",
-                desc: "Custom sensor",
-                loc: Sensor.LOC_NOT_CONNECTED,
+                type: "none",
+                name: "No sensor",
+                desc: "No sensor",
+                loc: Sensor.LOC_NONE,
                 vesselIndex: 0,
-                readTemp: false,
-                readHumidity: false,
+                readTemp: null,
+                readHumidity: null,
+                addresses: null,
+                address: null,
             }
         }
-        static get LOC_INTERNAL() { return "Vessel Internal"; }
-        static get LOC_EXTERNAL() { return "Vessel External"; }
-        static get LOC_AMBIENT() { return "Ambient"; }
-        static get LOC_NOT_CONNECTED() { return "Not connected"; }
+        static get LOC_INTERNAL() { return "internal"; }
+        static get LOC_EXTERNAL() { return "external"; }
+        static get LOC_AMBIENT() { return "ambient"; }
+        static get LOC_NONE() { return "none"; }
         static get COMM_I2C() { return "I\u00B2C"; }
         static get BYTE_IGNORE() { return "Ignored byte"; }
         static get BYTE_CRC_HIGH() { return "CRC high byte"; }
@@ -103,8 +107,23 @@
         static get TYPE_LIST() { 
             return [
                 Sensor.TYPE_AM2315, 
-                Sensor.TYPE_CUSTOM, 
+                Sensor.TYPE_NONE, 
             ];
+        }
+        static get LOCATION_LIST() {
+            return [{
+                id: Sensor.LOC_INTERNAL,
+                desc: "Vessel internal (at plant roots)",
+            }, {
+                id: Sensor.LOC_EXTERNAL,
+                desc: "Vessel external (at plant stem)",
+            }, {
+                id: Sensor.LOC_AMBIENT,
+                desc: "Ambient (shaded, 5' above earth)",
+            }, {
+                id: Sensor.LOC_NONE,
+                desc: "No sensor",
+            }];
         }
         static crcModbus(buf, length=buf.length) {
             var crc = 0xffff;

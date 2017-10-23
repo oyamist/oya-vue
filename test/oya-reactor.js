@@ -126,6 +126,44 @@
         }();
         async.next();
     });
+    it("GET /sensor/types returns sensor types", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/sensor/types").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should(res.body[0]).properties({ type: 'AM2315' });
+                    should(res.body[1]).properties({ type: 'none' });
+                    should(res.body.length).equal(2);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("GET /sensor/locations returns sensor locations", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/sensor/locations").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should(res.body[0]).properties({ id: 'internal' });
+                    should(res.body[1]).properties({ id: 'external' });
+                    should(res.body[2]).properties({ id: 'ambient' });
+                    should(res.body[3]).properties({ id: 'none' });
+                    should(res.body.length).equal(4);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
     it("GET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {

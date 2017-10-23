@@ -78,6 +78,14 @@
                         new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                             vesselIndex: iVessel,
                     })));
+                    this.sensors.push(
+                        new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                            vesselIndex: iVessel,
+                    })));
+                    this.sensors.push(
+                        new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                            vesselIndex: iVessel,
+                    })));
                 }
             }
 

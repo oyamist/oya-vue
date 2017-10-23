@@ -35,12 +35,24 @@
             }),
         ],
         sensors: [
-            new Sensor({
+            new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                 vesselIndex: 0,
-            }),
-            new Sensor({
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                vesselIndex: 0,
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                vesselIndex: 0,
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                 vesselIndex: 1,
-            }),
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                vesselIndex: 1,
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                vesselIndex: 1,
+            })),
         ],
     };
     winston.level = 'error';
@@ -115,6 +127,8 @@
             actuators,
             sensors: [
                 defaultConf.sensors[0],
+                defaultConf.sensors[1],
+                defaultConf.sensors[2],
             ],
         });
     });

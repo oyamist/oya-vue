@@ -4,6 +4,7 @@
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
     const Actuator = require("./actuator");
+    const Sensor = require("./sensor");
     const OyaVessel = require("./oya-vessel");
     const path = require("path");
     const rb = require("rest-bundle");
@@ -22,6 +23,8 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
+                    this.resourceMethod("get", "sensor/types", this.getSensorTypes),
+                    this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
                     this.resourceMethod("post", "vessel", this.postVessel),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "actuator", this.postActuator),
@@ -127,6 +130,14 @@
 
         getOyaConf(req, res, next) {
             return this.getApiModel(req, res, next, this.apiFile);
+        }
+
+        getSensorTypes(req, res, next) {
+            return Sensor.TYPE_LIST;
+        }
+
+        getSensorLocations(req, res, next) {
+            return Sensor.LOCATION_LIST;
         }
 
         putOyaConf(req, res, next) {

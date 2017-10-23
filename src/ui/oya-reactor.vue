@@ -111,14 +111,14 @@
                             <v-text-field v-model='cycleCopy.cycle.desc'
                                 label="Description" class="input-group--focused" />
                             <v-layout>
-                            <v-flex xs3>
-                                <v-text-field v-model='cycleCopy.cycle.on'
-                                    label="On seconds" class="input-group--focused" />
-                            </v-flex>
-                            <v-flex xs3>
-                                <v-text-field v-model='cycleCopy.cycle.off'
-                                    label="Off seconds" class="input-group--focused" />
-                            </v-flex>
+                                <v-flex xs3>
+                                    <v-text-field v-model='cycleCopy.cycle.on'
+                                        label="On seconds" class="input-group--focused" />
+                                </v-flex>
+                                <v-flex xs3>
+                                    <v-text-field v-model='cycleCopy.cycle.off'
+                                        label="Off seconds" class="input-group--focused" />
+                                </v-flex>
                             </v-layout>
                         </rb-dialog-row>
                     </v-card-text>
@@ -144,10 +144,37 @@
                 <div slot="header">Sensors</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row v-for="sensor in mutableSensors" key="name"
-                            :label="sensor.loc" >
-                            <div>{{sensor.name}}</div>
-                            <div>{{sensor.desc}}</div>
+                        <rb-dialog-row v-for="(sensor,i) in mutableSensors" key="name"
+                            :label="`Sensor #${i+1}`" >
+                            <v-select
+                                v-bind:items="sensorTypes"
+                                v-model="sensor.type"
+                                label="Sensor type"
+                                @input="clickSensorType(sensor)"
+                                :rules="sensorRules(sensor)"
+                                item-text="desc"
+                                item-value="type"
+                                ></v-select>
+                            <v-text-field v-model="sensor.name" label="Name"/>
+                            <v-select
+                                v-bind:items="sensorLocations"
+                                v-model="sensor.loc"
+                                label="Location"
+                                item-text="desc"
+                                item-value="id"
+                                ></v-select>
+                            <div style="display:flex">
+                                <v-checkbox v-if="sensor.readTemp != null"
+                                    label="Temperature" v-model="sensor.readTemp" light></v-checkbox>
+                                <v-checkbox v-if="sensor.readHumidity != null"
+                                    label="Humidity" v-model="sensor.readHumidity" light></v-checkbox>
+                            </div>
+                            <v-select v-if="sensor.addresses"
+                                v-bind:items="sensorAddresses(sensor)"
+                                v-model="sensor.address"
+                                label="Address"
+                                :rules="sensorRules(sensor)"
+                                ></v-select>
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -194,6 +221,22 @@ export default {
         }
     },
     methods: {
+        sensorAddresses(sensor) {
+            return sensor.addresses.map(a => ({
+                value: a,
+                text: `${sensor.comm}: ${a} (= 0x${a.toString(16)}, ${a.toString(2)})`,
+            }));
+        },
+        sensorRules(sensor) {
+            return [
+                () => {
+                    var valid = this.mutableSensors.reduce((a,s) => 
+                        a && (s === sensor || s.address == null || sensor.address !== s.address)
+                    , true);
+                    return valid || `${sensor.comm} address conflict: ${sensor.address}`;
+                },
+            ];
+        },
         posIntRules(value) {
             return [
                 () => !!value || 'This field is required',
@@ -245,9 +288,14 @@ export default {
                 console.error("error", e);
             });
         },
+        clickSensorType(sensor) {
+            var template = this.sensorTypes.filter(s => s.type === sensor.type)[0];
+            Object.keys(template).forEach(key=>{
+                sensor[key] = template[key];
+            });
+        },
         clickCycle(cycle) {
             var url = [this.restOrigin(), this.service, 'vessel'].join('/');
-            console.log("clicked", cycle);
             this.$http.post(url, {
                 cycle,
             }).then(r => {
@@ -319,6 +367,20 @@ export default {
             this.rbService.active != null && (this.activeToggle = this.rbService.active);
         }).catch(e => {
             console.error(e);
+        });
+        var url = [this.restOrigin(), this.service, 'sensor/types'].join('/');
+        this.sensorTypes = [];
+        this.$http.get(url).then(r => {
+            this.sensorTypes = r.data;
+        }).catch(e => {
+            console.error("error", e);
+        });
+        var url = [this.restOrigin(), this.service, 'sensor/locations'].join('/');
+        this.sensorLocations = [];
+        this.$http.get(url).then(r => {
+            this.sensorLocations = r.data;
+        }).catch(e => {
+            console.error("error", e);
         });
     },
     mounted() {
