@@ -35,16 +35,16 @@
             }),
         ],
         sensors: [
-            new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                vesselIndex: 0,
-            })),
             new Sensor(Object.assign(Sensor.TYPE_NONE, {
                 vesselIndex: 0,
             })),
             new Sensor(Object.assign(Sensor.TYPE_NONE, {
                 vesselIndex: 0,
             })),
-            new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
+                vesselIndex: 0,
+            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE, {
                 vesselIndex: 1,
             })),
             new Sensor(Object.assign(Sensor.TYPE_NONE, {

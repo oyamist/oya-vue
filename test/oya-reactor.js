@@ -133,8 +133,9 @@
                 var response = yield supertest(app).get("/test/sensor/types").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body[0]).properties({ type: 'AM2315' });
-                    should(res.body[1]).properties({ type: 'none' });
-                    should(res.body.length).equal(2);
+                    should(res.body[1]).properties({ type: 'SHT31-DIS' });
+                    should(res.body[2]).properties({ type: 'none' });
+                    should(res.body.length).equal(3);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
