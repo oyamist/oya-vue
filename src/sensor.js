@@ -28,6 +28,7 @@
             this.address = opts.address || sensorDefault.address;
             this.tempScale = opts.tempScale == null ? sensorDefault.tempScale : opts.tempScale;
             this.tempOffset = opts.tempOffset == null ? sensorDefault.tempOffset : opts.tempOffset;
+            this.heater = opts.heater || sensorDefault.heater;
             this.humidityScale = opts.humidityScale == null ? sensorDefault.humidityScale : opts.humidityScale;
             this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : opts.humidityOffset;
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
@@ -451,7 +452,7 @@
         should(Sensor.crcModbus(buf,buf.length-2)).equal(34817);
         should(Sensor.crcModbus(buf)).equal(0); // zero if CRC data is included
     });
-    it("TESTTESTparseData() parses SHT31-DIS", function() {
+    it("parseData() parses SHT31-DIS", function() {
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS);
 
         var buf = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
@@ -552,7 +553,6 @@
             try {
                 // The AM2315 sensor is an i2c sensor. 
                 // Client provides i2c read/write implementations.
-                var opts = Sensor.TYPE_AM2315;
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
                 var i2cOut = [];
                 var msRead = null;
@@ -581,6 +581,38 @@
                 should(data.humidity).approximately(32.3, 0.01);
                 should(data.timestamp - Date.now()).approximately(0,1);
                 should.deepEqual(data, sensor.data);
+
+                done();
+            } catch(err) {
+                done(err);
+            }
+        }();
+        async.next();
+    });
+    it("heat(enable) turns heater on/off", function(done) {
+        var async = function*() {
+            try {
+                var i2cOut = [];
+                var msRead = null;
+                var testData = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_SHT31_DIS, {
+                    i2cRead: (addr, buf) => {
+                        msRead = Date.now();
+                        testData.copy(buf);
+                    },
+                    i2cWrite: (addr, buf) => {
+                        i2cOut.push(buf);
+                        return 0; // success
+                    },
+                }));
+
+                yield sensor.heat(true).then(r=>async.next(r)).catch(e=>async.throw(e));
+                should.deepEqual(i2cOut[0], Buffer.from([0x30, 0x6D])); // heater on
+                should(i2cOut.length).equal(1);
+
+                yield sensor.heat(false).then(r=>async.next(r)).catch(e=>async.throw(e));
+                should.deepEqual(i2cOut[1], Buffer.from([0x30, 0x66])); // heater off
+                should(i2cOut.length).equal(2);
 
                 done();
             } catch(err) {
