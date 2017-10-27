@@ -32,6 +32,7 @@
             this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : opts.humidityOffset;
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
+            this.readDelay = opts.readDelay || sensorDefault.readDelay;
             this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.crcInit = opts.crcInit || sensorDefault.crcInit;
@@ -74,6 +75,7 @@
                     Sensor.BYTE_RH_LOW,
                     Sensor.BYTE_CRC2,
                 ],
+                readDelay: 15, // 15ms high precision sensing delay
                 tempScale: 175.0/65535,
                 tempOffset: -45,
                 humidityScale: 100.0/65535,
@@ -82,6 +84,10 @@
                 addresses: [0x44,0x45],
                 readTemp: true,
                 readHumidity: true,
+                heater: {
+                    on: [0x30, 0x6d],
+                    off: [0x30, 0x66],
+                },
             }
         }
         static get TYPE_AM2315() {
@@ -205,21 +211,41 @@
             return result;
         }
 
+        heat(enable) {
+            if (this.heater == null) {
+                return Promise.reject(new Error("Sensor has no heater"));
+            }
+            return new Promise((resolve, reject) => {
+                try {
+                    this.write(enable ? this.heater.on : this.heater.off);
+                    resolve(true);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        write(cmd) {
+            if (this.comm === Sensor.COMM_I2C) {
+                if (this.cmdWakeup) {
+                    this.i2cWrite(this.address, Buffer.from(this.cmdWakeup));
+                }
+                this.i2cWrite(this.address, Buffer.from(cmd));
+            } else {
+                throw new Error("Could not . Unknown communication protocol");
+            }
+        }
+
         read() {
             return new Promise((resolve, reject) => {
                 try {
-                    if (this.comm === Sensor.COMM_I2C) {
-                        if (this.cmdWakeup) {
-                            this.i2cWrite(this.address, Buffer.from(this.cmdWakeup));
-                        }
-                        this.i2cWrite(this.address, Buffer.from(this.cmdRead));
-                        var buf = Buffer.alloc(this.dataRead.length);
+                    this.write(this.cmdRead);
+                    var buf = Buffer.alloc(this.dataRead.length);
+                    setTimeout(() => {
                         this.i2cRead(this.address, buf);
                         var data = this.parseData(buf);
                         resolve(data);
-                    } else {
-                        throw new Error("Could not read. Unknown communication protocol");
-                    }
+                    }, this.readDelay || 0);
                 } catch (err) {
                     reject(err);
                 }
@@ -529,14 +555,29 @@
                 var opts = Sensor.TYPE_AM2315;
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
                 var i2cOut = [];
+                var msRead = null;
+                var readDelay = 15;
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    i2cRead: (addr, buf) => testData.copy(buf),
-                    i2cWrite: (addr, buf) => i2cOut.push(Buffer.from(buf)),
+                    readDelay, // some sensors such as SHT31-DIS have a read delay
+                    i2cRead: (addr, buf) => {
+                        msRead = Date.now();
+                        testData.copy(buf);
+                    },
+                    i2cWrite: (addr, buf) => {
+                        i2cOut.push(buf);
+                        return 0; // success
+                    },
                 }));
 
                 // read() returns a promise that resolves to the data read
+                var msNow = Date.now();
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(msRead == null).equal(false);
+                should(msRead - msNow).above(readDelay-1);
                 should(data.temp).approximately(19.5, 0.01);
+                should.deepEqual(i2cOut[0], Buffer.from([0x03, 0x00, 0x04])); // wakeup
+                should.deepEqual(i2cOut[1], Buffer.from([0x03, 0x00, 0x04])); // read
+                should(i2cOut.length).equal(2);
                 should(data.humidity).approximately(32.3, 0.01);
                 should(data.timestamp - Date.now()).approximately(0,1);
                 should.deepEqual(data, sensor.data);
