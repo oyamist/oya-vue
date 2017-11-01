@@ -17,6 +17,9 @@
         }
 
         update(opts = {}) {
+            var i2cRead = opts.i2cRead;
+            var i2cWrite = opts.i2cWrite;
+
             this.name = opts.name || this.name || 'test';
 
             this.relayController = opts.relayController || "pmi-automation";
@@ -66,24 +69,23 @@
             }
             if (opts.sensors) {
                 this.sensors = opts.sensors.map((s,i) => {
-                    return new Sensor(s);
+                    return new Sensor(Object.assign({
+                        i2cRead,
+                        i2cWrite,
+                    }, s));
                 });
             } else if (this.sensors == null) {
                 this.sensors = [];
                 for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
                     var suffix = iVessel ? iVessel+1 : "";
-                    this.sensors.push(
-                        new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                            vesselIndex: iVessel,
-                    })));
-                    this.sensors.push(
-                        new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                            vesselIndex: iVessel,
-                    })));
-                    this.sensors.push(
-                        new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                            vesselIndex: iVessel,
-                    })));
+                    var sensorOpts = Object.assign(Sensor.TYPE_NONE, {
+                        vesselIndex: iVessel,
+                        i2cRead,
+                        i2cWrite,
+                    });
+                    this.sensors.push(new Sensor(sensorOpts));
+                    this.sensors.push(new Sensor(sensorOpts));
+                    this.sensors.push(new Sensor(sensorOpts));
                 }
             }
 

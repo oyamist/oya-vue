@@ -579,7 +579,7 @@
                 should.deepEqual(i2cOut[1], Buffer.from([0x03, 0x00, 0x04])); // read
                 should(i2cOut.length).equal(2);
                 should(data.humidity).approximately(32.3, 0.01);
-                should(data.timestamp - Date.now()).approximately(0,1);
+                should(data.timestamp - Date.now()).approximately(0,3);
                 should.deepEqual(data, sensor.data);
 
                 done();

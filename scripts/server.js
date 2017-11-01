@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
 const path = require("path");
+const compression = require("compression");
 const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
 const OyaReactor = require("../index").OyaReactor;
 const winston = require("winston");
+
+app.use(compression());
 
 // ensure argv is actually for script instead of mocha
 var argv = process.argv[1].match(__filename) && process.argv || [];
