@@ -54,6 +54,8 @@
         }
 
         static get EVENT_RELAY() { return "event:relay"; }
+        static get EVENT_BUTTON1() { return "event:button1"; }
+        static get EVENT_PUMP_OVERRIDE() { return "event:pump-override"; }
         static get DEFAULT_PINS() { return [ 
             33, // Pimoroni Automation Hat relay 1
             35, // Pimoroni Automation Hat relay 2

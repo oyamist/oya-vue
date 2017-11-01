@@ -94,7 +94,7 @@
                     cycles: {
                         [OyaVessel.CYCLE_COOL]: {
                             desc: 'fans are cool',
-                            activationSource: OyaVessel.EVENT_COOL,
+                            emits: OyaVessel.EVENT_COOL,
                             on: 10,
                             off: 23,
                         }
@@ -112,7 +112,7 @@
                 name: "Cool",
                 key: OyaVessel.CYCLE_COOL,
                 desc: 'fans are cool',
-                activationSource: OyaVessel.EVENT_COOL,
+                emits: OyaVessel.EVENT_COOL,
                 on: 10,
                 off: 23,
             }
@@ -238,7 +238,7 @@
                 name: "Cool",
                 key: OyaVessel.CYCLE_COOL,
                 desc: defaultCycles[OyaVessel.CYCLE_COOL].desc,
-                activationSource: OyaVessel.EVENT_MIST,
+                emits: OyaVessel.EVENT_MIST,
                 on: 10,
                 off: 23,
             }

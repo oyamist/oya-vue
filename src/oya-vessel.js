@@ -33,9 +33,13 @@
 
             this.nextCycle = this._state.cycle,
             this._state.active = false,
+            this._state.pumpManual = false,
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
+            this.emitter.on(OyaVessel.EVENT_PUMP_MANUAL, (value) => {
+                this._state.pumpManual = value;
+            });
             this.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                 this._state.Mist = value;
             });
@@ -64,7 +68,7 @@
                 name: "Standard",
                 key: OyaVessel.CYCLE_STANDARD,
                 desc: "Standard cycle for all phases of plant growth",
-                activationSource: OyaVessel.EVENT_MIST,
+                emits: OyaVessel.EVENT_MIST,
                 on: 30,
                 off: 60,
             },
@@ -72,7 +76,7 @@
                 name: "Drain",
                 key: OyaVessel.CYCLE_DRAIN,
                 desc: "Partially drain reservoir and stop to add fresh nutrients",
-                activationSource: OyaVessel.EVENT_MIST,
+                emits: OyaVessel.EVENT_MIST,
                 on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
                 off: -1,
             },
@@ -80,7 +84,7 @@
                 name: "Cool",
                 key: OyaVessel.CYCLE_COOL,
                 desc: "Hot day evaporative cooling cycle with fan",
-                activationSource: OyaVessel.EVENT_MIST,
+                emits: OyaVessel.EVENT_MIST,
                 on: 15,
                 off: 15,
             },
@@ -88,7 +92,7 @@
                 name: "Conserve",
                 key: OyaVessel.CYCLE_CONSERVE,
                 desc: "Conservative misting cycle for plants with good roots",
-                activationSource: OyaVessel.EVENT_MIST,
+                emits: OyaVessel.EVENT_MIST,
                 on: 5,
                 off: 60,
             },
@@ -98,10 +102,11 @@
         static get CYCLE_DRAIN() { return "Cycle #2"; }
         static get CYCLE_COOL() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
-        static get EVENT_MIST() { return "event:pump1"; }
+        static get EVENT_MIST() { return "event:mist"; }
         static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_DRAIN() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
+        static get EVENT_PUMP_MANUAL() { return "event:pump-manual"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
