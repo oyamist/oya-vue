@@ -52,7 +52,7 @@
                 return vessel;
             });
             this.vessel = this.vessels[0];
-            this.loadApiModel(this.apiFile).then(() => this.vessel.activate(true));
+            this.loadApiModel(this.apiFile).then(() => this.onApiModelLoaded());
         }
 
         static get EVENT_RELAY() { return "event:relay"; }
@@ -76,6 +76,11 @@
                     }
                 }
             });
+        }
+
+        onApiModelLoaded() {
+            winston.info("OyaReactor api model loaded");
+            this.loadApiModel(this.apiFile).then(() => this.vessel.activate(true));
         }
 
         updateConf(conf) {
