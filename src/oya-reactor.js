@@ -25,7 +25,6 @@
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
-                    this.resourceMethod("post", "vessel", this.postVessel),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "actuator", this.postActuator),
                     this.resourceMethod("post", "sensor", this.postSensor),
@@ -47,8 +46,8 @@
                 vessel.emitter.on(OyaVessel.EVENT_COOL, (value) => {
                     this.onActuator(OyaVessel.EVENT_COOL, value, iv);
                 });
-                vessel.emitter.on(OyaVessel.EVENT_DRAIN, (value) => {
-                    this.onActuator(OyaVessel.EVENT_DRAIN, value, iv);
+                vessel.emitter.on(OyaVessel.EVENT_PRIME, (value) => {
+                    this.onActuator(OyaVessel.EVENT_PRIME, value, iv);
                 });
                 return vessel;
             });
@@ -182,23 +181,17 @@
         }
 
         postReactor(req, res, next) {
+            var result = {};
             if (req.body.hasOwnProperty('activate')) {
                 this.vessel.activate(req.body.activate);
-                return {
-                    activate: req.body.activate,
-                }
-            }
-            throw new Error("invalid reactor request: " + JSON.stringify(req.body));
-        }
-
-        postVessel(req, res, next) { // DEPRECATED
-            if (req.body.hasOwnProperty('cycle')) {
+                result.activate = req.body.activate;
+            } else if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.setCycle(req.body.cycle);
-                return {
-                    cycle: req.body.cycle,
-                }
+                result.cycle = req.body.cycle;
+            } else {
+                throw new Error("invalid reactor request: " + JSON.stringify(req.body));
             }
-            throw new Error("invalid vessel request: " + JSON.stringify(req.body));
+            return result;
         }
 
         getState() {

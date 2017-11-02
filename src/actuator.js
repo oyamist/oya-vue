@@ -28,7 +28,7 @@
         static get ACTUATOR_SPST_NO() { return "actuator:spst:no"; }
         static get USAGE_MIST() { return "Mist"; }
         static get USAGE_COOL() { return "Cool"; }
-        static get USAGE_DRAIN() { return "Drain"; }
+        static get USAGE_PRIME() { return "Prime"; }
         static get USAGE_DEFAULTS() { 
             return [{
                 usage: Actuator.USAGE_MIST,
@@ -41,9 +41,9 @@
                 desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
-                usage: Actuator.USAGE_DRAIN,
-                activate: OyaVessel.EVENT_DRAIN,
-                desc: 'Drain reservoir ',
+                usage: Actuator.USAGE_PRIME,
+                activate: OyaVessel.EVENT_PRIME,
+                desc: 'Prime mist system ',
                 type: Actuator.ACTUATOR_SPST_NO,
             }];
         }

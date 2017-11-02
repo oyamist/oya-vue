@@ -7,13 +7,13 @@
     const STANDARD_OFF = 0.02;
     const FAN_ON = 2*STANDARD_ON;
     const FAN_OFF = 2*STANDARD_OFF;
-    const DRAIN_ON = 3*STANDARD_ON;
+    const PRIME_ON = 3*STANDARD_ON;
     const SETTLE_MS = 5;
     function sensorDefaults() {
         return {
             Mist: false,
             Cool: false,
-            Drain: false,
+            Prime: false,
             tempInternal: null,
             tempExternal: null,
             tempAmbient: null,
@@ -35,7 +35,7 @@
         vessel.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
         vessel.cycles[OyaVessel.CYCLE_COOL].on = FAN_ON;
         vessel.cycles[OyaVessel.CYCLE_COOL].off = FAN_OFF;
-        vessel.cycles[OyaVessel.CYCLE_PRIME].on = DRAIN_ON;
+        vessel.cycles[OyaVessel.CYCLE_PRIME].on = PRIME_ON;
         vessel.cycles[OyaVessel.CYCLE_PRIME].off = OyaVessel.CYCLE_STANDARD;
 
         return vessel;
@@ -303,7 +303,7 @@
                     active: true,
                     type: "OyaVessel",
                     Mist: false,
-                    Drain: false,
+                    Prime: false,
                     cycleNumber: 1,
                     cycle: OyaVessel.CYCLE_PRIME,
                     nextCycle: OyaVessel.CYCLE_PRIME,
@@ -322,7 +322,7 @@
                 }));
 
                 // nextCycle has no effect during off phase
-                yield setTimeout(() => async.next(true), DRAIN_ON*1000);
+                yield setTimeout(() => async.next(true), PRIME_ON*1000);
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_STANDARD,
                     nextCycle: OyaVessel.CYCLE_STANDARD,

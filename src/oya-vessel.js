@@ -18,7 +18,7 @@
                 type: "OyaVessel",
                 Mist: false,
                 Cool: false,
-                Drain: false,
+                Prime: false,
                 countdown: 0,
                 countstart: 0,
                 tempInternal: null,
@@ -42,8 +42,8 @@
             this.emitter.on(OyaVessel.EVENT_COOL, (value) => {
                 this._state.Cool = value;
             });
-            this.emitter.on(OyaVessel.EVENT_DRAIN, (value) => {
-                this._state.Drain = value;
+            this.emitter.on(OyaVessel.EVENT_PRIME, (value) => {
+                this._state.Prime = value;
             });
             this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
@@ -69,7 +69,7 @@
                 off: 60,
             },
             [OyaVessel.CYCLE_PRIME]: {
-                name: "Drain",
+                name: "Prime",
                 key: OyaVessel.CYCLE_PRIME,
                 desc: "Circulate water to prime misting system",
                 emits: OyaVessel.EVENT_MIST,
@@ -100,7 +100,7 @@
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_MIST() { return "event:mist"; }
         static get EVENT_COOL() { return "event:Cool"; }
-        static get EVENT_DRAIN() { return "event:valve1"; }
+        static get EVENT_PRIME() { return "event:Prime"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
@@ -188,7 +188,7 @@
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 this.emitter.emit(OyaVessel.EVENT_MIST, false);
                 this.emitter.emit(OyaVessel.EVENT_COOL, false);
-                this.emitter.emit(OyaVessel.EVENT_DRAIN, false);
+                this.emitter.emit(OyaVessel.EVENT_PRIME, false);
             } else {
                 var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);
                 winston.warn(err.stack);

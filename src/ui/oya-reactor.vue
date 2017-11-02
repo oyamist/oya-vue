@@ -42,16 +42,15 @@
                     </div>
                 </div>
                 <div style="min-width: 20em">
-                    <div v-if="selCycle " class="pl-3">
+                    <div v-if="curCycle " class="pl-3">
                         <v-select
                           v-bind:items="cycles"
-                          v-model="selCycle"
+                          v-model="curCycle"
                           label="Active cycle"
                           item-text="name"
-                          @input="clickCycle(selCycle.key)"
                           item-value="key"
                           return-object
-                          :hint="`${selCycle.desc}`"
+                          :hint="`${curCycle.desc}`"
                           persistent-hint
                          ></v-select>
                     </div>
@@ -209,7 +208,6 @@ export default {
             apiEditDialog: false,
             activeToggle: false,
             actuatorToggle: false,
-            selCycle: null,
             cycleToggle: false,
             activeItems: [{
                 text: "Stop",
@@ -294,19 +292,26 @@ export default {
                 sensor[key] = template[key];
             });
         },
-        clickCycle(cycle) {
-            var url = [this.restOrigin(), this.service, 'vessel'].join('/');
-            this.$http.post(url, {
-                cycle,
-            }).then(r => {
-                console.log("ok", r);
-                this.rbService.cycle = r.data.cycle;
-            }).catch(e => {
-                console.error("error", e);
-            });
-        },
     },
     computed: {
+        curCycle: {
+            get: function() {
+                return this.vessel && this.rbService.cycle &&
+                    this.vessel.cycles[this.rbService.cycle];
+            },
+            set: function(value) {
+                var cycle = value.key;
+                var url = [this.restOrigin(), this.service, 'reactor'].join('/');
+                this.$http.post(url, {
+                    cycle,
+                }).then(r => {
+                    console.log("changed cycle", r);
+                    this.rbService.cycle = r.data.cycle;
+                }).catch(e => {
+                    console.error("error", e);
+                });
+            },
+        },
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];

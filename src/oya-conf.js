@@ -56,8 +56,8 @@
                     }));
                     this.actuators.push(
                         new Actuator({
-                            name: `${Actuator.USAGE_DRAIN}${suffix}`,
-                            usage: Actuator.USAGE_DRAIN,
+                            name: `${Actuator.USAGE_PRIME}${suffix}`,
+                            usage: Actuator.USAGE_PRIME,
                             vesselIndex: iVessel,
                     }));
                 }

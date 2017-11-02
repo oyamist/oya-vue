@@ -62,7 +62,7 @@
                     pin: 3,
                 }),
                 new Actuator({
-                    usage: Actuator.USAGE_DRAIN,
+                    usage: Actuator.USAGE_PRIME,
                     pin: 4,
                 }),
             ],
@@ -98,12 +98,12 @@
         should(relayValue).equal(true);
         should(relayPin).equal(3);
 
-        // test DRAIN
+        // test PRIME
         relayValue = null;
         relayPin = null;
-        should(reactor.vessels[0].state.Drain).equal(false);
-        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_DRAIN, true);
-        should(reactor.vessels[0].state.Drain).equal(true);
+        should(reactor.vessels[0].state.Prime).equal(false);
+        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_PRIME, true);
+        should(reactor.vessels[0].state.Prime).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(4);
     });
@@ -345,37 +345,6 @@
         }();
         async.next();
     });
-    it("POST /vessel changes vessel state", function(done) {
-        var async = function* () {
-            try {
-                var app = testInit();
-
-                var vessel = testReactor().vessels[0];
-                vessel.activate(false);
-                should(vessel.state.active).equal(false);
-
-                // change cycle
-                var command = {
-                    cycle: OyaVessel.CYCLE_COOL,
-                }
-                winston.level="warn";
-                should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
-                var res = yield supertest(app).post("/test/vessel").send(command)
-                    .end((e,r) => e ? async.throw(e) : async.next(r));
-                should(res.statusCode).equal(200);
-                should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
-                should.deepEqual(res.body, {
-                    cycle: OyaVessel.CYCLE_COOL,
-                });
-
-                done();
-            } catch(err) {
-                winston.error(err.message, err.stack);
-                throw(err);
-            }
-        }();
-        async.next();
-    });
     it("POST /reactor changes vessel state", function(done) {
         var async = function* () {
             try {
@@ -398,6 +367,20 @@
                 should(vessel.state.active).equal(true);
                 should.deepEqual(res.body, {
                     activate: true,
+                });
+
+                // change cycle
+                var command = {
+                    cycle: OyaVessel.CYCLE_COOL,
+                }
+                winston.level="warn";
+                should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+                var res = yield supertest(app).post("/test/reactor").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+                should.deepEqual(res.body, {
+                    cycle: OyaVessel.CYCLE_COOL,
                 });
 
                 done();

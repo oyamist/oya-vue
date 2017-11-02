@@ -17,7 +17,7 @@
         actuators: [
             new Actuator({usage:Actuator.USAGE_MIST}),
             new Actuator({usage:Actuator.USAGE_COOL}),
-            new Actuator({usage:Actuator.USAGE_DRAIN}),
+            new Actuator({usage:Actuator.USAGE_PRIME}),
             new Actuator({
                 name: "Mist2",
                 usage:Actuator.USAGE_MIST,
@@ -29,8 +29,8 @@
                 vesselIndex: 1
             }),
             new Actuator({
-                name: "Drain2",
-                usage:Actuator.USAGE_DRAIN,
+                name: "Prime2",
+                usage:Actuator.USAGE_PRIME,
                 vesselIndex: 1
             }),
         ],
