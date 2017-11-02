@@ -33,13 +33,9 @@
 
             this.nextCycle = this._state.cycle,
             this._state.active = false,
-            this._state.pumpManual = false,
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
-            this.emitter.on(OyaVessel.EVENT_PUMP_MANUAL, (value) => {
-                this._state.pumpManual = value;
-            });
             this.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                 this._state.Mist = value;
             });
@@ -72,13 +68,13 @@
                 on: 30,
                 off: 60,
             },
-            [OyaVessel.CYCLE_DRAIN]: {
+            [OyaVessel.CYCLE_PRIME]: {
                 name: "Drain",
-                key: OyaVessel.CYCLE_DRAIN,
-                desc: "Partially drain reservoir and stop to add fresh nutrients",
+                key: OyaVessel.CYCLE_PRIME,
+                desc: "Circulate water to prime misting system",
                 emits: OyaVessel.EVENT_MIST,
-                on: Math.round(60 * 3.78541/0.73), // about 1 gallon for Aquatec CDP6800 pump operating with no load
-                off: -1,
+                on: 60,
+                off: OyaVessel.CYCLE_STANDARD,
             },
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
@@ -99,14 +95,13 @@
         }}
 
         static get CYCLE_STANDARD() { return "Cycle #1"; }
-        static get CYCLE_DRAIN() { return "Cycle #2"; }
+        static get CYCLE_PRIME() { return "Cycle #2"; }
         static get CYCLE_COOL() { return "Cycle #3"; }
         static get CYCLE_CONSERVE() { return "Cycle #4"; }
         static get EVENT_MIST() { return "event:mist"; }
         static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_DRAIN() { return "event:valve1"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
-        static get EVENT_PUMP_MANUAL() { return "event:pump-manual"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
@@ -259,18 +254,22 @@
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
             self.emitter.emit(OyaVessel.EVENT_MIST, value);
-            var msOff = Number(cycle.off) * 1000;
-            if (msOff > 0) {
-                self._phaseTimeout = setTimeout(() => {
-                    self._phaseTimeout = null;
-                    if (self.cycle === self.nextCycle) {
-                        updatePhase(self, true);
-                    } else {
-                        self.setCycle(self.nextCycle);
-                    }
-                }, msOff);
-            } else if (msOff < 0) {
-                self.activate(false);
+            if (typeof cycle.off === 'string') {
+                self.setCycle(cycle.off);
+            } else {
+                var msOff = Number(cycle.off) * 1000;
+                if (msOff > 0) {
+                    self._phaseTimeout = setTimeout(() => {
+                        self._phaseTimeout = null;
+                        if (self.cycle === self.nextCycle) {
+                            updatePhase(self, true);
+                        } else {
+                            self.setCycle(self.nextCycle);
+                        }
+                    }, msOff);
+                } else {
+                    self.activate(false);
+                }
             }
         }
     }

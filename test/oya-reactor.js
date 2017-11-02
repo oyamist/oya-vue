@@ -183,7 +183,7 @@
                     should(apiModel.vessels[0].cycles).properties([
                         OyaVessel.CYCLE_COOL,
                         OyaVessel.CYCLE_STANDARD,
-                        OyaVessel.CYCLE_DRAIN,
+                        OyaVessel.CYCLE_PRIME,
                     ]);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
