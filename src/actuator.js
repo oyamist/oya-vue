@@ -21,7 +21,7 @@
             this.vesselIndex = opts.vesselIndex || 0;
             this.desc = opts.desc || actDefault.desc || 'generic actuator';
             this.pin = opts.pin || Actuator.NOPIN;
-            this.activationSink = opts.activationSink || actDefault.activationSink;
+            this.activate = opts.activate || actDefault.activate;
         }
 
         static get NOPIN() { return -1; }
@@ -32,17 +32,17 @@
         static get USAGE_DEFAULTS() { 
             return [{
                 usage: Actuator.USAGE_MIST,
-                activationSink: OyaVessel.EVENT_MIST,
+                activate: OyaVessel.EVENT_MIST,
                 desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: Actuator.USAGE_COOL,
-                activationSink: OyaVessel.EVENT_COOL,
+                activate: OyaVessel.EVENT_COOL,
                 desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: Actuator.USAGE_DRAIN,
-                activationSink: OyaVessel.EVENT_DRAIN,
+                activate: OyaVessel.EVENT_DRAIN,
                 desc: 'Drain reservoir ',
                 type: Actuator.ACTUATOR_SPST_NO,
             }];

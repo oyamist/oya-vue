@@ -249,8 +249,8 @@
                         self._phaseTimeout = null;
                         updatePhase(self, false);
                     }, msOn);
-               }
-           }
+                }
+            }
         } else {
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
@@ -263,6 +263,7 @@
                         updatePhase(self, true);
                     } else {
                         self.cycle = self.nextCycle;
+                        //updatePhase(self, true);
                     }
                 }, msOff);
             } else if (msOff < 0) {

@@ -508,7 +508,7 @@
         var data = sensor.parseData(buf);
         should(data.temp).equal(null);
         data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
-        should(data.timestamp - new Date()).approximately(0, 1);
+        should(data.timestamp - new Date()).approximately(0, 3);
         should.deepEqual(sensor.data, data);
         should(temp_event).equal(null); // no event
         should(temp_eventValue).equal(null); // no event

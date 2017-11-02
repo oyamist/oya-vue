@@ -41,6 +41,9 @@
                 vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                     this.onActuator(OyaVessel.EVENT_MIST, value, iv);
                 });
+                vessel.emitter.on(OyaVessel.EVENT_PUMP_MANUAL, (value) => {
+                    this.onActuator(OyaVessel.EVENT_PUMP_MANUAL, value, iv);
+                });
                 vessel.emitter.on(OyaVessel.EVENT_COOL, (value) => {
                     this.onActuator(OyaVessel.EVENT_COOL, value, iv);
                 });
@@ -65,7 +68,7 @@
         onActuator(event, value, vesselIndex) {
             var vessel = this.vessels[vesselIndex];
             this.oyaConf.actuators.map((a,ia) => {
-                if (event === a.activationSink && a.vesselIndex === vesselIndex) {
+                if (event === a.activate && a.vesselIndex === vesselIndex) {
                     if (a.pin === Actuator.NOPIN) {
                         winston.debug(`${vessel.name} onActuator ${event}:${value} ignored (no pin)`);
                     } else {
@@ -158,7 +161,7 @@
             if (value == null) {
                 throw new Error("no value provided: " + JSON.stringify(req.body));
             }
-            this.vessel.emitter.emit(actuator.activationSink, value);
+            this.vessel.emitter.emit(actuator.activate, value);
             return {
                 name,
                 value: this.vessel.state[name],

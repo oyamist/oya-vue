@@ -196,103 +196,91 @@
         }();
         async.next();
     });
-    it ("state property provides vessel state", function(done) {
+    it ("TESTTESTstate property provides vessel state", function(done) {
         var async = function*() {
             try {
-                var vessel = createTestVessel({name:'test6a', maxCycles:1});
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
-                    cycle: OyaVessel.CYCLE_STANDARD,
+                var testInvariant = {
                     countdown: 0,
                     countstart: 0,
-                    active: false,
+                    active: true,
+                    type: "OyaVessel",
                     pumpManual: false,
+                    cycleNumber: 1,
+                };
+                var vessel = createTestVessel({name:'test6a', maxCycles:2});
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
+                    cycle: OyaVessel.CYCLE_STANDARD,
+                    active: false,
                     Mist: false,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
-                    type: "OyaVessel",
                     cycleNumber: 0,
                 }));
 
                 // activation turns stuff on
                 vessel.activate();
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_STANDARD,
-                    countdown: 0,
-                    countstart: 0,
-                    active: true,
-                    pumpManual: false,
                     Mist: true,
                     nextCycle: OyaVessel.CYCLE_STANDARD,
-                    type: "OyaVessel",
-                    cycleNumber: 1,
                 }));
 
                 // setting nextCycle has no immediate effect
                 vessel.nextCycle = OyaVessel.CYCLE_COOL;
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_STANDARD,
-                    countdown: 0,
-                    countstart: 0,
-                    active: true,
-                    pumpManual: false,
                     Mist: true,
                     nextCycle: OyaVessel.CYCLE_COOL,
-                    type: "OyaVessel",
-                    cycleNumber: 1,
                 }));
 
                 // nextCycle has no effect during off phase
                 yield setTimeout(() => async.next(true), STANDARD_ON*1000);
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_STANDARD,
-                    countdown: 0,
-                    countstart: 0,
-                    active: true,
-                    pumpManual: false,
                     Mist: false,
                     nextCycle: OyaVessel.CYCLE_COOL,
-                    type: "OyaVessel",
-                    cycleNumber: 1,
                 }));
 
                 // nextCycle takes effect after off phase
-                yield setTimeout(() => async.next(true), FAN_ON*1000);
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                yield setTimeout(() => async.next(true), STANDARD_OFF*1000);
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_COOL,
-                    countdown: 0,
-                    countstart: 0,
-                    active: true,
-                    pumpManual: false,
                     Mist: true,
                     nextCycle: OyaVessel.CYCLE_COOL,
-                    type: "OyaVessel",
-                    cycleNumber: 1, // first iteration of new cycle
                 }));
 
                 // off phase of new cycle
-                yield setTimeout(() => async.next(true), FAN_OFF*1000);
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                yield setTimeout(() => async.next(true), FAN_ON*1000 );
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_COOL,
-                    countdown: 0,
-                    countstart: 0,
-                    active: true,
-                    pumpManual: false,
                     Mist: false,
                     nextCycle: OyaVessel.CYCLE_COOL,
-                    type: "OyaVessel",
-                    cycleNumber: 1, 
+                }));
+
+                // on phase of new cycle
+                yield setTimeout(() => async.next(true), FAN_OFF*1000);
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
+                    cycle: OyaVessel.CYCLE_COOL,
+                    Mist: true,
+                    nextCycle: OyaVessel.CYCLE_COOL,
+                    cycleNumber: 2,
+                }));
+
+                // off phase of new cycle
+                yield setTimeout(() => async.next(true), FAN_ON*1000 );
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
+                    cycle: OyaVessel.CYCLE_COOL,
+                    Mist: false,
+                    nextCycle: OyaVessel.CYCLE_COOL,
+                    cycleNumber: 2,
                 }));
 
                 // all done
-                yield setTimeout(() => async.next(true), FAN_ON*1000+SETTLE_MS);
-                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), {
+                yield setTimeout(() => async.next(true), FAN_OFF*1000);
+                should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaVessel.CYCLE_COOL,
-                    countdown: 0,
-                    countstart: 0,
                     active: false,
-                    pumpManual: false,
                     nextCycle: OyaVessel.CYCLE_COOL,
-                    type: "OyaVessel",
-                    cycleNumber: 2,
+                    cycleNumber: 3,
                 }));
                 done();
             } catch (err) {
