@@ -410,6 +410,8 @@
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
+        testReactor().vessels[0].activate(false);
+        testReactor().vessels[1].activate(false);
         app.locals.rbServer.close();
         winston.info("end test suite");
     });

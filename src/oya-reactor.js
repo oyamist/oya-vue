@@ -193,7 +193,7 @@
 
         postVessel(req, res, next) { // DEPRECATED
             if (req.body.hasOwnProperty('cycle')) {
-                this.vessel.cycle = req.body.cycle;
+                this.vessel.setCycle(req.body.cycle);
                 return {
                     cycle: req.body.cycle,
                 }

@@ -188,7 +188,7 @@
                 this._state.active = value;
                 this._state.countdown = 0;
                 this._state.countstart = 0;
-                this._phaseTimeout != null & clearTimeout(this._phaseTimeout);
+                this._phaseTimeout != null && clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 this.emitter.emit(OyaVessel.EVENT_MIST, false);
@@ -207,6 +207,10 @@
         }
 
         set cycle(value) {
+            throw new Error('"cycle" is a read-only property. Call setCycle()');
+        }
+
+        setCycle(value) {
             if (this.isActive) {
                 this.activate(false);
                 this._state.cycle = value;
@@ -262,8 +266,7 @@
                     if (self.cycle === self.nextCycle) {
                         updatePhase(self, true);
                     } else {
-                        self.cycle = self.nextCycle;
-                        //updatePhase(self, true);
+                        self.setCycle(self.nextCycle);
                     }
                 }, msOff);
             } else if (msOff < 0) {

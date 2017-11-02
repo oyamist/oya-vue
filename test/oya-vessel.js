@@ -99,6 +99,8 @@
         should.throws(() => {
             vessel2.activate("should-be-a-boolean");  
         });
+        vessel.activate(false);
+        should(vessel.isActive).equal(false);
     });
     it ("state.Mist is true when cycle is active and the phase is on", function(done) {
         var async = function*() {
@@ -162,7 +164,7 @@
 
                 // changing the cycle re-activates
                 var to = vessel._phaseTimeout;
-                vessel.cycle = OyaVessel.CYCLE_COOL;
+                vessel.setCycle(OyaVessel.CYCLE_COOL);
 
                 yield setTimeout(() => async.next(true), FAN_ON*1000);
                 should(vessel.state.cycleNumber).equal(1);
@@ -196,7 +198,7 @@
         }();
         async.next();
     });
-    it ("TESTTESTstate property provides vessel state", function(done) {
+    it ("state property provides vessel state", function(done) {
         var async = function*() {
             try {
                 var testInvariant = {
