@@ -11,7 +11,7 @@
     </rb-about>
 
     <div class="subheading primary--text oya-sensor">
-        {{sensorDisplay()}}
+        {{sensorDisplay}}
     </div>
 </div>
 
@@ -36,20 +36,22 @@ export default {
         }
     },
     methods: {
-        sensorDisplay(propName = this.sensorProp) {
-            var value = this.rbService[propName];
+    },
+    computed: {
+        sensorDisplay() {
+            var value = this.rbService[this.sensorProp];
             var result = '\u254d';
             var suffix = '';
-            if (propName.startsWith('temp')) {
-                suffix = this.rbService.tempUnit === 'F' ? '\u2109' : '\u2103';
+            if (this.sensorProp.startsWith('temp')) {
+                suffix = this.apiModel && this.apiModel.tempUnit === 'F' ? '\u2109' : '\u2103';
                 if (value == null) {
                     // do nothing
-                } else if (this.rbService.tempUnit === 'F') {
+                } else if (this.apiModel && this.apiModel.tempUnit === 'F') {
                     result = (value * 1.8 + 32).toFixed(1);
                 } else {
                     result = value.toFixed(1);
                 }
-            } else if (propName.startsWith('humidity')) {
+            } else if (this.sensorProp.startsWith('humidity')) {
                 suffix = '%RH';
                 value != null && (result = (value*100).toFixed(1));
             } else {
@@ -57,8 +59,6 @@ export default {
             }
             return result + suffix;
         },
-    },
-    computed: {
     },
     components: {
     },
