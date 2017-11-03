@@ -72,6 +72,13 @@
         data.temp.should.approximately(24.2, 0.1); // Centigrade
         data.humidity.should.approximately(0.517, 0.001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 1);
+        should.throws(() => {
+            var buf = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xf0]); // bad crc
+            var data = sensor.parseData(buf);
+        }, function(e) {
+            should(e.message).match(/bad CRC/);
+            return true;
+        });
     });
     it("parseData() parses data buffer", function() {
         var buf = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
@@ -195,6 +202,12 @@
                 should(data.humidity).approximately(32.3, 0.01);
                 should(data.timestamp - Date.now()).approximately(0,3);
                 should.deepEqual(data, sensor.data);
+
+                // read() rejects bad data
+                var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x90]); // bad crc
+                var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
+                    .catch(e=>async.next(e));
+                should(data).instanceOf(Error);
 
                 done();
             } catch(err) {

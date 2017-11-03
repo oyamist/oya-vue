@@ -256,21 +256,21 @@
 
         read() {
             return new Promise((resolve, reject) => {
-                //try {
+                try {
                     this.write(this.cmdRead);
                     var buf = Buffer.alloc(this.dataRead.length);
                     setTimeout(() => {
-                        //try {
+                        try {
                             this.i2cRead(this.address, buf);
                             var data = this.parseData(buf);
                             resolve(data);
-                        //} catch(e) {
-                            //reject(e);
-                        //}
+                        } catch(e) {
+                            reject(e);
+                        }
                     }, this.readDelay || 0);
-                //} catch (err) {
-                    //reject(err);
-                //}
+                } catch (e) {
+                    reject(e);
+                }
             });
         }
 
