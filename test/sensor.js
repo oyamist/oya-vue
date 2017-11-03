@@ -180,6 +180,7 @@
                 var readDelay = 15;
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
+                    maxReadErrors: 1,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
                         testData.copy(buf);
@@ -205,21 +206,30 @@
 
                 // read() rejects bad data 5x then doesn't read anymore
                 should(sensor.readErrors).equal(0);
+                should(sensor.fault).equal(null);
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x90]); // bad crc
                 var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
                     .catch(e=>async.next(e));
                 should(data).instanceOf(Error);
                 should(data.message).match(/CRC/);
                 should(sensor.readErrors).equal(1);
+                should(sensor.fault.message).match(/too many errors/);
+
+                // read is disabled if fault is not null
+                var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
+                var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
+                    .catch(e=>async.next(e));
+                should(data).equal(sensor.fault);
 
                 // readErrors is set to zero on success
-                var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
+                sensor.clear();  // clear fault and permit reading
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(sensor.readErrors).equal(0);
                 should(data.temp).approximately(19.5, 0.01);
 
                 done();
             } catch(err) {
+                console.log(err.stack);
                 done(err);
             }
         }();

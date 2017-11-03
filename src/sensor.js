@@ -35,7 +35,8 @@
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readDelay = opts.readDelay || sensorDefault.readDelay;
-            this.readErrors = 0; 
+            this.clear();
+            this.maxReadErrors = opts.maxReadErrors == null ? 5 : opts.maxReadErrors;
             this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.crcInit = opts.crcInit || sensorDefault.crcInit;
@@ -256,8 +257,8 @@
         }
 
         read() {
-            if (this.readErrors > this.maxReadErrors) {
-                return Promise.reject(new Error("sensor unavailable"));
+            if (this.fault) {
+                return Promise.reject(this.fault);
             }
             return new Promise((resolve, reject) => {
                 try {
@@ -270,15 +271,24 @@
                             this.readErrors = 0;
                             resolve(data);
                         } catch(e) {
-                            this.readErrors++;
+                            if (++this.readErrors >= this.maxReadErrors) {
+                                this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors)`);
+                            }
                             reject(e);
                         }
                     }, this.readDelay || 0);
                 } catch (e) {
-                    this.readErrors++;
+                    if (++this.readErrors >= this.maxReadErrors) {
+                        this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors)`);
+                    }
                     reject(e);
                 }
             });
+        }
+
+        clear() {
+            this.readErrors = null;
+            this.fault = null;
         }
 
         parseData(buf) {
