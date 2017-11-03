@@ -54,6 +54,22 @@
             });
         }
 
+        static get EVENT_HUMIDITY_MAP() {
+            return {
+                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+                [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
+                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+            };
+        }
+
+        static get EVENT_TEMP_MAP() {
+            return {
+                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
+                [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
+                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
+            };
+        }
+
         static get TYPE_SHT31_DIS() {
             return {
                 type: "SHT31-DIS",
@@ -79,7 +95,7 @@
                 readDelay: 15, // 15ms high precision sensing delay
                 tempScale: 175.0/65535,
                 tempOffset: -45,
-                humidityScale: 100.0/65535,
+                humidityScale: 1.0/65535,
                 humidityOffset: 0,
                 address: 0x44,
                 addresses: [0x44,0x45],
@@ -321,11 +337,7 @@
             if (temp != null) {
                 if (this.readTemp) {
                     temp = temp * this.tempScale + this.tempOffset;
-                    this.emit({
-                        [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
-                        [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
-                        [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
-                    }, temp);
+                    this.emit(temp, Sensor.EVENT_TEMP_MAP);
                 } else {
                     temp = null;
                 }
@@ -333,11 +345,7 @@
             if (humidity != null) {
                 if (this.readHumidity) {
                     humidity = humidity * this.humidityScale + this.humidityOffset;
-                    this.emit({
-                        [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                        [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
-                        [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
-                    }, humidity);
+                    this.emit(humidity, Sensor.EVENT_HUMIDITY_MAP);
                 } else {
                     humidity = null;
                 }
@@ -349,7 +357,7 @@
             }
         }
 
-        emit(eventMap, value) {
+        emit(value, eventMap) {
             var event = eventMap[this.loc];
             if (event && this.emitter) {
                 this.emitter.emit(event, value);
@@ -458,7 +466,7 @@
         var buf = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
         var data = sensor.parseData(buf);
         data.temp.should.approximately(24.2, 0.1); // Centigrade
-        data.humidity.should.approximately(51.7, 0.1); // %relative humidity
+        data.humidity.should.approximately(0.517, 0.001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 1);
     });
     it("parseData() parses data buffer", function() {
