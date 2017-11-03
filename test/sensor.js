@@ -203,11 +203,20 @@
                 should(data.timestamp - Date.now()).approximately(0,3);
                 should.deepEqual(data, sensor.data);
 
-                // read() rejects bad data
+                // read() rejects bad data 5x then doesn't read anymore
+                should(sensor.readErrors).equal(0);
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x90]); // bad crc
                 var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
                     .catch(e=>async.next(e));
                 should(data).instanceOf(Error);
+                should(data.message).match(/CRC/);
+                should(sensor.readErrors).equal(1);
+
+                // readErrors is set to zero on success
+                var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
+                var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(sensor.readErrors).equal(0);
+                should(data.temp).approximately(19.5, 0.01);
 
                 done();
             } catch(err) {

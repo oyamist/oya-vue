@@ -35,6 +35,7 @@
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readDelay = opts.readDelay || sensorDefault.readDelay;
+            this.readErrors = 0; 
             this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.crcInit = opts.crcInit || sensorDefault.crcInit;
@@ -250,11 +251,14 @@
                 }
                 this.i2cWrite(this.address, Buffer.from(cmd));
             } else {
-                throw new Error("Could not . Unknown communication protocol");
+                throw new Error("Could not write sensor. Unknown communication protocol ${this.comm}");
             }
         }
 
         read() {
+            if (this.readErrors > this.maxReadErrors) {
+                return Promise.reject(new Error("sensor unavailable"));
+            }
             return new Promise((resolve, reject) => {
                 try {
                     this.write(this.cmdRead);
@@ -263,12 +267,15 @@
                         try {
                             this.i2cRead(this.address, buf);
                             var data = this.parseData(buf);
+                            this.readErrors = 0;
                             resolve(data);
                         } catch(e) {
+                            this.readErrors++;
                             reject(e);
                         }
                     }, this.readDelay || 0);
                 } catch (e) {
+                    this.readErrors++;
                     reject(e);
                 }
             });
