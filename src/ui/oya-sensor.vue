@@ -10,7 +10,7 @@
             property name of sensor</rb-about-item>
     </rb-about>
 
-    <div class="subheading primary--text oya-sensor">
+    <div v-if="sensorDisplay" class="subheading primary--text oya-sensor">
         {{sensorDisplay}}
     </div>
 </div>
@@ -39,14 +39,18 @@ export default {
     },
     computed: {
         sensorDisplay() {
+            var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
+            if (apiModel == null) {
+                return null;
+            }
             var value = this.rbService[this.sensorProp];
             var result = '\u254d';
             var suffix = '';
             if (this.sensorProp.startsWith('temp')) {
-                suffix = this.apiModel && this.apiModel.tempUnit === 'F' ? '\u2109' : '\u2103';
+                suffix = apiModel.tempUnit === 'F' ? '\u2109' : '\u2103';
                 if (value == null) {
                     // do nothing
-                } else if (this.apiModel && this.apiModel.tempUnit === 'F') {
+                } else if (apiModel.tempUnit === 'F') {
                     result = (value * 1.8 + 32).toFixed(1);
                 } else {
                     result = value.toFixed(1);
