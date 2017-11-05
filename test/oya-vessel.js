@@ -34,7 +34,7 @@
         vessel.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
         vessel.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
         vessel.cycles[OyaVessel.CYCLE_COOL].on = FAN_ON;
-        vessel.cycles[OyaVessel.CYCLE_COOL].off = FAN_OFF;
+        vessel.cycles[OyaVessel.CYCLE_COOL].off = FAN_OFF+"";
         vessel.cycles[OyaVessel.CYCLE_PRIME].on = PRIME_ON;
         vessel.cycles[OyaVessel.CYCLE_PRIME].off = OyaVessel.CYCLE_STANDARD;
 
