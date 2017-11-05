@@ -254,7 +254,7 @@
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
             self.emitter.emit(OyaVessel.EVENT_MIST, value);
-            if (cycle.off + "" !== Number(cycle.off) +'') {
+            if (OyaVessel.DEFAULT_CYCLES[cycle.off]) {
                 self.setCycle(cycle.off);
             } else {
                 var msOff = Number(cycle.off) * 1000;
