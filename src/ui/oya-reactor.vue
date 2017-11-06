@@ -209,6 +209,7 @@ export default {
             activeToggle: false,
             actuatorToggle: false,
             cycleToggle: false,
+            mockPhase: 0,
             activeItems: [{
                 text: "Stop",
                 value: false,
@@ -277,9 +278,11 @@ export default {
         },
         mockSensors() {
             var url = [this.restOrigin(), this.service, 'sensor'].join('/');
+            this.mockPhase += 2*Math.PI / 10;
+            var mockFactor = 0.1*Math.sin(this.mockPhase);
             this.$http.post(url, {
-                tempInternal: Math.random() * 5 + 20,
-                humidityInternal: Math.random(),
+                tempInternal: mockFactor + 20,
+                humidityInternal: 0.9 + mockFactor * 0.05,
             }).then(r => {
                 this.rbService.cycle = r.data.cycle;
             }).catch(e => {

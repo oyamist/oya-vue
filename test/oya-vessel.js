@@ -14,10 +14,18 @@
             Mist: false,
             Cool: false,
             Prime: false,
-            tempInternal: null,
+            tempInternal: {
+                avg: null,
+                unit: "C",
+                value: null,
+            },
             tempExternal: null,
             tempAmbient: null,
-            humidityInternal: null,
+            humidityInternal: {
+                avg: null,
+                unit: "%RH",
+                value: null,
+            },
             humidityExternal: null,
             humidityAmbient: null,
         };
@@ -73,21 +81,21 @@
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
         const coolThreshold = vessel.coolThreshold;
         should(typeof coolThreshold).equal("number");
-        should(vessel.state.tempInternal).equal(null);
-        should(vessel.state.humidityInternal).equal(null);
+        should(vessel.state.tempInternal.value).equal(null);
+        should(vessel.state.humidityInternal.value).equal(null);
 
         // just right
         vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.coolThreshold-1);
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
-        should(vessel.state.tempInternal).equal(vessel.coolThreshold-1);
+        should(vessel.state.tempInternal.value).equal(vessel.coolThreshold-1);
 
         // too hot
         vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.coolThreshold+1);
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_COOL);
-        should(vessel.state.tempInternal).equal(vessel.coolThreshold+1);
+        should(vessel.state.tempInternal.value).equal(vessel.coolThreshold+1);
 
         vessel.emitter.emit(OyaVessel.SENSE_HUMIDITY_INTERNAL, 0.55);
-        should(vessel.state.humidityInternal).equal(0.55);
+        should(vessel.state.humidityInternal.value).equal(0.55);
     });
     it ("isActive property is initially false", function() {
         var vessel = createTestVessel({name:'test2b', maxCycles:1});

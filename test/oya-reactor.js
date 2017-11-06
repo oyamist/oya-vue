@@ -4,6 +4,7 @@
     const srcPkg = require("../package.json");
     const rb = require('rest-bundle');
     const rbh = new rb.RbHash();
+    const EAVG = 0.2;
     const supertest = require('supertest');
     const fs = require('fs');
     const APIMODEL_PATH = `api-model/${srcPkg.name}.test.oya-conf.json`;
@@ -306,8 +307,8 @@
                 var app = testInit();
                 var vessel = testReactor().vessels[0];
                 vessel.activate(false);
-                should(vessel.state.tempInternal).equal(null);
-                should(vessel.state.humidityInternal).equal(null);
+                should(vessel.state.tempInternal.value).equal(null);
+                should(vessel.state.humidityInternal.value).equal(null);
 
                 var command = {
                     tempInternal: 72,
@@ -316,8 +317,16 @@
                 var res = yield supertest(app).post("/test/sensor").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
-                should(vessel.state.tempInternal).equal(72);
-                should(vessel.state.humidityInternal).equal(0.64);
+                should.deepEqual(vessel.state.tempInternal, {
+                    value: 72,
+                    avg: 72,
+                    unit: "C",
+                });
+                should.deepEqual(vessel.state.humidityInternal, {
+                    value: 0.64,
+                    avg: 0.64,
+                    unit: "%RH",
+                });
                 should.deepEqual(res.body, {
                     tempInternal: 72,
                     humidityInternal: 0.64,
@@ -330,8 +339,16 @@
                 var res = yield supertest(app).post("/test/sensor").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
-                should(vessel.state.tempInternal).equal(73);
-                should(vessel.state.humidityInternal).equal(0.74);
+                should.deepEqual(vessel.state.tempInternal, {
+                    value: 73,
+                    avg: 73*EAVG + (1-EAVG)*72,
+                    unit: "C",
+                });
+                should.deepEqual(vessel.state.humidityInternal, {
+                    value: 0.74,
+                    avg: 0.74*EAVG + (1-EAVG)*0.64,
+                    unit: "%RH",
+                });
                 should.deepEqual(res.body, {
                     tempInternal: 73,
                     humidityInternal: 0.74,

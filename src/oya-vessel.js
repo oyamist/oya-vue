@@ -12,6 +12,7 @@
             this.startCycle = OyaVessel.CYCLE_STANDARD;
             this.hotCycle = OyaVessel.CYCLE_COOL;
             this.coolThreshold = 80;
+            this.eAvg = opts.eAvg || 0.2; // exponential average rate
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
@@ -21,10 +22,18 @@
                 Prime: false,
                 countdown: 0,
                 countstart: 0,
-                tempInternal: null,
+                tempInternal: {
+                    value: null,
+                    avg: null,
+                    unit: "C",
+                },
                 tempExternal: null,
                 tempAmbient: null,
-                humidityInternal: null,
+                humidityInternal: {
+                    value: null,
+                    avg: null,
+                    unit: "%RH",
+                },
                 humidityExternal: null,
                 humidityAmbient: null,
             };
@@ -48,12 +57,8 @@
             this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
             });
-            this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, 
-                (value) => this.onTempInternal(value)
-            );
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, 
-                (value) => this.onHumidityInternal(value)
-            );
+            this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (v) => this.onTempInternal(v));
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (v) => this.onHumidityInternal(v));
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
@@ -153,7 +158,10 @@
 
         onHumidityInternal(value) {
             winston.debug(`onHumidityInternal ${value}`);
-            this._state.humidityInternal = value;
+            this._state.humidityInternal.value = value;
+            this._state.humidityInternal.avg = this._state.humidityInternal.avg == null 
+                ? value
+                : value * this.eAvg + (1 - this.eAvg) * this._state.humidityInternal.avg;
         }
 
         onTempInternal(value) {
@@ -168,7 +176,10 @@
                 winston.info("onTempInternal: next cycle will be cooling cycle");
                 this.nextCycle = this.hotCycle;
             }
-            this._state.tempInternal = value;
+            this._state.tempInternal.value = value;
+            this._state.tempInternal.avg = this._state.tempInternal.avg == null 
+                ? value
+                : value * this.eAvg + (1 - this.eAvg) * this._state.tempInternal.avg;
         }
 
         activate(value=true) {

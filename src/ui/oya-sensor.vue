@@ -39,29 +39,55 @@ export default {
     },
     computed: {
         sensorDisplay() {
+            const deltaPrecision = 2;
+            const smallDelta = 0.05;
+            const largeDelta = 0.1;
             var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
             if (apiModel == null) {
                 return null;
             }
-            var value = this.rbService[this.sensorProp];
+            var data = this.rbService[this.sensorProp];
+            if (data == null) {
+                return null;
+            }
             var result = '\u254d';
+            var delta = 0;
             var suffix = '';
-            if (this.sensorProp.startsWith('temp')) {
+            if (data.unit === 'C') {
                 suffix = apiModel.tempUnit === 'F' ? '\u2109' : '\u2103';
-                if (value == null) {
+                if (data.value == null) {
                     // do nothing
                 } else if (apiModel.tempUnit === 'F') {
-                    result = (value * 1.8 + 32).toFixed(1);
+                    var f = data.value * 1.8 + 32;
+                    var avg = data.avg * 1.8 + 32;
+                    result = f.toFixed(1);
+                    delta = f-avg;
                 } else {
-                    result = value.toFixed(1);
+                    var c = data.value;
+                    var avg = data.avg;
+                    result = c.toFixed(1);
+                    delta = c - avg;
                 }
-            } else if (this.sensorProp.startsWith('humidity')) {
+            } else if (data.unit === "%RH") {
                 suffix = '%RH';
-                value != null && (result = (value*100).toFixed(1));
+                if (data.value != null) {
+                    var rh = data.value * 100;
+                    var avg = data.avg * 100;
+                    result = rh.toFixed(1);
+                    delta = rh - avg;
+                }
             } else {
-                result = value.toFixed(1);
+                result = data.value.toFixed(1);
+                delta = data.value - data.avg;
             }
-            return result + suffix;
+            result += suffix;
+            if (delta > smallDelta) {
+                result += delta > largeDelta ? "\u2b06" : "\u21e7";
+            } else if (delta < -smallDelta) {
+                result += delta < -largeDelta ? "\u2b07" : "\u21e9";
+            }
+            //result += delta.toFixed(deltaPrecision);
+            return result;
         },
     },
     components: {
