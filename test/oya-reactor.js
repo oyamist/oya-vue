@@ -4,7 +4,7 @@
     const srcPkg = require("../package.json");
     const rb = require('rest-bundle');
     const rbh = new rb.RbHash();
-    const EAVG = 0.2;
+    const EAVG = 0.01;
     const supertest = require('supertest');
     const fs = require('fs');
     const APIMODEL_PATH = `api-model/${srcPkg.name}.test.oya-conf.json`;

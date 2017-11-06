@@ -97,8 +97,17 @@
                     <v-card-text>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                             label="Name" class="input-group--focused" />
-                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].coolThreshold' 
-                            :label="`Cool threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                        <v-text-field v-model='coolThreshold' v-if='coolThreshold'
+                            type="number"
+                            :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                        <v-select v-bind:items="tempItems" 
+                            v-model='apiModelCopy.tempUnit' 
+                            label="Temperature unit"
+                            class="input-group--focused"
+                            ></v-select>
+                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
+                            type="number"
+                            :label="`Sensor trend sensitivity (exponential smoothing rate)`" class="input-group--focused" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -111,11 +120,11 @@
                                 label="Description" class="input-group--focused" />
                             <v-layout>
                                 <v-flex xs3>
-                                    <v-text-field v-model='cycleCopy.cycle.on'
+                                    <v-text-field v-model='cycleCopy.cycle.on' type="number"
                                         label="On seconds" class="input-group--focused" />
                                 </v-flex>
                                 <v-flex xs3>
-                                    <v-text-field v-model='cycleCopy.cycle.off'
+                                    <v-text-field v-model='cycleCopy.cycle.off' type="number"
                                         label="Off seconds" class="input-group--focused" />
                                 </v-flex>
                             </v-layout>
@@ -297,6 +306,39 @@ export default {
         },
     },
     computed: {
+        coolThreshold: {
+            get: function () {
+                if (this.apiModelCopy == null) {
+                    return null;
+                }
+                console.log("get cool",
+                    this.apiModelCopy.vessels[this.vesselIndex]
+                );
+                var value = this.apiModelCopy.vessels[this.vesselIndex].coolThreshold;
+                if (this.apiModelCopy.tempUnit === 'F') {
+                    value = value * 1.8 + 32;
+                }
+                return value;
+            },
+            set: function (value) {
+                if (this.apiModelCopy) {
+                    if (this.apiModelCopy.tempUnit === 'F') {
+                        value = (value - 32)/1.8;
+                    }
+                    console.log("set cool", value);
+                    this.apiModelCopy.vessels[this.vesselIndex].coolThreshold = value;
+                }
+            },
+        },
+        tempItems() {
+            return [{
+                text: "Fahrenheit",
+                value: "F",
+            },{
+                text: "Centigrade",
+                value: "C",
+            }]
+        },
         curCycle: {
             get: function() {
                 return this.vessel && this.rbService.cycle &&

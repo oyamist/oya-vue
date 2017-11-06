@@ -12,7 +12,7 @@
             this.startCycle = OyaVessel.CYCLE_STANDARD;
             this.hotCycle = OyaVessel.CYCLE_COOL;
             this.coolThreshold = 80;
-            this.eAvg = opts.eAvg || 0.2; // exponential average rate
+            this.sensorExpRate = opts.sensorExpRate || 0.01; // exponential average rate
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
             this._state = {
@@ -119,6 +119,7 @@
         toJSON() {
             return {
                 name: this.name,
+                sensorExpRate: this.sensorExpRate,
                 type: 'OyaVessel',
                 enabled: this.enabled,
                 startCycle: this.startCycle,
@@ -159,9 +160,10 @@
         onHumidityInternal(value) {
             winston.debug(`onHumidityInternal ${value}`);
             this._state.humidityInternal.value = value;
+            var expRate = Number(this.sensorExpRate);
             this._state.humidityInternal.avg = this._state.humidityInternal.avg == null 
                 ? value
-                : value * this.eAvg + (1 - this.eAvg) * this._state.humidityInternal.avg;
+                : value * expRate + (1 - expRate) * this._state.humidityInternal.avg;
         }
 
         onTempInternal(value) {
@@ -177,9 +179,10 @@
                 this.nextCycle = this.hotCycle;
             }
             this._state.tempInternal.value = value;
+            var expRate = Number(this.sensorExpRate);
             this._state.tempInternal.avg = this._state.tempInternal.avg == null 
                 ? value
-                : value * this.eAvg + (1 - this.eAvg) * this._state.tempInternal.avg;
+                : value * expRate + (1 - expRate) * this._state.tempInternal.avg;
         }
 
         activate(value=true) {

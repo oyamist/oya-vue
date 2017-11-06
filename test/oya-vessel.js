@@ -58,6 +58,7 @@
         });
         should.deepEqual(vessel1.toJSON(), {
             name: 'test1a',
+            sensorExpRate: 0.01,
             type: 'OyaVessel',
             enabled: true,
             coolThreshold: 80,

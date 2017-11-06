@@ -135,6 +135,7 @@
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
         should.deepEqual(OyaConf.createVesselConfig(), {
             name: "vessel1",
+            sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,
@@ -145,6 +146,7 @@
         });
         should.deepEqual(OyaConf.createVesselConfig(1), {
             name: "vessel2",
+            sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,
@@ -165,6 +167,7 @@
         }
         should.deepEqual(OyaConf.createVesselConfig(1, opts), {
             name: "dubba",
+            sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaVessel.CYCLE_COOL,
@@ -178,6 +181,7 @@
         };
         should.deepEqual(OyaConf.createVesselConfig(2,opts), {
             name: "vessel3",
+            sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,

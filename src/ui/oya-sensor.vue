@@ -40,8 +40,8 @@ export default {
     computed: {
         sensorDisplay() {
             const deltaPrecision = 2;
-            const smallDelta = 0.05;
-            const largeDelta = 0.1;
+            const smallDelta = 0.01;
+            const largeDelta = 0.05;
             var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
             if (apiModel == null) {
                 return null;
