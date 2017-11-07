@@ -97,10 +97,10 @@
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
                 key: OyaVessel.CYCLE_CONSERVE,
-                desc: "Conservative misting cycle for plants with good roots",
+                desc: "Conservative misting cycle for cool nights",
                 emits: OyaVessel.EVENT_MIST,
-                on: 5,
-                off: 60,
+                on: 10,
+                off: 120,
                 nextCycle: OyaVessel.CYCLE_CONSERVE,
             },
         }}
@@ -278,19 +278,15 @@
             if (OyaVessel.DEFAULT_CYCLES[cycle.off]) {
                 self.setCycle(cycle.off);
             } else {
-                var msOff = Number(cycle.off) * 1000;
-                if (msOff > 0) {
-                    self._phaseTimeout = setTimeout(() => {
-                        self._phaseTimeout = null;
-                        if (self.cycle === self.nextCycle) {
-                            updatePhase(self, true);
-                        } else {
-                            self.setCycle(self.nextCycle);
-                        }
-                    }, msOff);
-                } else {
-                    self.activate(false);
-                }
+            var msOff = Math.max(0,Number(cycle.off) * 1000);
+                self._phaseTimeout = setTimeout(() => {
+                    self._phaseTimeout = null;
+                    if (self.cycle === self.nextCycle) {
+                        updatePhase(self, true);
+                    } else {
+                        self.setCycle(self.nextCycle);
+                    }
+                }, msOff);
             }
         }
     }
