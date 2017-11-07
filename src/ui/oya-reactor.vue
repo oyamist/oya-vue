@@ -97,7 +97,7 @@
                     <v-card-text>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                             label="Name" class="input-group--focused" />
-                        <v-text-field v-model='coolThreshold' v-if='coolThreshold'
+                        <v-text-field v-model='coolThreshold' 
                             type="number"
                             :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
                         <v-select v-bind:items="tempItems" 
@@ -258,7 +258,9 @@ export default {
             return vessel && cycle && vessel.cycles[cycle];
         },
         clickMenu() {
-            this.apiEdit();
+            this.rbDispatch("apiLoad").then(r => {
+                this.apiEdit();
+            });
         },
         clickActivate() {
             var url = [this.restOrigin(), this.service, 'reactor'].join('/');
