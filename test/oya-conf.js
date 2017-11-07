@@ -97,6 +97,7 @@
                             emits: OyaVessel.EVENT_COOL,
                             on: 10,
                             off: 23,
+                            nextCycle: OyaVessel.CYCLE_COOL,
                         }
                     },
             })],
@@ -115,6 +116,7 @@
                 emits: OyaVessel.EVENT_COOL,
                 on: 10,
                 off: 23,
+                nextCycle: OyaVessel.CYCLE_COOL,
             }
         };
         should.deepEqual(new OyaConf(opts).toJSON(), {
@@ -245,6 +247,7 @@
                 emits: OyaVessel.EVENT_MIST,
                 on: 10,
                 off: 23,
+                nextCycle: OyaVessel.CYCLE_COOL,
             }
         };
 

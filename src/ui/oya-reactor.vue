@@ -121,12 +121,17 @@
                             <v-layout>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.on' type="number"
-                                        label="On seconds" class="input-group--focused" />
+                                        label="On seconds" class="input-group--focused pr-1" />
                                 </v-flex>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.off' type="number"
-                                        label="Off seconds" class="input-group--focused" />
+                                        label="Off seconds" class="input-group--focused pr-1" />
                                 </v-flex>
+                                <v-select v-bind:items="cycleItems" 
+                                    v-model='cycleCopy.cycle.nextCycle' 
+                                    label="Next cycle"
+                                    class="input-group--focused"
+                                    ></v-select>
                             </v-layout>
                         </rb-dialog-row>
                     </v-card-text>
@@ -331,6 +336,14 @@ export default {
                     this.apiModelCopy.vessels[this.vesselIndex].coolThreshold = value;
                 }
             },
+        },
+        cycleItems() {
+            return [
+                "Cycle #1",
+                "Cycle #2",
+                "Cycle #3",
+                "Cycle #4",
+            ];
         },
         tempItems() {
             return [{

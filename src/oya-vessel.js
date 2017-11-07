@@ -72,6 +72,7 @@
                 emits: OyaVessel.EVENT_MIST,
                 on: 30,
                 off: 60,
+                nextCycle: OyaVessel.CYCLE_STANDARD,
             },
             [OyaVessel.CYCLE_PRIME]: {
                 name: "Prime",
@@ -80,6 +81,7 @@
                 emits: OyaVessel.EVENT_MIST,
                 on: 60,
                 off: OyaVessel.CYCLE_STANDARD,
+                nextCycle: OyaVessel.CYCLE_STANDARD,
             },
             [OyaVessel.CYCLE_COOL]: {
                 name: "Cool",
@@ -88,6 +90,7 @@
                 emits: OyaVessel.EVENT_MIST,
                 on: 15,
                 off: 15,
+                nextCycle: OyaVessel.CYCLE_COOL,
             },
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
@@ -96,6 +99,7 @@
                 emits: OyaVessel.EVENT_MIST,
                 on: 5,
                 off: 60,
+                nextCycle: OyaVessel.CYCLE_CONSERVE,
             },
         }}
 
@@ -227,7 +231,8 @@
             } else {
                 this._state.cycle = value;
             }
-            this.nextCycle = this._state.cycle;
+            //this.nextCycle = this._state.cycle;
+            this.nextCycle = this.cycles[this._state.cycle].nextCycle;
             return this;
         }
 

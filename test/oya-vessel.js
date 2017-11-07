@@ -322,12 +322,14 @@
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     active: false,
                     cycleNumber: 0,
+                    nextCycle: OyaVessel.CYCLE_STANDARD,
                 }));
 
                 // activation turns stuff on
                 vessel.activate();
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     Mist: true,
+                    nextCycle: OyaVessel.CYCLE_STANDARD,
                 }));
 
                 // nextCycle has no effect during off phase
