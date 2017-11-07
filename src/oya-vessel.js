@@ -72,7 +72,7 @@
                 key: OyaVessel.CYCLE_STANDARD,
                 desc: "Standard cycle for all phases of plant growth",
                 emits: OyaVessel.EVENT_MIST,
-                on: 30,
+                on: 10,
                 off: 60,
                 nextCycle: OyaVessel.CYCLE_STANDARD,
             },
@@ -82,7 +82,7 @@
                 desc: "Circulate water to prime misting system",
                 emits: OyaVessel.EVENT_MIST,
                 on: 60,
-                off: OyaVessel.CYCLE_STANDARD,
+                off: 0,
                 nextCycle: OyaVessel.CYCLE_STANDARD,
             },
             [OyaVessel.CYCLE_COOL]: {
@@ -90,8 +90,8 @@
                 key: OyaVessel.CYCLE_COOL,
                 desc: "Hot day evaporative cooling cycle with fan",
                 emits: OyaVessel.EVENT_MIST,
-                on: 15,
-                off: 15,
+                on: 10,
+                off: 20,
                 nextCycle: OyaVessel.CYCLE_COOL,
             },
             [OyaVessel.CYCLE_CONSERVE]: {
