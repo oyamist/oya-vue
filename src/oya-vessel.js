@@ -97,7 +97,7 @@
             [OyaVessel.CYCLE_CONSERVE]: {
                 name: "Conserve",
                 key: OyaVessel.CYCLE_CONSERVE,
-                desc: "Conservative misting cycle for cool nights",
+                desc: "Conservative misting cycle for mild conditions",
                 emits: OyaVessel.EVENT_MIST,
                 on: 10,
                 off: 120,
