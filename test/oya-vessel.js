@@ -61,7 +61,7 @@
             sensorExpRate: 0.01,
             type: 'OyaVessel',
             enabled: true,
-            coolThreshold: 80,
+            coolThreshold: (70-32)/1.8,
             startCycle: OyaVessel.CYCLE_STANDARD,
             hotCycle: OyaVessel.CYCLE_COOL,
             maxCycles: 0,

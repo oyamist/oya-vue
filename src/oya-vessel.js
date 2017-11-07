@@ -6,12 +6,14 @@
 
     class OyaVessel {
         constructor(opts = {}) {
+            const COOLTHRESHOLD = 70;
+
             // serializable toJSON() properties
             this.name = `vessel${id++}`;
             this.enabled = true; // can be activated
             this.startCycle = OyaVessel.CYCLE_STANDARD;
             this.hotCycle = OyaVessel.CYCLE_COOL;
-            this.coolThreshold = 80;
+            this.coolThreshold = (COOLTHRESHOLD - 32)/1.8;  
             this.sensorExpRate = opts.sensorExpRate || 0.01; // exponential average rate
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,

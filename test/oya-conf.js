@@ -142,7 +142,7 @@
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,
             hotCycle: OyaVessel.CYCLE_COOL,
-            coolThreshold: 80,
+            coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
         });
@@ -153,7 +153,7 @@
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,
             hotCycle: OyaVessel.CYCLE_COOL,
-            coolThreshold: 80,
+            coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
         });
@@ -188,7 +188,7 @@
             enabled: true,
             startCycle: OyaVessel.CYCLE_STANDARD,
             hotCycle: OyaVessel.CYCLE_COOL,
-            coolThreshold: 80,
+            coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
         });
