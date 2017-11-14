@@ -319,12 +319,14 @@
                 should(res.statusCode).equal(200);
                 should.deepEqual(vessel.state.tempInternal, {
                     value: 72,
-                    avg: 72,
+                    avg1: 72,
+                    avg2: 72,
                     unit: "C",
                 });
                 should.deepEqual(vessel.state.humidityInternal, {
                     value: 0.64,
-                    avg: 0.64,
+                    avg1: 0.64,
+                    avg2: 0.64,
                     unit: "%RH",
                 });
                 should.deepEqual(res.body, {
@@ -339,14 +341,18 @@
                 var res = yield supertest(app).post("/test/sensor").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
+                var avg1 = 73*EAVG + (1-EAVG)*72;
                 should.deepEqual(vessel.state.tempInternal, {
                     value: 73,
-                    avg: 73*EAVG + (1-EAVG)*72,
+                    avg1,
+                    avg2: avg1*EAVG + (1-EAVG)*72,
                     unit: "C",
                 });
+                var avg1 = 0.74*EAVG + (1-EAVG)*0.64;
                 should.deepEqual(vessel.state.humidityInternal, {
                     value: 0.74,
-                    avg: 0.74*EAVG + (1-EAVG)*0.64,
+                    avg1,
+                    avg2: avg1*EAVG + (1-EAVG)*0.64,
                     unit: "%RH",
                 });
                 should.deepEqual(res.body, {

@@ -59,26 +59,26 @@ export default {
                     // do nothing
                 } else if (apiModel.tempUnit === 'F') {
                     var f = data.value * 1.8 + 32;
-                    var avg = data.avg * 1.8 + 32;
+                    var avg1 = data.avg1 * 1.8 + 32;
                     result = f.toFixed(1);
-                    delta = f-avg;
+                    delta = f-avg1;
                 } else {
                     var c = data.value;
-                    var avg = data.avg;
+                    var avg1 = data.avg1;
                     result = c.toFixed(1);
-                    delta = c - avg;
+                    delta = c - avg1;
                 }
             } else if (data.unit === "%RH") {
                 suffix = '%RH';
                 if (data.value != null) {
                     var rh = data.value * 100;
-                    var avg = data.avg * 100;
+                    var avg1 = data.avg1 * 100;
                     result = rh.toFixed(1);
-                    delta = rh - avg;
+                    delta = rh - avg1;
                 }
             } else {
                 result = data.value.toFixed(1);
-                delta = data.value - data.avg;
+                delta = data.value - data.avg1;
             }
             result += suffix;
             if (delta > smallDelta) {

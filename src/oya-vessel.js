@@ -26,14 +26,16 @@
                 countstart: 0,
                 tempInternal: {
                     value: null,
-                    avg: null,
+                    avg1: null,
+                    avg2: null,
                     unit: "C",
                 },
                 tempExternal: null,
                 tempAmbient: null,
                 humidityInternal: {
                     value: null,
-                    avg: null,
+                    avg1: null,
+                    avg2: null,
                     unit: "%RH",
                 },
                 humidityExternal: null,
@@ -167,9 +169,12 @@
             winston.debug(`onHumidityInternal ${value}`);
             this._state.humidityInternal.value = value;
             var expRate = Number(this.sensorExpRate);
-            this._state.humidityInternal.avg = this._state.humidityInternal.avg == null 
+            this._state.humidityInternal.avg1 = this._state.humidityInternal.avg1 == null 
                 ? value
-                : value * expRate + (1 - expRate) * this._state.humidityInternal.avg;
+                : value * expRate + (1 - expRate) * this._state.humidityInternal.avg1;
+            this._state.humidityInternal.avg2 = this._state.humidityInternal.avg2 == null 
+                ? this._state.humidityInternal.avg1 
+                : this._state.humidityInternal.avg1 * expRate + (1 - expRate) * this._state.humidityInternal.avg2;
         }
 
         onTempInternal(value) {
@@ -186,9 +191,12 @@
             }
             this._state.tempInternal.value = value;
             var expRate = Number(this.sensorExpRate);
-            this._state.tempInternal.avg = this._state.tempInternal.avg == null 
+            this._state.tempInternal.avg1 = this._state.tempInternal.avg1 == null 
                 ? value
-                : value * expRate + (1 - expRate) * this._state.tempInternal.avg;
+                : value * expRate + (1 - expRate) * this._state.tempInternal.avg1;
+            this._state.tempInternal.avg2 = this._state.tempInternal.avg2 == null 
+                ? this._state.tempInternal.avg1 
+                : this._state.tempInternal.avg1 * expRate + (1 - expRate) * this._state.tempInternal.avg2;
         }
 
         activate(value=true) {

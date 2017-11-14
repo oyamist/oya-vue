@@ -15,14 +15,16 @@
             Cool: false,
             Prime: false,
             tempInternal: {
-                avg: null,
+                avg1: null,
+                avg2: null,
                 unit: "C",
                 value: null,
             },
             tempExternal: null,
             tempAmbient: null,
             humidityInternal: {
-                avg: null,
+                avg1: null,
+                avg2: null,
                 unit: "%RH",
                 value: null,
             },
