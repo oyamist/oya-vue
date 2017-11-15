@@ -60,31 +60,38 @@ export default {
                 } else if (apiModel.tempUnit === 'F') {
                     var f = data.value * 1.8 + 32;
                     var avg1 = data.avg1 * 1.8 + 32;
+                    var avg2 = data.avg2 * 1.8 + 32;
                     result = f.toFixed(1);
-                    delta = f-avg1;
+                    delta = avg1 - avg2;
                 } else {
                     var c = data.value;
                     var avg1 = data.avg1;
+                    var avg2 = data.avg2;
                     result = c.toFixed(1);
-                    delta = c - avg1;
+                    delta = avg1 - avg2;
                 }
             } else if (data.unit === "%RH") {
                 suffix = '%RH';
                 if (data.value != null) {
                     var rh = data.value * 100;
                     var avg1 = data.avg1 * 100;
+                    var avg2 = data.avg2 * 100;
                     result = rh.toFixed(1);
-                    delta = rh - avg1;
+                    delta = avg1 - avg2;
                 }
             } else {
                 result = data.value.toFixed(1);
-                delta = data.value - data.avg1;
+                delta = data.avg1 - data.avg2;
             }
             result += suffix;
             if (delta > smallDelta) {
-                result += delta > largeDelta ? "\u2b06" : "\u21e7";
+                //result += delta > largeDelta ? "\u2b06" : "\u21e7";
+                result += delta > largeDelta ? "\u2b08" : "\u2b00";
             } else if (delta < -smallDelta) {
-                result += delta < -largeDelta ? "\u2b07" : "\u21e9";
+                //result += delta < -largeDelta ? "\u2b07" : "\u21e9";
+                result += delta < -largeDelta ? "\u2b0a" : "\u2b02";
+            } else {
+                result += delta < 0 ? "\u2198" : "\u2197";
             }
             //result += delta.toFixed(deltaPrecision);
             return result;
