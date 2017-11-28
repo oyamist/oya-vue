@@ -90,8 +90,10 @@ export default {
             } else if (delta < -smallDelta) {
                 //result += delta < -largeDelta ? "\u2b07" : "\u21e9";
                 result += delta < -largeDelta ? "\u2b0a" : "\u2b02";
-            } else {
-                result += delta < 0 ? "\u2198" : "\u2197";
+            } else if (delta < 0) {
+                result += "\u2198";
+            } else if (delta > 0) {
+                result += "\u2197";
             }
             //result += delta.toFixed(deltaPrecision);
             return result;
