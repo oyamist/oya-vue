@@ -185,7 +185,7 @@
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
-            } else {
+            } else if (this.nextCycle !== this.hotCycle) {
                 winston.info("onTempInternal: next cycle will be cooling cycle");
                 this.nextCycle = this.hotCycle;
             }
