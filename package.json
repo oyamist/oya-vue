@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "rest-bundle": "^0.22.1",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
