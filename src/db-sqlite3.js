@@ -7,6 +7,9 @@
             super(opts);
             var self = this;
             this.dbname = opts.dbname || './oyamist.db';
+            Object.defineProperty(this, 'isOpen', {
+                get: () => this.db ? true : false,
+            });
         }
 
         open() {
@@ -16,42 +19,41 @@
                         winston.error(e);
                         reject(e);
                     } else {
-                        self.db = db;
-                        resolve(db);
+                        this.db = db;
+                        resolve(this);
                     }
                 });
             });
         }
 
-        datestr(date) {
-            var yyyy = date.getFullYear();
-            var mo = ('0'+(date.getMonth()+1)).slice(-2);
-            var dd = ('0'+date.getDate()).slice(-2);
-            return `'${yyyy}-${mo}-${dd}'`;
+        sqlGet(sql) {
+            if (!this.isOpen) {
+                return Promise.reject(DbFacade.ERROR_NOT_OPEN);
+            }
+            return new Promise((resolve, reject) => {
+                this.db.get(sql, [], (e,r) => {
+                    if (e) {
+                        reject(e);
+                    } else {
+                        resolve(r);
+                    }
+                });
+            });
         }
 
-        timestr(date) {
-            var hh = ('0'+date.getHours()).slice(-2);
-            var mm = ('0'+date.getMinutes()).slice(-2);
-            var ss = ('0'+date.getSeconds()).slice(-2);
-            return `'${hh}:${mm}:${ss}'`;
-        }
-
-        exec(sql) {
-            // default behavior is to do nothing
-            // subclass should override with method that executes sql
-        }
-
-        logSensor(vname, evt, value, date=new Date()) {
-            var stmt = `insert into sensordata(vessel,evt,d,t,v) values(` +
-                `'${vname}',` +
-                `'${evt}',` +
-                `${this.datestr(date)},` +
-                `${this.timestr(date)},` +
-                `${value}` +
-                ');';
-            this.exec(stmt);
-            return stmt;
+        sqlExec(sql) {
+            if (!this.isOpen) {
+                return Promise.reject(DbFacade.ERROR_NOT_OPEN);
+            }
+            return new Promise((resolve, reject) => {
+                this.db.run(sql, [], (e) => {
+                    if (e) {
+                        reject(e);
+                    } else {
+                        resolve(sql);
+                    }
+                });
+            });
         }
 
     } //// class DbSqlite3
@@ -63,32 +65,59 @@
     const winston = require('winston');
     const should = require("should");
     const testDate = new Date(2017,2,9,1,2,3);
+    const DbFacade = require('./db-facade');
     const DbSqlite3 = exports.DbSqlite3 || require('./index').DbSqlite3;
-    class TestLogger extends DbSqlite3 {
-        constructor(opts={}) {
-            super(opts);
-            this.stmts = [];
-        }
-        exec(sql) {
-            this.stmts.push(sql);
-        }
-    }
+    const TESTDATESTR = "'2017-03-09'";
 
-    it("TESTTESTdatestr(date) returns SQL date string", function() {
-        var logger = new DbSqlite3();
-        logger.datestr(testDate).should.equal("'2017-03-09'");
+    it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
+        var async = function*() {
+            try {
+                var dbl = new DbSqlite3();
+                const stmtDel = `delete from sensordata where sensordata.vessel='test'`;
+                const stmtCount = `select count(*) c from sensordata as sd where sd.d=${TESTDATESTR}`;
+
+                // open() must be called before use
+                var r = yield dbl.logSensor("test", "testevt", 12.34, testDate)
+                    .then(r=>async.throw(new Error("expected catch()"))).catch(e=>async.next(e));
+                should.deepEqual(r, DbFacade.ERROR_NOT_OPEN);
+                should(dbl.db).equal(undefined);
+                var r = yield dbl.open().then(r=>async.next(r)).catch(e=>async.throw(e));
+                dbl.should.properties(["db"]);
+                should(dbl.isOpen).equal(true);
+
+                // remove test data
+                yield dbl.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(r.c).equal(0);
+
+                // insert sensordata row
+                yield dbl.logSensor("test", "testevt", 12.34, testDate)
+                    .then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(r.c).equal(1);
+
+                // remove test data
+                yield dbl.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(r.c).equal(0);
+
+                done();
+            } catch (e) {
+                done(e);
+            }
+        }();
+        async.next();
     });
-    it("TESTTESTtimestr(date) returns SQL time string", function() {
-        var logger = new DbSqlite3();
-        logger.timestr(testDate).should.equal("'01:02:03'");
-    });
-    it("TESTTESTlogSensor(vname,evt,value,date) logs sensor data via exec(sql) method", function() {
-        var logger = new TestLogger();
-        logger.stmts.length.should.equal(0);
-        var stmt = "insert into sensordata(vessel,evt,d,t,v) values" +
-            "('test','testevt','2017-03-09','01:02:03',12.34);"
-        logger.logSensor("test", "testevt", 12.34, testDate).should.equal(stmt);
-        logger.stmts.length.should.equal(1);
-        logger.stmts[0].should.equal(stmt);
+    it("sqlGet(sql) returns JSON object for single tuple query", function(done) {
+        (async function () {
+            try {
+                var dbl = await new DbSqlite3().open();
+                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.vessel='test'");
+                should.deepEqual(r, { c: 0 }); 
+                done();
+            } catch (e) {
+                done(e);
+            }
+        })();
     });
 })
