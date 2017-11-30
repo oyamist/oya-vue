@@ -1,6 +1,7 @@
 (function(exports) {
     const EventEmitter = require("events");
     const winston = require("winston");
+    const DbFacade = require("./db-facade");
 
     var id = 1;
 
@@ -46,6 +47,8 @@
 
             this.nextCycle = this._state.cycle,
             this._state.active = false,
+            this.dbfacade = opts.dbfacade || new DbFacade();
+            this.dbfacade.open();
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
@@ -179,6 +182,8 @@
 
         onTempInternal(value) {
             winston.debug(`onTempInternal ${value}`);
+            this.dbfacade.isOpen && this.dbfacade
+                .logSensor(this.name, OyaVessel.SENSE_TEMP_INTERNAL, value);
             if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
                     winston.info("onTempInternal: reverting to default cycle");

@@ -36,7 +36,7 @@
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 var vessel = new OyaVessel(Object.assign({
                     name: `${name}-vessel${iv}`,
-                }, vconf));
+                }, vconf, opts));
                 vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                     this.onActuator(OyaVessel.EVENT_MIST, value, iv);
                 });

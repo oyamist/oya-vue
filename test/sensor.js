@@ -195,7 +195,7 @@
                 var msNow = Date.now();
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(msRead == null).equal(false);
-                should(msRead - msNow).above(readDelay-1);
+                should(msRead - msNow).above(readDelay-2);
                 should(data.temp).approximately(19.5, 0.01);
                 should.deepEqual(i2cOut[0], Buffer.from([0x03, 0x00, 0x04])); // wakeup
                 should.deepEqual(i2cOut[1], Buffer.from([0x03, 0x00, 0x04])); // read

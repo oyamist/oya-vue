@@ -3,12 +3,26 @@
     const winston = require('winston');
     const OyaVessel = exports.OyaVessel || require("../index").OyaVessel;
     const OyaConf = require("../index").OyaConf;
+    const DbFacade = require("../index").DbFacade;
     const STANDARD_ON = 0.01;
     const STANDARD_OFF = 0.02;
     const FAN_ON = 2*STANDARD_ON;
     const FAN_OFF = 2*STANDARD_OFF;
     const PRIME_ON = 3*STANDARD_ON;
     const SETTLE_MS = 5;
+    class DbTest extends DbFacade {
+        constructor(opts={}) {
+            super(opts);
+            this.stmts = [];
+        }
+        sqlExec(sql) {
+            if (!this.isOpen) {
+                return super.sqlExec(sql);
+            }
+            this.stmts.push(sql);
+            return Promise.resolve(sql);
+        }
+    }
     function sensorDefaults() {
         return {
             Mist: false,
@@ -80,7 +94,10 @@
         should(vessel2.cycle).equal('fan');
     });
     it ("vessel responds to emitter sensor events", function() {
-        var vessel = new OyaVessel();
+        var dbfacade = new DbTest();
+        var vessel = new OyaVessel({
+            dbfacade,
+        });
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
         const coolThreshold = vessel.coolThreshold;
         should(typeof coolThreshold).equal("number");
@@ -88,12 +105,15 @@
         should(vessel.state.humidityInternal.value).equal(null);
 
         // just right
+        dbfacade.stmts.length.should.equal(0);
         vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.coolThreshold-1);
+        dbfacade.stmts.length.should.equal(1); // temperature was logged
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_STANDARD);
         should(vessel.state.tempInternal.value).equal(vessel.coolThreshold-1);
 
         // too hot
         vessel.emitter.emit(OyaVessel.SENSE_TEMP_INTERNAL, vessel.coolThreshold+1);
+        dbfacade.stmts.length.should.equal(2); // temperature was logged
         should(vessel.nextCycle).equal(OyaVessel.CYCLE_COOL);
         should(vessel.state.tempInternal.value).equal(vessel.coolThreshold+1);
 
