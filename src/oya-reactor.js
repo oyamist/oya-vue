@@ -23,6 +23,9 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
+                    //this.resourceMethod("get", "sensor/data/day/yyyy/mm/dd", this.getSensorTypes),
+                    //this.resourceMethod("get", "sensor/data/month/yyyy/mm", this.getSensorTypes),
+                    //this.resourceMethod("get", "sensor/data/year/yyyy", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
                     this.resourceMethod("post", "reactor", this.postReactor),

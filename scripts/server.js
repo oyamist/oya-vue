@@ -7,6 +7,7 @@ const app = module.exports = express();
 const rb = require("rest-bundle");
 const OyaReactor = require("../index").OyaReactor;
 const DbSqlite3 = require('../index').DbSqlite3;
+const DbFacade = require('../index').DbFacade;
 const winston = require("winston");
 
 app.use(compression());
@@ -33,7 +34,10 @@ let async = function*() {
         var services = ['test'].concat(argv.filter((a, i) => i>1 && a[0]!=='-' && a!=="test"));
         for (var iService = 0; iService < services.length; iService++) {
             var serviceName = services[iService];
-            var dbfacade = new DbSqlite3();
+
+            // for unit tests, do not disturb real database
+            var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
+
             var oya = new OyaReactor(serviceName, {
                 dbfacade,
             });

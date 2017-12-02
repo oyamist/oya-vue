@@ -1,7 +1,7 @@
 (typeof describe === 'function') && describe("DbFacade", function() {
     const winston = require('winston');
     const should = require("should");
-    const testDate = new Date(2017,2,9,1,2,3);
+    const testDate = new Date(2017,2,10,1,2,3,456);
     const DbFacade = exports.DbFacade || require('../index').DbFacade;
     class TestLogger extends DbFacade {
         constructor(opts={}) {
@@ -19,11 +19,11 @@
 
     it("datestr(date) returns SQL date string", function() {
         var dbl = new DbFacade();
-        dbl.datestr(testDate).should.equal("'2017-03-09'");
+        dbl.datestr(testDate).should.equal("'2017-03-10'");
     });
     it("timestr(date) returns SQL time string", function() {
         var dbl = new DbFacade();
-        dbl.timestr(testDate).should.equal("'01:02:03'");
+        dbl.timestr(testDate).should.equal("'01:02:03.456'");
     });
     it("logSensor(vname,evt,value,date) logs sensor data via sqlExec(sql) method", function(done) {
         var async = function*() {
@@ -40,7 +40,7 @@
                 var r = yield dbl.logSensor("test", "testevt", 11, testDate)
                     .then(r=>async.next(r)).catch(e=>async.throw(e));
                 var stmt = "insert into sensordata(vessel,evt,d,t,v) values" +
-                    "('test','testevt','2017-03-09','01:02:03',10.5);"
+                    "('test','testevt','2017-03-10','01:02:03.456',10.5);"
                 should.deepEqual(r, stmt);
                 dbl.stmts.length.should.equal(1);
                 dbl.stmts[0].should.equal(stmt);
@@ -55,7 +55,7 @@
                 var r = yield dbl.logSensor("test", "testevt", 13, testDate)
                     .then(r=>async.next(r)).catch(e=>async.throw(e));
                 var stmt = "insert into sensordata(vessel,evt,d,t,v) values" +
-                    "('test','testevt','2017-03-09','01:02:03',12.5);"
+                    "('test','testevt','2017-03-10','01:02:03.456',12.5);"
                 should.deepEqual(r, stmt);
                 dbl.stmts.length.should.equal(2);
 

@@ -1,10 +1,10 @@
 (typeof describe === 'function') && describe("DbSqlite3", function() {
     const winston = require('winston');
     const should = require("should");
-    const testDate = new Date(2017,2,9,1,2,3);
+    const testDate = new Date(2017,2,8,1,2,3);
     const DbFacade = require('../index').DbFacade;
     const DbSqlite3 = exports.DbSqlite3 || require('../index').DbSqlite3;
-    const TESTDATESTR = "'2017-03-09'";
+    const TESTDATESTR = "'2017-03-08'";
 
     it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {

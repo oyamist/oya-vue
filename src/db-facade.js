@@ -22,7 +22,8 @@
             var hh = ('0'+date.getHours()).slice(-2);
             var mm = ('0'+date.getMinutes()).slice(-2);
             var ss = ('0'+date.getSeconds()).slice(-2);
-            return `'${hh}:${mm}:${ss}'`;
+            var ms = ('00'+date.getMilliseconds()).slice(-3);
+            return `'${hh}:${mm}:${ss}.${ms}'`;
         }
 
         open() {

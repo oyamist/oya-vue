@@ -183,7 +183,10 @@
         onTempInternal(value) {
             winston.debug(`onTempInternal ${value}`);
             this.dbfacade.isOpen && this.dbfacade
-                .logSensor(this.name, OyaVessel.SENSE_TEMP_INTERNAL, value);
+                .logSensor(this.name, OyaVessel.SENSE_TEMP_INTERNAL, value)
+                .catch(e => {
+                    winston.debug(e); // ignore sensor errors
+                });
             if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
                     winston.info("onTempInternal: reverting to default cycle");

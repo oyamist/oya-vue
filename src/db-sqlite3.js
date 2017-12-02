@@ -1,6 +1,7 @@
 (function(exports) {
     const DbFacade = require('./db-facade');
     const Sqlite3 = require('sqlite3').verbose();
+    const winston = require('winston');
 
     class DbSqlite3 extends DbFacade {
         constructor(opts = {}) {
@@ -30,9 +31,11 @@
             if (!this.isOpen) {
                 return Promise.reject(DbFacade.ERROR_NOT_OPEN);
             }
+            var context = new Error("");
             return new Promise((resolve, reject) => {
                 this.db.get(sql, [], (e,r) => {
                     if (e) {
+                        winston.error(`${e.message}\n"${sql}"\n${context.stack}`);
                         reject(e);
                     } else {
                         resolve(r);
@@ -45,9 +48,11 @@
             if (!this.isOpen) {
                 return Promise.reject(DbFacade.ERROR_NOT_OPEN);
             }
+            var context = new Error("");
             return new Promise((resolve, reject) => {
                 this.db.run(sql, [], (e) => {
                     if (e) {
+                        winston.error(`${e.message}\n"${sql}"\n${context.stack}`);
                         reject(e);
                     } else {
                         resolve(sql);
