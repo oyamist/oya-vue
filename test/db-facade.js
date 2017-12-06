@@ -1,7 +1,7 @@
 (typeof describe === 'function') && describe("DbFacade", function() {
     const winston = require('winston');
     const should = require("should");
-    const testDate = new Date(2017,2,10,1,2,3,456);
+    const testDate = new Date(Date.UTC(2017,2,10,1,2,3,456));
     const DbFacade = exports.DbFacade || require('../index').DbFacade;
     class TestLogger extends DbFacade {
         constructor(opts={}) {
@@ -88,18 +88,9 @@
                 var dbl = new TestLogger();
                 var r = await dbl.open();
                 var r = await dbl.sensorDataByHour('test','testevt', testDate);
-                var sql = 'select d, printf("%s00",substr(t,1,2)) hr,avg(v) vavg, min(v) vmin, max(v) vmax\n'+
-                    "from sensordata\n"+
-                    "where '2017-03-09'<=d and (d<'2017-03-10' or d='2017-03-10' and t<='01:02:03.456')\n"+
-                    "group by d,hr\n"+
-                    "order by d desc, hr desc\n"+
-                    "limit 24;";
-                should.deepEqual(r, {
-                    sql,
-                    data: [{
-                        error: DbFacade.ERROR_ABSTRACT,
-                    }],
-                }); 
+                should(r).properties(["sql","data"]);
+                should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\ngroup by hr\norder by hr desc\nlimit 24/m);
+                should(r.data).instanceOf(Array);
                 done();
             } catch (e) {
                 done(e);

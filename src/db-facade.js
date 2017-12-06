@@ -12,17 +12,17 @@
         static get ERROR_ABSTRACT() { return new Error("abstract method must be implemented by subclass"); }
 
         datestr(date) {
-            var yyyy = date.getFullYear();
-            var mo = ('0'+(date.getMonth()+1)).slice(-2);
-            var dd = ('0'+date.getDate()).slice(-2);
+            var yyyy = date.getUTCFullYear();
+            var mo = ('0'+(date.getUTCMonth()+1)).slice(-2);
+            var dd = ('0'+date.getUTCDate()).slice(-2);
             return `'${yyyy}-${mo}-${dd}'`;
         }
 
         timestr(date) {
-            var hh = ('0'+date.getHours()).slice(-2);
-            var mm = ('0'+date.getMinutes()).slice(-2);
-            var ss = ('0'+date.getSeconds()).slice(-2);
-            var ms = ('00'+date.getMilliseconds()).slice(-3);
+            var hh = ('0'+date.getUTCHours()).slice(-2);
+            var mm = ('0'+date.getUTCMinutes()).slice(-2);
+            var ss = ('0'+date.getUTCSeconds()).slice(-2);
+            var ms = ('00'+date.getUTCMilliseconds()).slice(-3);
             return `'${hh}:${mm}:${ss}.${ms}'`;
         }
 
@@ -92,11 +92,12 @@
                     var d1 = this.datestr(new Date(enddate.getTime() - 24*3600*1000));
                     var d2 = this.datestr(enddate);
                     var t2 = this.timestr(enddate);
-                    var sql = `select d, printf("%s00",substr(t,1,2)) hr,avg(v) vavg, min(v) vmin, max(v) vmax\n`+
+                    var sql = `select strftime("%Y-%m-%d %H00", printf("%s %s",d,t),"localtime") hr, `+
+                        `avg(v) vavg, min(v) vmin, max(v) vmax\n`+
                         `from sensordata\n`+
                         `where ${d1}<=d and (d<${d2} or d=${d2} and t<=${t2})\n`+
-                        `group by d,hr\n`+
-                        `order by d desc, hr desc\n`+
+                        `group by hr\n`+
+                        `order by hr desc\n`+
                         `limit 24;`;
                     this.sqlAll(sql).then(data=>{
                         resolve( { sql, data, });
