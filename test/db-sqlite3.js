@@ -13,7 +13,7 @@
         var async = function*() {
             try {
                 var dbl = new DbSqlite3();
-                const stmtCount = `select count(*) c from sensordata as sd where sd.d=${TESTDATESTR}`;
+                const stmtCount = `select count(*) c from sensordata as sd where sd.evt='testevt'`;
 
                 // open() must be called before use
                 var r = yield dbl.logSensor("test", "testevt", 12.34, testDate)
@@ -69,25 +69,25 @@
                 await dbl.logSensor("test", "testevt", 12, testDate3);
                 await dbl.logSensor("test", "testevt", 13, testDate2);
 
-                var r = await dbl.sqlAll("select d,t,v from sensordata as sd where sd.vessel='test'");
+                var r = await dbl.sqlAll("select utc,v from sensordata as sd where sd.vessel='test'");
                 should(r).instanceof(Array);
                 should(r.length).equal(2);
-                should(r[0]).properties(["d","t","v"]);
-                should(r[1]).properties(["d","t","v"]);
+                should(r[0]).properties(["utc","v"]);
+                should(r[1]).properties(["utc","v"]);
 
                 // database date and time are stored in UTC
-                should(Number(r[0].d.slice(0,4))).equal(testDate3.getUTCFullYear());
-                should(Number(r[0].d.slice(5,7))).equal(testDate3.getUTCMonth()+1);
-                should(Number(r[0].d.slice(8,10))).equal(testDate3.getUTCDate());
-                should(Number(r[0].t.slice(0,2))).equal(testDate3.getUTCHours());
-                should(Number(r[0].t.slice(3,5))).equal(testDate3.getUTCMinutes());
-                should(Number(r[0].t.slice(6,8))).equal(testDate3.getUTCSeconds());
-                should(Number(r[1].d.slice(0,4))).equal(testDate2.getUTCFullYear());
-                should(Number(r[1].d.slice(5,7))).equal(testDate2.getUTCMonth()+1);
-                should(Number(r[1].d.slice(8,10))).equal(testDate2.getUTCDate());
-                should(Number(r[1].t.slice(0,2))).equal(testDate2.getUTCHours());
-                should(Number(r[1].t.slice(3,5))).equal(testDate2.getUTCMinutes());
-                should(Number(r[1].t.slice(6,8))).equal(testDate2.getUTCSeconds());
+                should(Number(r[0].utc.slice(0,4))).equal(testDate3.getUTCFullYear());
+                should(Number(r[0].utc.slice(5,7))).equal(testDate3.getUTCMonth()+1);
+                should(Number(r[0].utc.slice(8,10))).equal(testDate3.getUTCDate());
+                should(Number(r[0].utc.slice(11,13))).equal(testDate3.getUTCHours());
+                should(Number(r[0].utc.slice(14,16))).equal(testDate3.getUTCMinutes());
+                should(Number(r[0].utc.slice(17,19))).equal(testDate3.getUTCSeconds());
+                should(Number(r[1].utc.slice(0,4))).equal(testDate2.getUTCFullYear());
+                should(Number(r[1].utc.slice(5,7))).equal(testDate2.getUTCMonth()+1);
+                should(Number(r[1].utc.slice(8,10))).equal(testDate2.getUTCDate());
+                should(Number(r[1].utc.slice(11,13))).equal(testDate2.getUTCHours());
+                should(Number(r[1].utc.slice(14,16))).equal(testDate2.getUTCMinutes());
+                should(Number(r[1].utc.slice(17,19))).equal(testDate2.getUTCSeconds());
 
                 done();
             } catch (e) {
@@ -107,13 +107,6 @@
                 await dbl.logSensor("test", "testevt", 14, testDate);
 
                 var r = await dbl.sensorDataByHour('test','testevt', testDate2);
-                var sql = 'select strftime("%Y-%m-%d %H00", printf("%s %s",d,t),"localtime") hr,'+
-                    'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
-                    "from sensordata\n"+
-                    "where '2017-03-07'<=d and (d<'2017-03-08' or d='2017-03-08' and t<='01:03:04.000')\n"+
-                    "group by hr\n"+
-                    "order by hr desc\n"+
-                    "limit 24;";
                 should(r).properties(["sql","data"]);
                 should.deepEqual(r.data, [{
                     hr: '2017-03-08 0100',
