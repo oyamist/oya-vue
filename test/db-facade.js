@@ -17,13 +17,9 @@
         }
     }
 
-    it("datestr(date) returns SQL date string", function() {
+    it("utcstr(date) returns SQL utc date string", function() {
         var dbl = new DbFacade();
-        dbl.datestr(testDate).should.equal("'2017-03-10'");
-    });
-    it("timestr(date) returns SQL time string", function() {
-        var dbl = new DbFacade();
-        dbl.timestr(testDate).should.equal("'01:02:03.456'");
+        dbl.utcstr(testDate).should.equal("'2017-03-10 01:02:03.456'");
     });
     it("logSensor(vname,evt,value,date) logs sensor data via sqlExec(sql) method", function(done) {
         var async = function*() {

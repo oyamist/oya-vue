@@ -11,21 +11,6 @@
         static get ERROR_NOT_OPEN() { return new Error("open() database before use"); }
         static get ERROR_ABSTRACT() { return new Error("abstract method must be implemented by subclass"); }
 
-        datestr(date) {
-            var yyyy = date.getUTCFullYear();
-            var mo = ('0'+(date.getUTCMonth()+1)).slice(-2);
-            var dd = ('0'+date.getUTCDate()).slice(-2);
-            return `'${yyyy}-${mo}-${dd}'`;
-        }
-
-        timestr(date) {
-            var hh = ('0'+date.getUTCHours()).slice(-2);
-            var mm = ('0'+date.getUTCMinutes()).slice(-2);
-            var ss = ('0'+date.getUTCSeconds()).slice(-2);
-            var ms = ('00'+date.getUTCMilliseconds()).slice(-3);
-            return `'${hh}:${mm}:${ss}.${ms}'`;
-        }
-
         utcstr(date) {
             var yyyy = date.getUTCFullYear();
             var mo = ('0'+(date.getUTCMonth()+1)).slice(-2);
