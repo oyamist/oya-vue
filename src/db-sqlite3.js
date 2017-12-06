@@ -44,6 +44,23 @@
             });
         }
 
+        sqlAll(sql) {
+            if (!this.isOpen) {
+                return Promise.reject(DbFacade.ERROR_NOT_OPEN);
+            }
+            var context = new Error("");
+            return new Promise((resolve, reject) => {
+                this.db.all(sql, [], (e,r) => {
+                    if (e) {
+                        winston.error(`${e.message}\n"${sql}"\n${context.stack}`);
+                        reject(e);
+                    } else {
+                        resolve(r);
+                    }
+                });
+            });
+        }
+
         sqlExec(sql) {
             if (!this.isOpen) {
                 return Promise.reject(DbFacade.ERROR_NOT_OPEN);

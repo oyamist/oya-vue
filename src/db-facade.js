@@ -50,6 +50,15 @@
             })
         }
 
+        sqlAll(sql) {
+            if (!this.isOpen) {
+                return Promise.reject(DbFacade.ERROR_NOT_OPEN);
+            }
+            return Promise.resolve([{
+                error: DbFacade.ERROR_ABSTRACT,
+            }])
+        }
+
         logSensor(vname, evt, value, date=new Date()) {
             try {
                 this.logCount[evt] = this.logCount[evt] || 0;
@@ -75,6 +84,27 @@
             } catch(e) {
                 return Promise.reject(e);
             }
+        }
+
+        sensorDataByHour(vname, evt, enddate=new Date()) {
+            return new Promise((resolve,reject) => {
+                try {
+                    var d1 = this.datestr(new Date(enddate.getTime() - 24*3600*1000));
+                    var d2 = this.datestr(enddate);
+                    var t2 = this.timestr(enddate);
+                    var sql = `select d, printf("%s00",substr(t,1,2)) hr,avg(v) vavg, min(v) vmin, max(v) vmax\n`+
+                        `from sensordata\n`+
+                        `where ${d1}<=d and (d<${d2} or d=${d2} and t<=${t2})\n`+
+                        `group by d,hr\n`+
+                        `order by d desc, hr desc\n`+
+                        `limit 24;`;
+                    this.sqlAll(sql).then(data=>{
+                        resolve( { sql, data, });
+                    }).catch(e=>reject(e));
+                } catch (e) {
+                    return Promise.reject(e);
+                }
+            });
         }
 
     } //// class DbFacade
