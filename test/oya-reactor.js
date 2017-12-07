@@ -127,6 +127,29 @@
         }();
         async.next();
     });
+    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/internal-temp/2017-03-09").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
+                        'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
+                        'from sensordata\n'+
+                        "where utc between '2017-03-08 08:00:00.000' and '2017-03-09 08:00:00.000'\n"+
+                        "group by hr\n"+
+                        "order by hr desc\n"+
+                        "limit 24;");
+                    should(res.body.data).instanceOf(Array);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
     it("GET /sensor/types returns sensor types", function(done) {
         var async = function* () {
             try {

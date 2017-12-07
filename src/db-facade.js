@@ -86,7 +86,7 @@
                 try {
                     var d1 = this.utcstr(new Date(enddate.getTime() - 24*3600*1000));
                     var d2 = this.utcstr(enddate);
-                    var sql = `select strftime("%Y-%m-%d %H00",utc,"localtime") hr, `+
+                    var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         `avg(v) vavg, min(v) vmin, max(v) vmax\n`+
                         `from sensordata\n`+
                         `where utc between ${d1} and ${d2}\n`+

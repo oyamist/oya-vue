@@ -23,9 +23,7 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
-                    //this.resourceMethod("get", "sensor/data/day/yyyy/mm/dd", this.getSensorTypes),
-                    //this.resourceMethod("get", "sensor/data/month/yyyy/mm", this.getSensorTypes),
-                    //this.resourceMethod("get", "sensor/data/year/yyyy", this.getSensorTypes),
+                    this.resourceMethod("get", "sensor/data-by-hour/:field/:date", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
                     this.resourceMethod("post", "reactor", this.postReactor),
@@ -142,6 +140,29 @@
 
         getOyaConf(req, res, next) {
             return this.getApiModel(req, res, next, this.apiFile);
+        }
+
+        getSensorDataByHour(req, res, next) {
+            return new Promise((resolve, reject) => {
+                try {
+                    var dbf = this.vessel.dbfacade;
+                    var yyyy = Number(req.params.date.substr(0,4));
+                    var mo = Number(req.params.date.substr(5,2))-1;
+                    var dd = Number(req.params.date.substr(8,2));
+                    var date = new Date(yyyy,mo,dd);
+                    if (req.params.field === 'internal-temp') {
+                        var evt = OyaVessel.SENSE_TEMP_INTERNAL;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else {
+                        reject(new Error(`unknown field:${req.params.field}`));
+                    }
+                } catch(e) {
+                    winston.error(e.stack);
+                    reject(e);
+                }
+            });
         }
 
         getSensorTypes(req, res, next) {
