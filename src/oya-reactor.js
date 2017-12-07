@@ -149,7 +149,7 @@
                     var yyyy = Number(req.params.date.substr(0,4));
                     var mo = Number(req.params.date.substr(5,2))-1;
                     var dd = Number(req.params.date.substr(8,2));
-                    var date = new Date(yyyy,mo,dd);
+                    var date = new Date(yyyy,mo,dd,23,59,59,999);
                     if (req.params.field === 'internal-temp') {
                         var evt = OyaVessel.SENSE_TEMP_INTERNAL;
                         dbf.sensorDataByHour(this.vessel.name, evt, date)

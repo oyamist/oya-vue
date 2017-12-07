@@ -136,7 +136,7 @@
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
                         'from sensordata\n'+
-                        "where utc between '2017-03-08 08:00:00.000' and '2017-03-09 08:00:00.000'\n"+
+                        "where utc between '2017-03-09 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
                         "group by hr\n"+
                         "order by hr desc\n"+
                         "limit 24;");
