@@ -1,6 +1,6 @@
 {
   "name": "oya-vue",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Vue/Vuetify RestBundle for OyaMist bioreactor controller",
   "main": "index.js",
   "directories": {
@@ -9,7 +9,7 @@
     "src": "src"
   },
   "dependencies": {
-    "rest-bundle": "^0.22.1",
+    "rest-bundle": "^0.22.2",
     "rimraf": "^2.6.1",
     "sqlite3": "^3.1.13"
   },
