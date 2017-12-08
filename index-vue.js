@@ -1,9 +1,11 @@
 import OyaReactor from "./src/ui/oya-reactor.vue";
+import OyaChart from "./src/ui/oya-chart.vue";
 import OyaSensor from "./src/ui/oya-sensor.vue";
 import OyaProgress from "./src/ui/oya-progress.vue";
 
 var components = {
     OyaReactor,
+    OyaChart,
     OyaSensor,
     OyaProgress,
 }

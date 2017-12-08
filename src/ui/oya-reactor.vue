@@ -83,6 +83,7 @@
                     </v-list>
                 </div>
             </div>
+            <oya-chart></oya-chart>
         </v-card-text>
         <v-system-bar v-if='httpErr' class='error' dark>
             <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
@@ -204,6 +205,7 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
+import OyaChart from "./oya-chart.vue";
 import OyaSensor from "./oya-sensor.vue";
 import OyaProgress from "./oya-progress.vue";
 
@@ -219,6 +221,7 @@ export default {
     },
     data: function() {
         return {
+            showChart: false,
             apiEditDialog: false,
             activeToggle: false,
             actuatorToggle: false,
@@ -419,6 +422,7 @@ export default {
     components: {
         RbApiDialog,
         RbDialogRow,
+        OyaChart,
         OyaSensor,
         OyaProgress,
     },
@@ -449,6 +453,7 @@ export default {
         });
     },
     mounted() {
+        setTimeout(()=>(this.showChart=true), 5000);
     },
 }
 

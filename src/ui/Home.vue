@@ -1,6 +1,8 @@
 <template>
 
-<oya-reactor service="test"></oya-reactor>
+    <div>
+        <oya-reactor service="test"></oya-reactor>
+    </div>
 
 </template><script>
 
