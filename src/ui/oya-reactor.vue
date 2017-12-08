@@ -10,11 +10,13 @@
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
-    <v-card hover>
-        <v-toolbar class="green darken-3" flat>
-            <v-toolbar-title class="white--text">{{name}}</v-toolbar-title>
+    <v-card flat small>
+        <v-toolbar height="14" class="white pb-4" flat>
+            <v-toolbar-title class="white">{{name}}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-toolbar-side-icon dark @click="clickMenu"></v-toolbar-side-icon>
+            <v-toolbar-side-icon light class="pr-2" @click="clickMenu">
+                <v-icon>settings</v-icon>
+            </v-toolbar-side-icon>
         </v-toolbar> 
         <v-card-text class="text-xs-center" style="position:relative">
             <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">

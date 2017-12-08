@@ -11,7 +11,7 @@
     </rb-about>
 
     <line-chart :chartLabels="labelHours"
-        :width="600" :height="300"
+       :height="200"
     ></line-chart>
 </div>
 
@@ -41,7 +41,7 @@ export default {
     computed: {
         labelHours() {
             var result = [];
-            for (var i=0; i<2400; i+=100) {
+            for (var i=0; i<=2400; i+=100) {
                 result.push(("000" + i).slice(-4));
             }
             return result;
