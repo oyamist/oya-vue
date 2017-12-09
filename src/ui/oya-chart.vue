@@ -26,7 +26,7 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 import LineChart from "./line-chart.vue";
 
-function mockData(date) {
+function mockResponse(date1,date2=date1) {
     const data = [
         {"hr":"2017-12-08 2300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
         {"hr":"2017-12-08 2200","vavg":18.074496982104563,"vmin":17.99795274789553,"vmax":18.104765901172403},
@@ -71,8 +71,11 @@ function mockData(date) {
         {"hr":"2017-12-07 0700","vavg":17.22438593033409,"vmin":16.969253070878157,"vmax":17.350843060959797},
         {"hr":"2017-12-07 0600","vavg":16.220778003214743,"vmin":15.7107715978739,"vmax":16.950649780015777},
     ];
-
-    return data.filter(d=>d.hr.startsWith(date));
+    
+    return {
+        sql:"select strftime(\"%Y-%m-%d %H00\",utc,\"localtime\") hr, avg(v) vavg, min(v) vmin, max(v) vmax\nfrom sensordata\nwhere utc between '2017-12-07 08:00:00.000' and '2017-12-08 08:00:00.000'\ngroup by hr\norder by hr desc\nlimit 24;",
+        data: data.filter(d=>date1 < d.hr && d.hr < date2 + " 2400"),
+    }
 }
 
 function dataByHour(data, options={}) {
@@ -106,43 +109,6 @@ function dataByHour(data, options={}) {
     });
 }
 
-function testDatasets(n) {
-    var ds = [];
-    var spanGaps = false;
-    var tempOpts = {
-        scale: 1.8,
-        offset: 32,
-    };
-
-    if (n > 0) {
-        ds.push({
-            label: "2017-12-14",
-            data: dataByHour(mockData("2017-12-08"), tempOpts),
-            borderColor: LineChart.colors("red",0),
-            pointBackgroundColor: LineChart.colors("red",0),
-            borderWidth: 3,
-            radius: 0,
-            pointBorderColor: LineChart.colors("red",0),
-            backgroundColor: 'transparent',
-            spanGaps,
-        });
-    }
-    if (n > 1) {
-        ds.push({
-            label: "2017-12-13",
-            data: dataByHour(mockData("2017-12-07"), tempOpts),
-            borderColor: LineChart.colors("red",1),
-            pointBackgroundColor: LineChart.colors("red",1),
-            borderWidth: 3,
-            radius: 0,
-            pointBorderColor: LineChart.colors("red",1),
-            backgroundColor: 'transparent',
-            spanGaps,
-        });
-    }
-    return ds;
-}
-
 export default {
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
@@ -150,7 +116,10 @@ export default {
     ],
     props: {
         sensorProp: {
-            default: 'tempInternal',
+            default: 'temp-internal',
+        },
+        palette: {
+            default: 'red',
         },
     },
     data: function() {
@@ -160,9 +129,45 @@ export default {
     },
     methods: {
         addData() {
-            var n = this.linechartData.datasets.length;
-            this.linechartData.datasets = testDatasets(n+1);
+            var res = mockResponse("2017-12-07","2017-12-08");
+            this.linechartData.datasets = this.responseDatasets(res);
             this.$refs.lineChart.update();
+        },
+        responseDatasets(res, opts) {
+            var ds = [];
+            var spanGaps = false;
+            opts = Object.assign({
+                precision: 1,
+                scale: 1.8,
+                offset: 32,
+            },opts);
+
+            var data = res.data;
+            data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
+            var dataMap = {};
+            console.log("palette",this.palette);
+            data.forEach(d=>{
+                var date = d.hr.substr(0,10);
+                if (dataMap[date] == null) {
+                    var n = ds.length;
+                    dataMap[date] = {
+                        label: date,
+                        data: [],
+                        borderColor: LineChart.colors(this.palette,n),
+                        pointBackgroundColor: LineChart.colors(this.palette,n),
+                        borderWidth: 3,
+                        radius: 0,
+                        pointBorderColor: LineChart.colors(this.palette,n),
+                        backgroundColor: 'transparent',
+                        spanGaps,
+                    }
+                    ds.unshift(dataMap[date]);
+                }
+                dataMap[date].data.unshift(d);
+            });
+            ds = ds.reverse();
+            ds.forEach(d=>(d.data = dataByHour(d.data, opts)));
+            return ds;
         },
     },
     computed: {
@@ -182,7 +187,7 @@ export default {
     mounted() {
         this.linechartData = Object.assign({}, {
             labels: this.labelHours,
-            datasets: testDatasets(1),
+            datasets: [],
         });
     },
 }
