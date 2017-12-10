@@ -10,12 +10,21 @@
             property name of sensor</rb-about-item>
     </rb-about>
 
-    <line-chart v-if="linechartData"
-        ref="lineChart"
-        :chartLabels="labelHours"
-        :chartData="linechartData"
-        :height="200"
-    ></line-chart>
+    <div class="pt-3" style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
+        <div style="width: 8em; display:flex; flex-flow: column; ">
+            <p class="text-xs-center subheading">{{sensorLabels[sensorProp]}}</p>
+            <oya-sensor service='test' :sensorProp="sensorProp"/>
+        </div>
+        <div style="">
+            <line-chart v-if="linechartData"
+                ref="lineChart"
+                :chartLabels="labelHours"
+                :chartData="linechartData"
+                xAxisLabel="time of day"
+                :height="200"
+            ></line-chart>
+        </div>
+    </div>
 </div>
 
 </template>
@@ -63,7 +72,7 @@ export default {
     ],
     props: {
         sensorProp: {
-            default: 'temp-internal',
+            default: 'tempInternal',
         },
         palette: {
             default: 'red',
@@ -123,6 +132,12 @@ export default {
         },
     },
     computed: {
+        sensorLabels() {
+            return {
+                tempInternal: "Internal/Root Temperature",
+                humidityInternal: "Internal/Root Humidity",
+            };
+        },
         labelHours() {
             var result = [];
             for (var i=0; i<=2400; i+=100) {

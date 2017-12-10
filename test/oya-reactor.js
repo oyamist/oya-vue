@@ -133,7 +133,7 @@
                 var app = testInit();
 
                 // one day 
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal/1/2017-03-09").expect((res) => {
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/1/2017-03-09").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
@@ -146,7 +146,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
                 // seven days
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal/7/2017-03-09").expect((res) => {
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/7/2017-03-09").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
@@ -159,7 +159,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
                 // default is 7 days ending today
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal").expect((res) => {
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, .*/m);
                     should(res.body.sql).match(/limit 168/m); // 7 days

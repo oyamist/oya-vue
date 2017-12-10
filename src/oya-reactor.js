@@ -153,8 +153,13 @@
                     var mo = Number(endDate.substr(5,2))-1;
                     var dd = Number(endDate.substr(8,2));
                     var date = new Date(yyyy,mo,dd,23,59,59,999);
-                    if (req.params.field === 'temp-internal') {
+                    if (req.params.field === 'tempInternal') {
                         var evt = OyaVessel.SENSE_TEMP_INTERNAL;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else if (req.params.field === 'humidityInternal') {
+                        var evt = OyaVessel.SENSE_HUMIDITY_INTERNAL;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolve(r))
                         .catch(e => reject(e));

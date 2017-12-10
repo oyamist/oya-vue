@@ -11,39 +11,7 @@
     </rb-about>
 
     <div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
-        <div class="pt-3" style="display:flex; flex-direction: column; justify-content: center">
-            <div style="position:relative">
-                <img v-show="rbService.active && rbService.Mist" 
-                    src="/assets/mist-on.svg" height=200px/>
-                <img v-show="rbService.active && !rbService.Mist" 
-                    src="/assets/mist-off.svg" height=200px/>
-                <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
-            </div>
-            <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
-                <oya-sensor :service='service' sensorProp="tempInternal"/>
-                <v-spacer/>
-                <oya-sensor :service='service' sensorProp="humidityInternal"/>
-            </div>
-            <div class="pl-2" style="display:flex; flex-direction: row">
-                <v-switch label="Bioreactor" v-show="rbService.active"
-                    value input-value="true"
-                    color="light-green darken-2"
-                    v-on:click.native.stop="clickActivate()"></v-switch>
-                <v-switch label="Bioreactor" v-show="!rbService.active"
-                    v-on:click.native.stop="clickActivate()"></v-switch>
-                <oya-progress :service='service'/>
-            </div>
-        </div>
         <v-card flat >
-            <v-card-text>
-            <v-toolbar height="20" class="white pb-4" flat>
-                <v-toolbar-title class="white">{{name}}</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-toolbar-side-icon light class="pr-2" @click="clickMenu">
-                    <v-icon>settings</v-icon>
-                </v-toolbar-side-icon>
-            </v-toolbar> 
-            </v-card-text>
             <v-card-text class="text-xs-center" style="position:relative">
                 <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                     <div style="min-width: 20em">
@@ -60,16 +28,9 @@
                              ></v-select>
                         </div>
                         <v-list v-show="vessel" dense subheader>
-                            <v-subheader @click='actuatorToggle=!actuatorToggle'
-                                style="cursor: pointer">
-                                Advanced...
-                                <v-spacer/>
-                                <v-icon v-show="actuatorToggle">keyboard_arrow_up</v-icon>
-                                <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
-                            </v-subheader>
                             <v-list-tile v-for="actuator in actuators" key="actuator.name" 
                                 @click="actuator.pin >= 0 && clickActuator(actuator)"
-                                v-show="actuatorToggle && actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
+                                v-show="actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
                                 >
                                 <v-list-tile-action >
                                 </v-list-tile-action >
@@ -88,7 +49,7 @@
                         </v-list>
                     </div>
                 </div>
-                <oya-chart :service="service"></oya-chart>
+                <v-btn color="primary" @click="clickMenu">Settings</v-btn>
             </v-card-text>
             <v-system-bar v-if='httpErr' class='error' dark>
                 <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
@@ -227,19 +188,9 @@ export default {
     },
     data: function() {
         return {
-            showChart: false,
             apiEditDialog: false,
-            activeToggle: false,
-            actuatorToggle: false,
             cycleToggle: false,
             mockPhase: 0,
-            activeItems: [{
-                text: "Stop",
-                value: false,
-            },{
-                text: "Run",
-                value: true,
-            }],
         }
     },
     methods: {
@@ -274,19 +225,6 @@ export default {
         clickMenu() {
             this.rbDispatch("apiLoad").then(r => {
                 this.apiEdit();
-            });
-        },
-        clickActivate() {
-            var url = [this.restOrigin(), this.service, 'reactor'].join('/');
-            console.log("activate");
-            this.$http.post(url, {
-                activate:!this.rbService.active,
-            }).then(r => {
-                console.log("ok", r);
-                this.activeToggle = r.data.activate;
-            }).catch(e => {
-                console.error("error", e);
-                this.activeToggle = r.data.activate;
             });
         },
         clickActuator(actuator) {
@@ -438,11 +376,6 @@ export default {
             console.log("OyaReactor apiLoad", r);
             this.selCycle = this.vessel.cycles[this.rbService.cycle];
         });
-        this.rbInitialized().then(r => {
-            this.rbService.active != null && (this.activeToggle = this.rbService.active);
-        }).catch(e => {
-            console.error(e);
-        });
         var url = [this.restOrigin(), this.service, 'sensor/types'].join('/');
         this.sensorTypes = [];
         this.$http.get(url).then(r => {
@@ -459,7 +392,6 @@ export default {
         });
     },
     mounted() {
-        setTimeout(()=>(this.showChart=true), 5000);
     },
 }
 

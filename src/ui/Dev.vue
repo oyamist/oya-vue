@@ -71,13 +71,9 @@
         <v-spacer/>
         <rb-web-socket/>
     </v-toolbar>
-    <main>
-        <v-content>
-            <v-container fluid >
-                <router-view> </router-view>
-            </v-container>
-        </v-content>
-    </main>
+    <v-content>
+        <router-view> </router-view>
+    </v-content>
 </v-app>
 
 </template> 

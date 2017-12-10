@@ -41,11 +41,11 @@
         props: {
             xAxisLabel: {
                 type: String,
-                default: "time of day",
+                default: "",
             },
             yAxisLabel: {
                 type: String,
-                default: "internal temperature",
+                default: "",
             },
             palette: {
                 type: String,
