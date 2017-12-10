@@ -13,7 +13,7 @@
     <div class="pt-3" style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
         <div style="width: 8em; display:flex; flex-flow: column; ">
             <p class="text-xs-center subheading">{{sensorLabels[sensorProp]}}</p>
-            <oya-sensor service='test' :sensorProp="sensorProp"/>
+            <oya-sensor :service='service' :sensorProp="sensorProp"/>
         </div>
         <div style="">
             <line-chart v-if="linechartData"
