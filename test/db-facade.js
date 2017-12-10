@@ -85,7 +85,7 @@
                 var r = await dbl.open();
                 var r = await dbl.sensorDataByHour('test','testevt', testDate);
                 should(r).properties(["sql","data"]);
-                should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\ngroup by hr\norder by hr desc\nlimit 24/m);
+                should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\nand evt='testevt'\ngroup by hr\norder by hr desc\nlimit 24/m);
                 should(r.data).instanceOf(Array);
                 done();
             } catch (e) {

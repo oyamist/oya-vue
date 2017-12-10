@@ -133,6 +133,7 @@
                         `avg(v) vavg, min(v) vmin, max(v) vmax\n`+
                         `from sensordata\n`+
                         `where utc between ${d1} and ${d2}\n`+
+                        `and evt='${evt}'\n`+
                         `group by hr\n`+
                         `order by hr desc\n`+
                         `limit ${days*24};`;

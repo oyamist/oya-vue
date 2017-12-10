@@ -139,6 +139,7 @@
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-09 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
+                        "and evt='sense: temp-internal'\n"+
                         "group by hr\n"+
                         "order by hr desc\n"+
                         "limit 24;");
@@ -152,6 +153,7 @@
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-03 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
+                        "and evt='sense: temp-internal'\n"+
                         "group by hr\n"+
                         "order by hr desc\n"+
                         "limit 168;");
