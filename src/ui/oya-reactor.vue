@@ -88,7 +88,7 @@
                         </v-list>
                     </div>
                 </div>
-                <oya-chart></oya-chart>
+                <oya-chart :service="service"></oya-chart>
             </v-card-text>
             <v-system-bar v-if='httpErr' class='error' dark>
                 <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
