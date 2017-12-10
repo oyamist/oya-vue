@@ -131,7 +131,9 @@
         var async = function* () {
             try {
                 var app = testInit();
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/internal-temp/2017-03-09").expect((res) => {
+
+                // one day 
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal/1/2017-03-09").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
@@ -140,6 +142,27 @@
                         "group by hr\n"+
                         "order by hr desc\n"+
                         "limit 24;");
+                    should(res.body.data).instanceOf(Array);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+
+                // seven days
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal/7/2017-03-09").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
+                        'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
+                        'from sensordata\n'+
+                        "where utc between '2017-03-03 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
+                        "group by hr\n"+
+                        "order by hr desc\n"+
+                        "limit 168;");
+                    should(res.body.data).instanceOf(Array);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+
+                // default is 7 days ending today
+                var response = yield supertest(app).get("/test/sensor/data-by-hour/temp-internal").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should(res.body.sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, .*/m);
+                    should(res.body.sql).match(/limit 168/m); // 7 days
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();

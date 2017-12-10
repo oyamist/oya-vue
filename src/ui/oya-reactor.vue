@@ -10,87 +10,91 @@
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
-    <v-card flat small>
-        <v-toolbar height="14" class="white pb-4" flat>
-            <v-toolbar-title class="white">{{name}}</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-toolbar-side-icon light class="pr-2" @click="clickMenu">
-                <v-icon>settings</v-icon>
-            </v-toolbar-side-icon>
-        </v-toolbar> 
-        <v-card-text class="text-xs-center" style="position:relative">
-            <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
-                <div style="display:flex; flex-direction: column; justify-content: center">
-                    <div style="position:relative">
-                        <img v-show="rbService.active && rbService.Mist" 
-                            src="/assets/mist-on.svg" height=200px/>
-                        <img v-show="rbService.active && !rbService.Mist" 
-                            src="/assets/mist-off.svg" height=200px/>
-                        <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
-                    </div>
-                    <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
-                        <oya-sensor :service='service' sensorProp="tempInternal"/>
-                        <v-spacer/>
-                        <oya-sensor :service='service' sensorProp="humidityInternal"/>
-                    </div>
-                    <div class="pl-2" style="display:flex; flex-direction: row">
-                        <v-switch label="Bioreactor" v-show="rbService.active"
-                            value input-value="true"
-                            color="blue darken-2"
-                            v-on:click.native.stop="clickActivate()"></v-switch>
-                        <v-switch label="Bioreactor" v-show="!rbService.active"
-                            v-on:click.native.stop="clickActivate()"></v-switch>
-                        <oya-progress :service='service'/>
-                    </div>
-                </div>
-                <div style="min-width: 20em">
-                    <div v-if="curCycle " class="pl-3">
-                        <v-select
-                          v-bind:items="cycles"
-                          v-model="curCycle"
-                          label="Active cycle"
-                          item-text="name"
-                          item-value="key"
-                          return-object
-                          :hint="`${curCycle.desc}`"
-                          persistent-hint
-                         ></v-select>
-                    </div>
-                    <v-list v-show="vessel" dense subheader>
-                        <v-subheader @click='actuatorToggle=!actuatorToggle'
-                            style="cursor: pointer">
-                            Advanced...
-                            <v-spacer/>
-                            <v-icon v-show="actuatorToggle">keyboard_arrow_up</v-icon>
-                            <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
-                        </v-subheader>
-                        <v-list-tile v-for="actuator in actuators" key="actuator.name" 
-                            @click="actuator.pin >= 0 && clickActuator(actuator)"
-                            v-show="actuatorToggle && actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
-                            >
-                            <v-list-tile-action >
-                            </v-list-tile-action >
-                            <v-list-tile-content>
-                                <v-list-tile-title v-show="actuator.pin >= 0">
-                                    {{actuator.name}}
-                                </v-list-tile-title>
-                            </v-list-tile-content>
-                            <v-list-tile-action v-show='rbService[actuator.name]' >
-                                <v-switch value input-value="true" color="blue darken-2" ></v-switch>
-                            </v-list-tile-action>
-                            <v-list-tile-action v-show='!rbService[actuator.name]' >
-                                <v-switch ></v-switch>
-                            </v-list-tile-action>
-                        </v-list-tile>
-                    </v-list>
-                </div>
+    <div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
+        <div class="pt-3" style="display:flex; flex-direction: column; justify-content: center">
+            <div style="position:relative">
+                <img v-show="rbService.active && rbService.Mist" 
+                    src="/assets/mist-on.svg" height=200px/>
+                <img v-show="rbService.active && !rbService.Mist" 
+                    src="/assets/mist-off.svg" height=200px/>
+                <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
             </div>
-            <oya-chart></oya-chart>
-        </v-card-text>
-        <v-system-bar v-if='httpErr' class='error' dark>
-            <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
-        </v-system-bar>
-    </v-card>
+            <div style="display: flex; flex-direction:row;justify-content; space-between; flex-wrap: wrap">
+                <oya-sensor :service='service' sensorProp="tempInternal"/>
+                <v-spacer/>
+                <oya-sensor :service='service' sensorProp="humidityInternal"/>
+            </div>
+            <div class="pl-2" style="display:flex; flex-direction: row">
+                <v-switch label="Bioreactor" v-show="rbService.active"
+                    value input-value="true"
+                    color="light-green darken-2"
+                    v-on:click.native.stop="clickActivate()"></v-switch>
+                <v-switch label="Bioreactor" v-show="!rbService.active"
+                    v-on:click.native.stop="clickActivate()"></v-switch>
+                <oya-progress :service='service'/>
+            </div>
+        </div>
+        <v-card flat >
+            <v-card-text>
+            <v-toolbar height="20" class="white pb-4" flat>
+                <v-toolbar-title class="white">{{name}}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-side-icon light class="pr-2" @click="clickMenu">
+                    <v-icon>settings</v-icon>
+                </v-toolbar-side-icon>
+            </v-toolbar> 
+            </v-card-text>
+            <v-card-text class="text-xs-center" style="position:relative">
+                <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
+                    <div style="min-width: 20em">
+                        <div v-if="curCycle " class="pl-3">
+                            <v-select
+                              v-bind:items="cycles"
+                              v-model="curCycle"
+                              label="Active cycle"
+                              item-text="name"
+                              item-value="key"
+                              return-object
+                              :hint="`${curCycle.desc}`"
+                              persistent-hint
+                             ></v-select>
+                        </div>
+                        <v-list v-show="vessel" dense subheader>
+                            <v-subheader @click='actuatorToggle=!actuatorToggle'
+                                style="cursor: pointer">
+                                Advanced...
+                                <v-spacer/>
+                                <v-icon v-show="actuatorToggle">keyboard_arrow_up</v-icon>
+                                <v-icon v-show="!actuatorToggle">keyboard_arrow_down</v-icon>
+                            </v-subheader>
+                            <v-list-tile v-for="actuator in actuators" key="actuator.name" 
+                                @click="actuator.pin >= 0 && clickActuator(actuator)"
+                                v-show="actuatorToggle && actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
+                                >
+                                <v-list-tile-action >
+                                </v-list-tile-action >
+                                <v-list-tile-content>
+                                    <v-list-tile-title v-show="actuator.pin >= 0">
+                                        {{actuator.name}}
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action v-show='rbService[actuator.name]' >
+                                    <v-switch value input-value="true" color="blue darken-2" ></v-switch>
+                                </v-list-tile-action>
+                                <v-list-tile-action v-show='!rbService[actuator.name]' >
+                                    <v-switch ></v-switch>
+                                </v-list-tile-action>
+                            </v-list-tile>
+                        </v-list>
+                    </div>
+                </div>
+                <oya-chart></oya-chart>
+            </v-card-text>
+            <v-system-bar v-if='httpErr' class='error' dark>
+                <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
+            </v-system-bar>
+        </v-card>
+    </div>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
         <v-expansion-panel >

@@ -18,7 +18,7 @@
         <v-progress-circular v-bind:value="cycleProgress" 
             v-bind:rotate="-90"
             v-show="!rbService.Mist"
-            class="amber--text text--darken-3">
+            class="light-green--text text--darken-1">
             {{rbService.countdown}}
         </v-progress-circular>
     </div>

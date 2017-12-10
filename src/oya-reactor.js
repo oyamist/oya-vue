@@ -23,7 +23,8 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
-                    this.resourceMethod("get", "sensor/data-by-hour/:field/:date", this.getSensorDataByHour),
+                    this.resourceMethod("get", "sensor/data-by-hour/:field/:days/:endDate", this.getSensorDataByHour),
+                    this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
                     this.resourceMethod("post", "reactor", this.postReactor),
@@ -146,13 +147,15 @@
             return new Promise((resolve, reject) => {
                 try {
                     var dbf = this.vessel.dbfacade;
-                    var yyyy = Number(req.params.date.substr(0,4));
-                    var mo = Number(req.params.date.substr(5,2))-1;
-                    var dd = Number(req.params.date.substr(8,2));
+                    var days = Number(req.params.days) || 7;
+                    var endDate = req.params.endDate || new Date().toISOString().substr(0,10);
+                    var yyyy = Number(endDate.substr(0,4));
+                    var mo = Number(endDate.substr(5,2))-1;
+                    var dd = Number(endDate.substr(8,2));
                     var date = new Date(yyyy,mo,dd,23,59,59,999);
-                    if (req.params.field === 'internal-temp') {
+                    if (req.params.field === 'temp-internal') {
                         var evt = OyaVessel.SENSE_TEMP_INTERNAL;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date)
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolve(r))
                         .catch(e => reject(e));
                     } else {
