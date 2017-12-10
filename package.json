@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.1",
-    "rest-bundle": "^0.22.2",
+    "rest-bundle": "^0.22.3",
     "rimraf": "^2.6.1",
     "sqlite3": "^3.1.13",
     "vue-chartjs": "^3.0.2"
