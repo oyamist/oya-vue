@@ -184,6 +184,7 @@
                     should(res.body[0]).properties({ type: 'AM2315' });
                     should(res.body[1]).properties({ type: 'SHT31-DIS' });
                     should(res.body[2]).properties({ type: 'DS18B20' });
+                    should(res.body[2].addresses.length).above(0);
                     should(res.body[3]).properties({ type: 'none' });
                     should(res.body.length).equal(4);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));

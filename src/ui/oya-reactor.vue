@@ -195,10 +195,19 @@ export default {
     },
     methods: {
         sensorAddresses(sensor) {
-            return sensor.addresses.map(a => ({
-                value: a,
-                text: `${sensor.comm}: ${a} (= 0x${a.toString(16)}, ${a.toString(2)})`,
-            }));
+            return sensor.addresses.map(a => {
+                if (typeof a === "number") {
+                    return {
+                        value: a,
+                        text: `${sensor.comm}: ${a} (= 0x${a.toString(16)}, ${a.toString(2)})`,
+                    };
+                } else {
+                    return {
+                        value: a,
+                        text: `${sensor.comm}: ${a}`,
+                    };
+                }
+            });
         },
         sensorRules(sensor) {
             return [

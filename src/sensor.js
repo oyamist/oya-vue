@@ -5,11 +5,14 @@
 
     class Sensor {
         constructor(opts = {}) {
-            if (opts.hasOwnProperty('type')) {
-                if (0>Sensor.TYPE_LIST.findIndex(ud => (ud.type === opts.type))) {
-                    throw new Error(`Unknown type:${opts.type}`);
+            var type = opts.type;
+            if (typeof type === "object") {
+                type = type.type;
+            }
+            if (type) {
+                if (0>Sensor.TYPE_LIST.findIndex(ud => (ud.type === type))) {
+                    throw new Error(`Unknown type:${type}`);
                 }
-                var type = opts.type;
             } else {
                 var type = Sensor.TYPE_NONE.type;
             }
