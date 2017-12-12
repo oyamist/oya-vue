@@ -1,6 +1,7 @@
 (function(exports) {
     const winston = require("winston");
     const OyaVessel = require('./oya-vessel');
+    const SystemFacade = require("./system-facade");
 
     class Sensor {
         constructor(opts = {}) {
@@ -23,6 +24,7 @@
             this.pin = opts.pin == null ? sensorDefault.pin : opts.pin;
             this.comm = opts.comm || sensorDefault.comm;
             this.loc = opts.loc || sensorDefault.loc;
+            this.tempRegExp = opts.tempRegExp;
             this.cmdWakeup = opts.cmdWakeup || sensorDefault.cmdWakeup;
             this.cmdRead = opts.cmdRead || sensorDefault.cmdRead;
             this.dataRead = opts.dataRead || sensorDefault.dataRead;
@@ -142,6 +144,21 @@
                 readHumidity: true,
             }
         }
+        static get TYPE_DS18B20() {
+            return {
+                type: "DS18B20",
+                name: "DS18B20",
+                desc: "DS18B20 Temperature 1-Wire sensor",
+                comm: Sensor.COMM_W1,
+                loc: Sensor.LOC_INTERNAL,
+                tempRegExp: ".*\n.*t=([0-9-]+)\n.*",
+                tempScale: 0.001,
+                tempOffset: 0,
+                address: null,
+                addresses: SystemFacade.oneWireAddresses(),
+                readTemp: true,
+            }
+        }
         static get TYPE_NONE() {
             return {
                 type: "none",
@@ -160,6 +177,7 @@
         static get LOC_AMBIENT() { return "ambient"; }
         static get LOC_NONE() { return "none"; }
         static get COMM_I2C() { return "I\u00B2C"; }
+        static get COMM_W1() { return "1-wire"; }
         static get BYTE_IGNORE() { return "Ignored byte"; }
         static get BYTE_CRC_HIGH() { return "CRC high byte"; }
         static get BYTE_CRC_LOW() { return "CRC low byte"; }
@@ -174,6 +192,7 @@
             return [
                 Sensor.TYPE_AM2315, 
                 Sensor.TYPE_SHT31_DIS, 
+                Sensor.TYPE_DS18B20, 
                 Sensor.TYPE_NONE, 
             ];
         }
@@ -262,24 +281,42 @@
             }
             return new Promise((resolve, reject) => {
                 try {
-                    this.write(this.cmdRead);
-                    var buf = Buffer.alloc(this.dataRead.length);
-                    setTimeout(() => {
-                        try {
-                            this.i2cRead(this.address, buf);
-                            var data = this.parseData(buf);
-                            this.readErrors = 0;
-                            resolve(data);
-                        } catch(e) {
-                            if (++this.readErrors >= this.maxReadErrors) {
-                                this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors)`);
+                    if (this.comm === Sensor.COMM_I2C) {
+                        this.write(this.cmdRead);
+                        var buf = Buffer.alloc(this.dataRead.length);
+                        setTimeout(() => {
+                            try {
+                                this.i2cRead(this.address, buf);
+                                var data = this.parseData(buf);
+                                this.readErrors = 0;
+                                resolve(data);
+                            } catch(e) {
+                                if (++this.readErrors >= this.maxReadErrors) {
+                                    this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors) [E1]`);
+                                }
+                                reject(e);
                             }
-                            reject(e);
-                        }
-                    }, this.readDelay || 0);
+                        }, this.readDelay || 0);
+                    } else if (this.comm === Sensor.COMM_W1) {
+                        SystemFacade.oneWireRead(this.address, this.type).then(r => {
+                            if (r.temp && this.readTemp) {
+                                r.temp = r.temp * this.tempScale + this.tempOffset;
+                                this.data.temp = r.temp;
+                                this.emit(r.temp, Sensor.EVENT_TEMP_MAP);
+                            }
+                            if (r.humidity && this.readHumidity) {
+                                r.humidity = r.humidity * this.humidityScale + this.humidityOffset;
+                                this.data.humidity = r.humidity;
+                                this.emit(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
+                            }
+                            resolve(r);
+                        }).catch(e=>reject(e));
+                    } else {
+                        reject(new Error(`read() not supported for sensor:${this.name} comm:${this.comm}`));
+                    }
                 } catch (e) {
                     if (++this.readErrors >= this.maxReadErrors) {
-                        this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors)`);
+                        this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors) [E2]`);
                     }
                     reject(e);
                 }

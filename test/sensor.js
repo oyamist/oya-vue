@@ -2,12 +2,58 @@
     const winston = require('winston');
     const should = require("should");
     const Sensor = exports.Sensor || require("../index").Sensor;
+    const SystemFacade = exports.SystemFacade || require("../index").SystemFacade;
     const OyaVessel = require('../index').OyaVessel;
     const EventEmitter = require("events");
+
+    class MockSystem extends SystemFacade {
+        constructor(opts={}) {
+            super(opts);
+            this.w1Addresses = [ "28-MOCK1", "28-MOCK2" ];
+        }
+        oneWireRead(address, type) {
+            if (type === 'DS18B20') {
+                return Promise.resolve({
+                    temp: 12345,
+                    timestamp: new Date(1999,12,31),
+                });
+            } 
+            return Promise.reject(new Error(`unknown type:${type}`));
+        }
+    }
+    SystemFacade.facade = new MockSystem();
 
     it("default sensor is none", function() {
         var sensor = new Sensor();
         should(sensor).properties(Sensor.TYPE_NONE);
+    });
+    it("TESTTESTsupports 1-wire DS18B20", function(done) {
+        (async function() {
+            try {
+                Sensor.TYPE_DS18B20.should.properties({
+                    name: "DS18B20",
+                    comm: "1-wire",
+                    addresses: ["28-MOCK1", "28-MOCK2"],
+                });
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_DS18B20, {
+                    address: "28-MOCK2",
+                }));
+                sensor.address.should.equal("28-MOCK2");
+                sensor.comm.should.equal("1-wire");
+                sensor.type.should.equal("DS18B20");
+                var r = await sensor.read();
+                should.deepEqual(r, {
+                    temp: 12.345,
+                    timestamp: new Date(1999,12,31),
+                });
+                should(sensor.data).properties({
+                    temp: 12.345,
+                });
+                done();
+            } catch(e) {
+                done(e);
+            }
+        })();
     });
     it("ctor defaults can be overridden", function() {
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
