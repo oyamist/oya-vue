@@ -1,7 +1,7 @@
 <template>
 
 <v-app id="dev-app" >
-   <v-navigation-drawer persistent v-model="drawer" enable-resize-watcher app>
+   <v-navigation-drawer temporary absolute v-model="drawer" enable-resize-watcher app>
       <v-list dense>
         <div v-for="(item,i) in sidebarMain" :key="i">
           <v-list-tile exact :to="item.href">
@@ -72,7 +72,9 @@
         <rb-web-socket/>
     </v-toolbar>
     <v-content>
-        <router-view> </router-view>
+        <v-container fluid>
+            <router-view> </router-view>
+        </v-container >
     </v-content>
 </v-app>
 

@@ -28,7 +28,7 @@
                              ></v-select>
                         </div>
                         <v-list v-show="vessel" dense subheader>
-                            <v-list-tile v-for="actuator in actuators" key="actuator.name" 
+                            <v-list-tile v-for="(actuator,i) in actuators" :key="actuator.name+i" 
                                 @click="actuator.pin >= 0 && clickActuator(actuator)"
                                 v-show="actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
                                 >

@@ -84,24 +84,26 @@ export default {
         }
     },
     methods: {
-        refresh() {
+        refresh(opts) {
             var url = [this.restOrigin(), this.service, 'sensor', 'data-by-hour', this.sensorProp].join('/');
             this.$http.get(url).then(res=>{
                 var resData = res.data;
-                this.linechartData.datasets = this.responseDatasets(resData);
+                this.linechartData.datasets = this.responseDatasets(resData, opts);
                 this.$refs.lineChart.update();
             }).catch(e=>{
                 console.error(e);
             });
         },
-        responseDatasets(res, opts) {
+        responseDatasets(res, opts={}) {
             var ds = [];
             var spanGaps = false;
-            opts = Object.assign({
+            var chartOpts = {
                 precision: 1,
-                scale: 1.8,
-                offset: 32,
-            },opts);
+            };
+            if (opts.tempUnit === 'F') {
+                chartOpts.scale = 1.8;
+                chartOpts.offset = 32;
+            };
 
             var data = res.data;
             data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
@@ -127,7 +129,7 @@ export default {
                 dataMap[date].data.unshift(d);
             });
             ds = ds.reverse();
-            ds.forEach(d=>(d.data = dataByHour(d.data, opts)));
+            ds.forEach(d=>(d.data = dataByHour(d.data, chartOpts)));
             return ds;
         },
     },
@@ -156,7 +158,11 @@ export default {
             labels: this.labelHours,
             datasets: [],
         });
-        this.refresh();
+        this.onApiModelLoaded('oya-conf').then(apiModel=>{
+            this.refresh({
+                tempUnit: apiModel.tempUnit,
+            });
+        });
     },
 }
 
