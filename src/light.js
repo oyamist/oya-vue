@@ -1,5 +1,6 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
+    const EventEmitter = require('events');
 
     class Light {
         constructor(opts = {}) {
@@ -107,6 +108,43 @@
             }
 
             return cycle;
+        }
+
+        static runCycle(emitter, cycle, period=60*60*24) { 
+            if (! emitter instanceof EventEmitter) {
+                throw new Error("expected EventEmitter");
+            }
+            if (! cycle instanceof Array) {
+                throw new Error("expected cycle Array");
+            }
+            if (typeof period !== 'number') {
+                throw new Error("expected number of seconds for period");
+            }
+
+            var timers = [];
+            var context = {};
+            var periodMs = period * 1000;
+            var createTimers = () => {
+                cycle.forEach(c => {
+                    var timer = setTimeout(() => {
+                        emitter.emit(c.event, c.value);
+                    }, 1000*c.t);
+                    timers.push(timer);
+                });
+            };
+            createTimers();
+            context.interval = setInterval(() => createTimers(), periodMs);
+
+            var stopTimers = () => {
+                context.interval && clearInterval(context.interval);
+                context.interval = null;
+                var timer;
+                while ((timer = timers.pop())) {
+                    clearTimeout(timer);
+                }
+            };
+
+            return stopTimers;
         }
 
         toJSON() {
