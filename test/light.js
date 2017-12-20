@@ -13,7 +13,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on full spectrum lights',
-            name: 'Full spectrum',
+            name: 'Full spectrum light',
             pin: -1,
             spectrum: 'Full spectrum',
             type: 'Light:spst:no'
@@ -28,7 +28,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on blue lights',
-            name: 'Blue spectrum',
+            name: 'Blue spectrum light',
             pin: -1,
             spectrum: 'Blue spectrum',
             type: 'Light:spst:no'
@@ -43,7 +43,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on red lights',
-            name: 'Red spectrum',
+            name: 'Red spectrum light',
             pin: -1,
             spectrum: 'Red spectrum',
             type: 'Light:spst:no'
@@ -64,7 +64,7 @@
             cycleOn: 14,
             cycleOff: 4,
             desc: 'Turn on full spectrum lights',
-            name: 'Full spectrum',
+            name: 'Full spectrum light',
             pin: -1,
             spectrum: 'Full spectrum',
             type: 'Light:spst:no'

@@ -2,6 +2,7 @@
     const OyaVessel = require('./oya-vessel');
     const Actuator = require('./actuator');
     const Sensor = require('./sensor');
+    const Light = require('./light');
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -88,6 +89,16 @@
                     this.sensors.push(new Sensor(sensorOpts));
                 }
             }
+            if (opts.lights) {
+                this.lights = opts.lights.map((l,i) => {
+                    return new Light(l);
+                });
+            } else if (this.lights == null) {
+                this.lights = [];
+                this.lights.push(new Light(Light.LIGHT_FULL));
+                this.lights.push(new Light(Light.LIGHT_BLUE));
+                this.lights.push(new Light(Light.LIGHT_RED));
+            }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
 
@@ -105,6 +116,7 @@
                 vessels: this.vessels,
                 actuators: this.actuators,
                 sensors: this.sensors,
+                lights: this.lights,
             };
         }
 

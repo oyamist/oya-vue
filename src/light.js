@@ -16,7 +16,7 @@
                 lt => (lt.spectrum===spectrum))[0] || {};
 
             // serializable toJSON() properties
-            this.name = opts.name || `${spectrum}`;
+            this.name = opts.name || `${spectrum} light`;
             this.type = opts.type || actDefault.type || Light.Light_SPST_NO;
             this.cycleStartDay = opts.cycleStartDay || 0; // Sunday
             this.cycleStartTime = opts.cycleStartTime || '00:00';

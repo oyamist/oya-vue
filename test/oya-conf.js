@@ -3,6 +3,7 @@
     const winston = require('winston');
     const OyaConf = require("../index").OyaConf;
     const Actuator = require("../index").Actuator;
+    const Light = require("../index").Light;
     const Sensor = require("../index").Sensor;
     const OyaVessel = require("../index").OyaVessel;
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
@@ -13,6 +14,11 @@
         vessels: [
             OyaConf.createVesselConfig(0),
             OyaConf.createVesselConfig(1),
+        ],
+        lights: [
+            new Light(Light.LIGHT_FULL),
+            new Light(Light.LIGHT_BLUE),
+            new Light(Light.LIGHT_RED),
         ],
         actuators: [
             new Actuator({usage:Actuator.USAGE_MIST}),
@@ -127,6 +133,7 @@
                 updatedVessel,
             ],
             actuators,
+            lights: defaultConf.lights,
             sensors: [
                 defaultConf.sensors[0],
                 defaultConf.sensors[1],
@@ -263,6 +270,7 @@
                 updatedVessel,
             ],
             actuators,
+            lights: defaultConf.lights,
             sensors: defaultConf.sensors,
         });
 
