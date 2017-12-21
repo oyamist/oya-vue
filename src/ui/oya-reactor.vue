@@ -80,10 +80,53 @@
                 </v-card>
             </v-expansion-panel-content>
             <v-expansion-panel-content>
+                <div slot="header">Lights</div>
+                <v-card>
+                    <v-card-text>
+                        <rb-dialog-row v-for="(light,i) in mutableLights" :key="light.name+i"
+                            :label="light.name" >
+                            <div style="display:flex; flex-flow: row wrap;">
+                                <v-text-field label="Hours on" class="pr-2" required
+                                    v-model="light.cycleOn" 
+                                    :rules="nonNegRules(light.cycleOn)"
+                                    ></v-text-field>
+                                <v-text-field label="Hours off" class="pr-2" required
+                                    :rules="nonNegRules(light.cycleOff)"
+                                    v-model="light.cycleOff" 
+                                    ></v-text-field>
+                            </div>
+                            <div style="display:flex; flex-flow: row wrap;">
+                                <v-select v-bind:items="dayOfWeekItems" 
+                                    v-model='light.cycleStartDay' 
+                                    label="Start day"
+                                    class="pr-2 input-group"
+                                    ></v-select>
+                                <v-text-field label="Start time"
+                                    class="pr-2"
+                                    required
+                                    v-model="light.cycleStartTime" 
+                                    :rules="hhmmRules(light.cycleStartTime)"
+                                    ></v-text-field>
+                                <v-text-field label="Cycle days"
+                                    v-model="light.cycleDays" 
+                                    ></v-text-field>
+                            </div>
+                            <v-text-field 
+                                type="number"
+                                v-model="light.pin"
+                                required
+                                :rules="pinRules(light.pin)"
+                                label="MCU Pin" class="input-group" />
+                        </rb-dialog-row>
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
                 <div slot="header">Cycles</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row :label="cycleCopy.name" v-for="cycleCopy in editCycles" key="name">
+                        <rb-dialog-row :label="cycleCopy.name" 
+                            v-for="(cycleCopy,i) in editCycles" :key="cycleCopy.name+i">
                             <v-text-field v-model='cycleCopy.cycle.desc'
                                 label="Description" class="input-group--focused" />
                             <v-layout>
@@ -109,13 +152,13 @@
                 <div slot="header">Actuators</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row v-for="actuator in mutableActuators" key="name"
+                        <rb-dialog-row v-for="(actuator,i) in mutableActuators" :key="name+i"
                             :label="actuator.name" >
                             <v-text-field 
                                 type="number"
                                 v-model="actuator.pin"
                                 required
-                                :rules="posIntRules(actuator.pin)"
+                                :rules="pinRules(actuator.pin)"
                                 label="MCU Pin" class="input-group--focused" />
                         </rb-dialog-row>
                     </v-card-text>
@@ -125,7 +168,7 @@
                 <div slot="header">Sensors</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row v-for="(sensor,i) in mutableSensors" key="name"
+                        <rb-dialog-row v-for="(sensor,i) in mutableSensors" :key="name+i"
                             :label="`Sensor #${i+1}`" >
                             <v-select
                                 v-bind:items="sensorTypes"
@@ -191,6 +234,7 @@ export default {
             apiEditDialog: false,
             cycleToggle: false,
             mockPhase: 0,
+            cycleStartTimeMenu: false,
         }
     },
     methods: {
@@ -219,11 +263,24 @@ export default {
                 },
             ];
         },
-        posIntRules(value) {
+        nonNegRules(value) {
+            return [
+                () => !!value || 'This field is required',
+                () => !!value && Number(value)>=0 || 'Expected postiive number',
+            ];
+        },
+        hhmmRules(value) {
+            var pat = /^[0-9][0-9]:[0-9][0-9]$/;
+            return [
+                () => !!value || 'This field is required',
+                () => !!value && pat.test(value) || 'Expected 24-hour time HH:MM',
+            ];
+        },
+        pinRules(value) {
             return [
                 () => !!value || 'This field is required',
                 () => !!value && (Math.trunc(Number(value))+"") === (value+"") || 'Expected integer',
-                () => !!value && Number(value) >= 0 || 'Expected positive number',
+                () => !!value && Number(value) >= -1 || 'Expected positive number or -1 for no pin',
             ];
         },
         cycleDef(cycle) {
@@ -301,6 +358,30 @@ export default {
                 "Cycle #4",
             ];
         },
+        dayOfWeekItems() {
+            return [{
+                text: "Sunday",
+                value: 0,
+            },{
+                text: "Monday",
+                value: 1,
+            },{
+                text: "Tuesday",
+                value: 2,
+            },{
+                text: "Wednesday",
+                value: 3,
+            },{
+                text: "Thursday",
+                value: 4,
+            },{
+                text: "Friday",
+                value: 5,
+            },{
+                text: "Saturday",
+                value: 6,
+            }]
+        },
         tempItems() {
             return [{
                 text: "Fahrenheit",
@@ -335,6 +416,9 @@ export default {
         mutableActuators( ){
             return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
                 a.vesselIndex === this.vesselIndex);
+        },
+        mutableLights( ){
+            return this.apiModelCopy && this.apiModelCopy.lights;
         },
         mutableSensors( ){
             return this.apiModelCopy && this.apiModelCopy.sensors.filter(a => 

@@ -19,7 +19,7 @@
             this.name = opts.name || `${spectrum} light`;
             this.type = opts.type || actDefault.type || Light.Light_SPST_NO;
             this.cycleStartDay = opts.cycleStartDay || 0; // Sunday
-            this.cycleStartTime = opts.cycleStartTime || '00:00';
+            this.cycleStartTime = opts.cycleStartTime || '06:00';
             this.cycleDays = opts.cycleDays || 1;
             this.cycleOn = opts.cycleOn || 12;
             this.cycleOff = opts.cycleOff || 12;

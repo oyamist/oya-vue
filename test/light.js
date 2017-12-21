@@ -8,7 +8,7 @@
         var light = new Light();
         should(light).properties( {
             event: 'event:Full light',
-            cycleStartTime: '00:00',
+            cycleStartTime: '06:00',
             cycleDays: 1,
             cycleOn: 12,
             cycleOff: 12,
@@ -23,7 +23,7 @@
         var light = new Light(Light.LIGHT_BLUE);
         should(light).properties( {
             event: 'event:Blue light',
-            cycleStartTime: '00:00',
+            cycleStartTime: '06:00',
             cycleDays: 1,
             cycleOn: 12,
             cycleOff: 12,
@@ -38,7 +38,7 @@
         var light = new Light(Light.LIGHT_RED);
         should(light).properties( {
             event: 'event:Red light',
-            cycleStartTime: '00:00',
+            cycleStartTime: '06:00',
             cycleDays: 1,
             cycleOn: 12,
             cycleOff: 12,
