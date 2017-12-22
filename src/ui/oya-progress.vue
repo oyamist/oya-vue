@@ -8,17 +8,19 @@
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
     </rb-about>
 
-    <div class='caption ' v-show="rbService.active" >
+    <div class='oya-progress' v-if="rbService.active" >
         <v-progress-circular v-bind:value="cycleProgress" 
             v-bind:rotate="-90"
             v-show="rbService.Mist"
+            size="40"
             class="blue--text text--darken-1">
             {{rbService.countdown}}
         </v-progress-circular>
         <v-progress-circular v-bind:value="cycleProgress" 
             v-bind:rotate="-90"
+            size="40"
             v-show="!rbService.Mist"
-            class="light-green--text text--darken-1">
+            class="light-green--text text--darken-2">
             {{rbService.countdown}}
         </v-progress-circular>
     </div>
@@ -56,7 +58,6 @@ export default {
 </script>
 <style> 
 .oya-progress {
-    position: absolute;
-    top: 1.5em;
+    padding: 0.5em;
 }
 </style>

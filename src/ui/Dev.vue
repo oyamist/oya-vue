@@ -73,7 +73,7 @@
     </v-toolbar>
     <v-content class="oya-content">
         <oya-plant service="test"></oya-plant>
-        <v-container fluid>
+        <v-container fluid style="padding-right:1em">
             <router-view> </router-view>
         </v-container>
     </v-content>
@@ -118,6 +118,5 @@ export default {
 <style> 
 .oya-content {
     background: #ddd;
-    padding: 1em;
 }
 </style>

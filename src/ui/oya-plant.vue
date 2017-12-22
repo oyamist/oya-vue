@@ -17,19 +17,15 @@
         </div>
         <div class="oya-dashboard-controls">
             <div class="title pb-3">{{name}}</div>
+            <oya-light :service='service'/>
+            <oya-progress :service='service'/>
             <div >
                 <v-switch v-show="rbService.active"
                     value input-value="true"
-                    color="light-green darken-2"
+                    color="light-green darken-1"
                     v-on:click.native.stop="clickActivate()"></v-switch>
                 <v-switch v-show="!rbService.active"
                     v-on:click.native.stop="clickActivate()"></v-switch>
-            </div>
-            <div>
-                <oya-progress :service='service'/>
-            </div>
-            <div>
-                {{rbService.lights && (rbService.lights.white.countdown/60).toFixed(1)}}
             </div>
         </div>
     </div>
@@ -114,6 +110,9 @@ export default {
     padding-left: 2em;
     padding-right: 2em;
     border-radius: 1em;
+    border-left: 1px solid #fff;
+    border-right: 3px solid #ccc;
+    border-bottom: 3px solid #ccc;
 }
 .oya-dashboard {
     background: linear-gradient(to bottom, #ccc, #ddd);
@@ -126,7 +125,7 @@ export default {
     padding-top: 2em;
     display:flex;
     flex-flow: column nowrap;
-    justify-content: center;
+    justify-content: space-around;
     align-items:center;
 }
 </style>

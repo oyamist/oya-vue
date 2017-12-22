@@ -93,12 +93,14 @@
                 date.getHours() * 60 * 60 + 
                 date.getMinutes() * 60 + 
                 date.getSeconds();
-            var periodSec = (this.cycleOn + this.cycleOff) * 60 * 60;
+            var cycleOn = Number(this.cycleOn);
+            var cycleOff = Number(this.cycleOff);
+            var periodSec = (cycleOn + cycleOff) * 60 * 60;
             var daysSec = 60*60*24 * this.cycleDays;
             var nPeriods = Math.round(daysSec / periodSec);
             var cycleSec = (dateSec + periodSec - startSec) % periodSec;
-            var onSec = this.cycleOn * 60 * 60;
-            var offSec = this.cycleOff * 60 * 60;
+            var onSec = cycleOn * 60 * 60;
+            var offSec = cycleOff * 60 * 60;
             var t = 0;
             var value = cycleSec < onSec;
             cycle.push({
@@ -135,6 +137,10 @@
                 throw new Error("expected number of seconds for period");
             }
 
+            emitter.on(this.event, value => {
+                this.active = !!value;
+            });
+
             var timers = [];
             var context = {};
             var periodMs = period * 1000;
@@ -142,7 +148,6 @@
                 cycle.forEach(c => {
                     var timer = setTimeout(() => {
                         emitter.emit(c.event, c.value);
-                        this.active = !!c.value;
                     }, 1000*c.t);
                     timers.push(timer);
                 });

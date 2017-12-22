@@ -145,9 +145,11 @@
     it("runCycle(emitter,cycle) starts event emitter daemon", function(done) {
         (async function() {
             try {
-                var light = new Light();
-                var emitter = new EventEmitter();
                 var evt = Light.EVENT_LIGHT_BLUE;
+                var light = new Light({
+                    event: evt,
+                });
+                var emitter = new EventEmitter();
                 var periodMs = 50;
                 var countOn = 0;
                 var countOff = 0;
