@@ -60,7 +60,7 @@
         <div slot="title">Bioreactor Settings</div>
         <v-expansion-panel >
             <v-expansion-panel-content>
-                <div slot="header">Vessel</div>
+                <div slot="header">General</div>
                 <v-card>
                     <v-card-text>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
@@ -80,7 +80,7 @@
                 </v-card>
             </v-expansion-panel-content>
             <v-expansion-panel-content>
-                <div slot="header">Lights</div>
+                <div slot="header">Light cycles</div>
                 <v-card>
                     <v-card-text>
                         <rb-dialog-row v-for="(light,i) in mutableLights" :key="light.name+i"
@@ -88,41 +88,31 @@
                             <div style="display:flex; flex-flow: row wrap;">
                                 <v-text-field label="Hours on" class="pr-2" required
                                     v-model="light.cycleOn" 
-                                    :rules="nonNegRules(light.cycleOn)"
-                                    ></v-text-field>
+                                    type="number" :rules="nonNegRules(light.cycleOn)" ></v-text-field>
                                 <v-text-field label="Hours off" class="pr-2" required
-                                    :rules="nonNegRules(light.cycleOff)"
-                                    v-model="light.cycleOff" 
+                                    type="number" :rules="nonNegRules(light.cycleOff)"
+                                    v-model="light.cycleOff" ></v-text-field>
+                            </div>
+                            <div style="display:flex; flex-flow: row wrap;">
+                                <v-select v-bind:items="dayOfWeekItems" v-model='light.cycleStartDay' 
+                                    label="Start day" class="pr-2 input-group" ></v-select>
+                                <v-text-field label="Start time" v-model="light.cycleStartTime" 
+                                    required :rules="hhmmRules(light.cycleStartTime)"
                                     ></v-text-field>
                             </div>
                             <div style="display:flex; flex-flow: row wrap;">
-                                <v-select v-bind:items="dayOfWeekItems" 
-                                    v-model='light.cycleStartDay' 
-                                    label="Start day"
-                                    class="pr-2 input-group"
-                                    ></v-select>
-                                <v-text-field label="Start time"
-                                    class="pr-2"
-                                    required
-                                    v-model="light.cycleStartTime" 
-                                    :rules="hhmmRules(light.cycleStartTime)"
-                                    ></v-text-field>
-                                <v-text-field label="Cycle days"
-                                    v-model="light.cycleDays" 
-                                    ></v-text-field>
+                                <v-text-field label="Cycle days" class="pr-2"
+                                    v-model="light.cycleDays" ></v-text-field>
+                                <v-text-field type="number" v-model="light.pin"
+                                    required :rules="pinRules(light.pin)"
+                                    label="MCU Pin" class="input-group" />
                             </div>
-                            <v-text-field 
-                                type="number"
-                                v-model="light.pin"
-                                required
-                                :rules="pinRules(light.pin)"
-                                label="MCU Pin" class="input-group" />
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
             <v-expansion-panel-content>
-                <div slot="header">Cycles</div>
+                <div slot="header">Pump cycles</div>
                 <v-card>
                     <v-card-text>
                         <rb-dialog-row :label="cycleCopy.name" 
@@ -152,14 +142,17 @@
                 <div slot="header">Actuators</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row v-for="(actuator,i) in mutableActuators" :key="name+i"
+                        <rb-dialog-row v-for="(actuator,i) in mutableActuators" :key="actuator.name+i"
                             :label="actuator.name" >
-                            <v-text-field 
-                                type="number"
-                                v-model="actuator.pin"
-                                required
-                                :rules="pinRules(actuator.pin)"
-                                label="MCU Pin" class="input-group--focused" />
+                            <v-text-field type="number" v-model="actuator.pin"
+                                required :rules="pinRules(actuator.pin)"
+                                label="MCU Pin" class="input-group" />
+                        </rb-dialog-row>
+                        <rb-dialog-row v-for="(light,i) in mutableLights" :key="light.name+i"
+                            :label="light.name" >
+                            <v-text-field type="number" v-model="light.pin"
+                                required :rules="pinRules(light.pin)"
+                                label="MCU Pin" class="input-group" />
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>

@@ -10,16 +10,12 @@
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
-    <div class="pt-4 pb-4 grey lighten-4" 
-        style='display:flex; flex-flow; row wrap; justify-content: space-evenly'>
-        <div>
-            <img v-show="rbService.active && rbService.Mist" 
-                src="/assets/mist-on.svg" height=200px/>
-            <img v-show="rbService.active && !rbService.Mist" 
-                src="/assets/mist-off.svg" height=200px/>
+    <div class="pt-4 pb-4 oya-dashboard">
+        <div class="oya-plant " :style="plantStyle">
+            <img v-show="rbService.active" src="/assets/mist-off.svg" height=200px/>
             <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
         </div>
-        <div style='display:flex; flex-flow: column nowrap; justify-content: center; align-items:center; '>
+        <div class="oya-dashboard-controls">
             <div class="title pb-3">{{name}}</div>
             <div >
                 <v-switch v-show="rbService.active"
@@ -31,6 +27,9 @@
             </div>
             <div>
                 <oya-progress :service='service'/>
+            </div>
+            <div>
+                {{rbService.lights && (rbService.lights.white.countdown/60).toFixed(1)}}
             </div>
         </div>
     </div>
@@ -74,6 +73,17 @@ export default {
         },
     },
     computed: {
+        plantStyle() {
+            var bgDark = `linear-gradient(to bottom, #ccc, #d4d4d4 40%, transparent 70%)`;
+            var bgLight = `linear-gradient(to bottom, white, white 30%, transparent 70%)`;
+            var bgMist = `repeating-linear-gradient(45deg, transparent, #bbddff 3px, blue 4px)`;
+            var bgAir = `repeating-linear-gradient(45deg, transparent, #ccdfff 3px, #ccdfff 4px)`;
+            var light = true;
+            var bg = [];
+            this.rbService.active && bg.push(light ? bgLight : bgDark);
+            this.rbService.active && bg.push(this.rbService.Mist ? bgMist : bgAir);
+            return bg.length ? `background: ${bg.join(',')};` : '';
+        },
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];
@@ -99,4 +109,24 @@ export default {
 
 </script>
 <style> 
+.oya-plant {
+    padding: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    border-radius: 1em;
+}
+.oya-dashboard {
+    background: linear-gradient(to bottom, #ccc, #ddd);
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+}
+.oya-dashboard-controls {
+    padding: 1em;
+    padding-top: 2em;
+    display:flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items:center;
+}
 </style>

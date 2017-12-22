@@ -16,7 +16,7 @@
                 lt => (lt.spectrum===spectrum))[0] || {};
 
             // serializable toJSON() properties
-            this.name = opts.name || `${spectrum} light`;
+            this.name = opts.name || actDefault.name || `${spectrum} light`;
             this.type = opts.type || actDefault.type || Light.Light_SPST_NO;
             this.cycleStartDay = opts.cycleStartDay || 0; // Sunday
             this.cycleStartTime = opts.cycleStartTime || '06:00';
@@ -27,6 +27,12 @@
             this.desc = opts.desc || actDefault.desc || 'generic Light';
             this.pin = opts.pin || Light.NOPIN;
             this.event = opts.event || actDefault.event;
+
+            // non-serializable properties
+            Object.defineProperty(this, "active", {
+                writable: true,
+                value: false,
+            });
         }
 
         static get NOPIN() { return -1; }
@@ -39,6 +45,7 @@
         static get SPECTRUM_RED() { return "Red spectrum"; }
         static get LIGHT_FULL() {
             return {
+                name: "White light",
                 spectrum: Light.SPECTRUM_FULL,
                 event: Light.EVENT_LIGHT_FULL,
                 desc: 'Turn on full spectrum lights',
@@ -47,6 +54,7 @@
         }
         static get LIGHT_BLUE() {
             return {
+                name: "Blue light",
                 spectrum: Light.SPECTRUM_BLUE,
                 event: Light.EVENT_LIGHT_BLUE,
                 desc: 'Turn on blue lights',
@@ -55,6 +63,7 @@
         }
         static get LIGHT_RED() {
             return {
+                name: "Red light",
                 spectrum: Light.SPECTRUM_RED,
                 event: Light.EVENT_LIGHT_RED,
                 desc: 'Turn on red lights',
@@ -67,6 +76,11 @@
                 Light.LIGHT_BLUE, 
                 Light.LIGHT_RED,
             ];
+        }
+
+        countdown(date=new Date()) {
+            var cycle = this.createCycle(date);
+            return cycle[1].t;
         }
 
         createCycle(date) {
@@ -110,7 +124,7 @@
             return cycle;
         }
 
-        static runCycle(emitter, cycle, period=60*60*24) { 
+        runCycle(emitter, cycle, period=60*60*24) { 
             if (! emitter instanceof EventEmitter) {
                 throw new Error("expected EventEmitter");
             }
@@ -128,6 +142,7 @@
                 cycle.forEach(c => {
                     var timer = setTimeout(() => {
                         emitter.emit(c.event, c.value);
+                        this.active = !!c.value;
                     }, 1000*c.t);
                     timers.push(timer);
                 });

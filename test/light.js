@@ -13,7 +13,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on full spectrum lights',
-            name: 'Full spectrum light',
+            name: 'White light',
             pin: -1,
             spectrum: 'Full spectrum',
             type: 'Light:spst:no'
@@ -28,7 +28,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on blue lights',
-            name: 'Blue spectrum light',
+            name: 'Blue light',
             pin: -1,
             spectrum: 'Blue spectrum',
             type: 'Light:spst:no'
@@ -43,7 +43,7 @@
             cycleOn: 12,
             cycleOff: 12,
             desc: 'Turn on red lights',
-            name: 'Red spectrum light',
+            name: 'Red light',
             pin: -1,
             spectrum: 'Red spectrum',
             type: 'Light:spst:no'
@@ -64,7 +64,7 @@
             cycleOn: 14,
             cycleOff: 4,
             desc: 'Turn on full spectrum lights',
-            name: 'Full spectrum light',
+            name: 'White light',
             pin: -1,
             spectrum: 'Full spectrum',
             type: 'Light:spst:no'
@@ -142,9 +142,10 @@
             tStart + 3*offSec + 2*onSec, tStart + 3*offSec + 3*onSec,
         ]);
     });
-    it("TESTTESTrunCycle(emitter,cycle) starts event emitter daemon", function(done) {
+    it("runCycle(emitter,cycle) starts event emitter daemon", function(done) {
         (async function() {
             try {
+                var light = new Light();
                 var emitter = new EventEmitter();
                 var evt = Light.EVENT_LIGHT_BLUE;
                 var periodMs = 50;
@@ -158,8 +159,10 @@
 
                 // empty cycle
                 var cycle = [];
-                var stop = Light.runCycle(emitter, cycle, periodMs/1000);
+                should(light.active).equal(false);
+                var stop = light.runCycle(emitter, cycle, periodMs/1000);
                 await new Promise((res,rej) => setTimeout(() => res(true), 1));
+                should(light.active).equal(false);
                 stop();
                 should(countOn).equal(0);
                 should(countOff).equal(1);
@@ -170,8 +173,9 @@
                     event: evt,
                     value: 1,
                 }];
-                var stop = Light.runCycle(emitter, cycle, periodMs/1000);
+                var stop = light.runCycle(emitter, cycle, periodMs/1000);
                 await new Promise((res,rej) => setTimeout(() => res(true), 5)); // avoid race
+                should(light.active).equal(true);
                 should(countOn).equal(1);
                 should(countOff).equal(1);
                 await new Promise((res,rej) => setTimeout(() => res(true), periodMs));
@@ -194,6 +198,16 @@
                 done(e);
             }
         })();
+    });
+    it("countdown(date) returns seconds till next light transition", function() {
+        var light = new Light({
+        });
+        var date = new Date(2017,0,1,06,30); // Sunday Jan 1, 2017
+        var c = light.countdown(date);
+        should(c).equal(60*60*12 - 1800);
+        var c = light.countdown();
+        should(c).below(60*60*12+1);
+        should(c).above(-1);
     });
 
 })

@@ -4,6 +4,7 @@
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
     const Actuator = require("./actuator");
+    const Light = require("./light");
     const Sensor = require("./sensor");
     const OyaVessel = require("./oya-vessel");
     const path = require("path");
@@ -232,8 +233,26 @@
         }
 
         getState() {
+            var lights = this.oyaConf.lights;
+            var white = lights.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
+            var blue = lights.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
+            var red = lights.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
             return Object.assign(this.vessel.state, {
                 api: 'oya-reactor',
+                lights: {
+                    white: {
+                        active: white.active,
+                        countdown: white.countdown(),
+                    },
+                    blue: {
+                        active: blue.active,
+                        countdown: blue.countdown(),
+                    },
+                    red: {
+                        active: red.active,
+                        countdown: red.countdown(),
+                    },
+                },
             });
         }
 
