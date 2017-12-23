@@ -121,13 +121,13 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 done(err);
             }
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -169,7 +169,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 done(err);
             }
         }();
@@ -190,7 +190,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -210,7 +210,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -239,7 +239,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -292,7 +292,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -345,7 +345,7 @@
 
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -412,7 +412,7 @@
 
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();
@@ -458,7 +458,7 @@
 
                 done();
             } catch(err) {
-                winston.error(err.message, err.stack);
+                winston.error(err.stack);
                 throw(err);
             }
         }();

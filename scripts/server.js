@@ -56,7 +56,7 @@ let async = function*() {
         winston.debug("firing asyncOnReady event");
         app.locals.asyncOnReady.forEach(async => async.next(app)); // notify waiting async blocks
     } catch (err) {
-        winston.error("server.js:", err);
+        winston.error("server.js:", err.stack);
         async.throw(err);
     }
 }();

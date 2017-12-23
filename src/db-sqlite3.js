@@ -17,7 +17,7 @@
             return new Promise((resolve, reject) => {
                 var db = new Sqlite3.Database(this.dbname, Sqlite3.OPEN_READWRITE, e=>{
                     if (e) {
-                        winston.error(e.stack);
+                        winston.error('db-sqlite3:', e.stack);
                         reject(e);
                     } else {
                         this.db = db;
