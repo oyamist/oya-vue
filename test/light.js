@@ -132,7 +132,7 @@
         });
         var date = new Date(2017,0,2,1,30,15);
         var cycle = light.createCycle(date);
-        should.deepEqual(cycle.map(c=>c.value?1:0),[1,0,1,0,1,0,1,0]);
+        should.deepEqual(cycle.map(c=>c.value===true?1:0),[1,0,1,0,1,0,1,0]);
         should.deepEqual(cycle.map(c=>c.event),[evt,evt,evt,evt,evt,evt,evt,evt,]);
         var tStart = 3600 * 14 - 15;
         should.deepEqual(cycle.map(c=>c.t), [
@@ -149,7 +149,11 @@
                 var light = new Light({
                     event: evt,
                 });
+                var active;
                 var emitter = new EventEmitter();
+                emitter.on(evt, value => {
+                    active = value;
+                });
                 var periodMs = 50;
                 var countOn = 0;
                 var countOff = 0;
@@ -161,10 +165,10 @@
 
                 // empty cycle
                 var cycle = [];
-                should(light.active).equal(false);
+                should(active).equal(false);
                 var stop = light.runCycle(emitter, cycle, periodMs/1000);
                 await new Promise((res,rej) => setTimeout(() => res(true), 1));
-                should(light.active).equal(false);
+                should(active).equal(false);
                 stop();
                 should(countOn).equal(0);
                 should(countOff).equal(1);
@@ -173,11 +177,11 @@
                 var cycle = [{
                     t:0,
                     event: evt,
-                    value: 1,
+                    value: true,
                 }];
                 var stop = light.runCycle(emitter, cycle, periodMs/1000);
                 await new Promise((res,rej) => setTimeout(() => res(true), 5)); // avoid race
-                should(light.active).equal(true);
+                should(active).equal(true);
                 should(countOn).equal(1);
                 should(countOff).equal(1);
                 await new Promise((res,rej) => setTimeout(() => res(true), periodMs));

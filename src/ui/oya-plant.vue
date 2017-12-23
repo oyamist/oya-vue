@@ -74,7 +74,8 @@ export default {
             var bgLight = `linear-gradient(to bottom, white, white 30%, transparent 70%)`;
             var bgMist = `repeating-linear-gradient(45deg, transparent, #bbddff 3px, blue 4px)`;
             var bgAir = `repeating-linear-gradient(45deg, transparent, #ccdfff 3px, #ccdfff 4px)`;
-            var light = true;
+            var lights = this.rbService.lights;
+            var light = lights && lights.white.active;
             var bg = [];
             this.rbService.active && bg.push(light ? bgLight : bgDark);
             this.rbService.active && bg.push(this.rbService.Mist ? bgMist : bgAir);

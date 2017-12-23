@@ -35,7 +35,30 @@
             });
             this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
+            this.lights = {
+                white: {
+                    active: false,
+                    countdown: 0,
+                },
+                blue: {
+                    active: false,
+                    countdown: 0,
+                },
+                red: {
+                    active: false,
+                    countdown: 0,
+                },
+            };
             this.emitter = new EventEmitter(),
+            this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
+                this.lights.white.active = !!value;
+            });
+            this.emitter.on(Light.EVENT_LIGHT_BLUE, value => {
+                this.lights.blue.active = !!value;
+            });
+            this.emitter.on(Light.EVENT_LIGHT_RED, value => {
+                this.lights.red.active = !!value;
+            });
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 var vessel = new OyaVessel(Object.assign({
                     name: `${name}-vessel${iv}`,
@@ -83,7 +106,7 @@
 
         onApiModelLoaded() {
             winston.info("OyaReactor api model loaded");
-            this.loadApiModel(this.apiFile).then(() => this.vessel.activate(true));
+            this.loadApiModel(this.apiFile).then(() => this.activate(true));
         }
 
         updateConf(conf) {
@@ -183,7 +206,14 @@
         }
 
         putOyaConf(req, res, next) {
-            return this.putApiModel(req, res, next, this.apiFile);
+            var result = this.putApiModel(req, res, next, this.apiFile);
+            if (this.vessel.isActive) {
+                winston.info("updated configuration");
+                this.activate(false);
+                setTimeout(() => this.activate(true), 500);
+            }
+
+            return result;
         }
 
         postActuator(req, res, next) {
@@ -218,11 +248,25 @@
             return req.body;
         }
 
+        activate(value) {
+            winston.info(`${value?'activating':'de-activating'} ${this.vessel.name}`);
+            this.vessel.activate(value);
+            if (this.stopLight) {
+                this.stopLight.forEach(stop => stop());
+                this.stopLight = null;
+            }
+            if (value) {
+                this.stopLight = this.oyaConf.lights.forEach(l=>{
+                    var cycle = l.createCycle();
+                    return l.runCycle(this.emitter, cycle);
+                });
+            }
+            return value;
+        }
         postReactor(req, res, next) {
             var result = {};
             if (req.body.hasOwnProperty('activate')) {
-                this.vessel.activate(req.body.activate);
-                result.activate = req.body.activate;
+                result.activate = this.activate(req.body.activate);
             } else if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.setCycle(req.body.cycle);
                 result.cycle = req.body.cycle;
@@ -233,26 +277,22 @@
         }
 
         getState() {
-            var lights = this.oyaConf.lights;
-            var white = lights.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
-            var blue = lights.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
-            var red = lights.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
+            var lightConf = this.oyaConf.lights;
+            var white = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
+            var blue = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
+            var red = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
+            lightConf.forEach(l => {
+                if (l.spectrum === Light.SPECTRUM_FULL) {
+                    this.lights.white.countdown = l.countdown();
+                } else if (l.spectrum === Light.SPECTRUM_BLUE) {
+                    this.lights.blue.countdown = l.countdown();
+                } else if (l.spectrum === Light.SPECTRUM_RED) {
+                    this.lights.red.countdown = l.countdown();
+                }
+            });
             return Object.assign(this.vessel.state, {
                 api: 'oya-reactor',
-                lights: {
-                    white: {
-                        active: white.active,
-                        countdown: white.countdown(),
-                    },
-                    blue: {
-                        active: blue.active,
-                        countdown: blue.countdown(),
-                    },
-                    red: {
-                        active: red.active,
-                        countdown: red.countdown(),
-                    },
-                },
+                lights: this.lights,
             });
         }
 

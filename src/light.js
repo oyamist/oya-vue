@@ -1,6 +1,7 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
     const EventEmitter = require('events');
+    const winston = require('winston');
 
     class Light {
         constructor(opts = {}) {
@@ -27,12 +28,6 @@
             this.desc = opts.desc || actDefault.desc || 'generic Light';
             this.pin = opts.pin || Light.NOPIN;
             this.event = opts.event || actDefault.event;
-
-            // non-serializable properties
-            Object.defineProperty(this, "active", {
-                writable: true,
-                value: false,
-            });
         }
 
         static get NOPIN() { return -1; }
@@ -83,7 +78,7 @@
             return cycle[1].t;
         }
 
-        createCycle(date) {
+        createCycle(date = new Date()) {
             var cycle = [];
             var startSec = Number(this.cycleStartTime.substr(0,2)) * 60 * 60 +
                 Number(this.cycleStartTime.substr(3)) * 60;
@@ -126,7 +121,7 @@
             return cycle;
         }
 
-        runCycle(emitter, cycle, period=60*60*24) { 
+        runCycle(emitter, cycle, period=this.cycleDays*60*60*24) { 
             if (! emitter instanceof EventEmitter) {
                 throw new Error("expected EventEmitter");
             }
@@ -138,7 +133,7 @@
             }
 
             emitter.on(this.event, value => {
-                this.active = !!value;
+                this.pin >= 0 && winston.info(`${this.name} ${value ? 'on':'off'}`);
             });
 
             var timers = [];
