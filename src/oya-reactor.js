@@ -52,12 +52,24 @@
             this.emitter = new EventEmitter(),
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.lights.white.active = !!value;
+                var whiteConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
+                if (whiteConf && whiteConf.pin >= 0) {
+                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, whiteConf.pin);
+                }
             });
             this.emitter.on(Light.EVENT_LIGHT_BLUE, value => {
                 this.lights.blue.active = !!value;
+                var blueConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
+                if (blueConf && blueConf.pin >= 0) {
+                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, blueConf.pin);
+                }
             });
             this.emitter.on(Light.EVENT_LIGHT_RED, value => {
                 this.lights.red.active = !!value;
+                var redConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
+                if (redConf && redConf.pin >= 0) {
+                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, redConf.pin);
+                }
             });
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 var vessel = new OyaVessel(Object.assign({
