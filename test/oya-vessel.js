@@ -34,16 +34,36 @@
                 unit: "C",
                 value: null,
             },
-            tempExternal: null,
-            tempAmbient: null,
+            tempExternal: {
+                avg1: null,
+                avg2: null,
+                unit: "C",
+                value: null,
+            },
+            tempAmbient: {
+                avg1: null,
+                avg2: null,
+                unit: "C",
+                value: null,
+            },
             humidityInternal: {
                 avg1: null,
                 avg2: null,
                 unit: "%RH",
                 value: null,
             },
-            humidityExternal: null,
-            humidityAmbient: null,
+            humidityExternal: {
+                avg1: null,
+                avg2: null,
+                unit: "%RH",
+                value: null,
+            },
+            humidityAmbient: {
+                avg1: null,
+                avg2: null,
+                unit: "%RH",
+                value: null,
+            },
         };
     }
 

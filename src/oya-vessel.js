@@ -31,16 +31,36 @@
                     avg2: null,
                     unit: "C",
                 },
-                tempExternal: null,
-                tempAmbient: null,
+                tempExternal: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: "C",
+                },
+                tempAmbient: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: "C",
+                },
                 humidityInternal: {
                     value: null,
                     avg1: null,
                     avg2: null,
                     unit: "%RH",
                 },
-                humidityExternal: null,
-                humidityAmbient: null,
+                humidityExternal: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: "%RH",
+                },
+                humidityAmbient: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: "%RH",
+                },
             };
             OyaVessel.applyDelta(this, opts);
             this._state.cycle = this.startCycle;
@@ -64,8 +84,18 @@
             this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
             });
-            this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (v) => this.onTempInternal(v));
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (v) => this.onHumidityInternal(v));
+            this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (v) => 
+                this.onTemp(v,'tempInternal',OyaVessel.SENSE_TEMP_INTERNAL));
+            this.emitter.on(OyaVessel.SENSE_TEMP_EXTERNAL, (v) => 
+                this.onTemp(v,'tempExternal',OyaVessel.SENSE_TEMP_EXTERNAL));
+            this.emitter.on(OyaVessel.SENSE_TEMP_AMBIENT, (v) => 
+                this.onTemp(v,'tempAmbient',OyaVessel.SENSE_TEMP_AMBIENT));
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (v) => 
+                this.onHumidity(v,'humidityInternal', OyaVessel.SENSE_HUMIDITY_INTERNAL));
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_AMBIENT, (v) => 
+                this.onHumidity(v,'humidityAmbient', OyaVessel.SENSE_HUMIDITY_AMBIENT));
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_EXTERNAL, (v) => 
+                this.onHumidity(v,'humidityExternal', OyaVessel.SENSE_HUMIDITY_EXTERNAL));
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
@@ -168,43 +198,48 @@
             return this._state.active;
         }
 
-        onHumidityInternal(value) {
-            winston.debug(`onHumidityInternal ${value}`);
-            this._state.humidityInternal.value = value;
+        onHumidity(value, field, sense) {
+            winston.debug(`onHumidity ${field} ${value}`);
+            this.dbfacade.isOpen && this.dbfacade
+                .logSensor(this.name, sense, value)
+                .catch(e => {
+                    winston.debug(e); // ignore sensor errors
+                });
+            this._state[field].value = value;
             var expRate = Number(this.sensorExpRate);
-            this._state.humidityInternal.avg1 = this._state.humidityInternal.avg1 == null 
+            this._state[field].avg1 = this._state[field].avg1 == null 
                 ? value
-                : value * expRate + (1 - expRate) * this._state.humidityInternal.avg1;
-            this._state.humidityInternal.avg2 = this._state.humidityInternal.avg2 == null 
-                ? this._state.humidityInternal.avg1 
-                : this._state.humidityInternal.avg1 * expRate + (1 - expRate) * this._state.humidityInternal.avg2;
+                : value * expRate + (1 - expRate) * this._state[field].avg1;
+            this._state[field].avg2 = this._state[field].avg2 == null 
+                ? this._state[field].avg1 
+                : this._state[field].avg1 * expRate + (1 - expRate) * this._state[field].avg2;
         }
 
-        onTempInternal(value) {
-            winston.debug(`onTempInternal ${value}`);
+        onTemp(value, field, sense) {
+            winston.debug(`onTemp ${field} ${value}`);
             this.dbfacade.isOpen && this.dbfacade
-                .logSensor(this.name, OyaVessel.SENSE_TEMP_INTERNAL, value)
+                .logSensor(this.name, sense, value)
                 .catch(e => {
                     winston.debug(e); // ignore sensor errors
                 });
             if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
-                    winston.info("onTempInternal: reverting to default cycle");
+                    winston.info("onTemp ${field}: reverting to default cycle");
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
             } else if (this.nextCycle !== this.hotCycle) {
-                winston.info("onTempInternal: next cycle will be cooling cycle");
+                winston.info("onTemp ${field}: next cycle will be cooling cycle");
                 this.nextCycle = this.hotCycle;
             }
-            this._state.tempInternal.value = value;
+            this._state[field].value = value;
             var expRate = Number(this.sensorExpRate);
-            this._state.tempInternal.avg1 = this._state.tempInternal.avg1 == null 
+            this._state[field].avg1 = this._state[field].avg1 == null 
                 ? value
-                : value * expRate + (1 - expRate) * this._state.tempInternal.avg1;
-            this._state.tempInternal.avg2 = this._state.tempInternal.avg2 == null 
-                ? this._state.tempInternal.avg1 
-                : this._state.tempInternal.avg1 * expRate + (1 - expRate) * this._state.tempInternal.avg2;
+                : value * expRate + (1 - expRate) * this._state[field].avg1;
+            this._state[field].avg2 = this._state[field].avg2 == null 
+                ? this._state[field].avg1 
+                : this._state[field].avg1 * expRate + (1 - expRate) * this._state[field].avg2;
         }
 
         activate(value=true) {

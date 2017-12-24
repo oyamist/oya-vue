@@ -199,6 +199,26 @@
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolve(r))
                         .catch(e => reject(e));
+                    } else if (req.params.field === 'tempExternal') {
+                        var evt = OyaVessel.SENSE_TEMP_EXTERNAL;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else if (req.params.field === 'humidityExternal') {
+                        var evt = OyaVessel.SENSE_HUMIDITY_EXTERNAL;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else if (req.params.field === 'tempAmbient') {
+                        var evt = OyaVessel.SENSE_TEMP_AMBIENT;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else if (req.params.field === 'humidityAmbient') {
+                        var evt = OyaVessel.SENSE_HUMIDITY_AMBIENT;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolve(r))
+                        .catch(e => reject(e));
                     } else {
                         reject(new Error(`unknown field:${req.params.field}`));
                     }
