@@ -76,7 +76,7 @@
         ]);
         should(sensor.tempScale).equal(0.1);
         should(sensor.tempOffset).equal(0);
-        should(sensor.humidityScale).equal(0.1);
+        should(sensor.humidityScale).equal(0.001);
         should(sensor.humidityOffset).equal(0);
         should(sensor.pin).equal(null);
         should(sensor.loc).equal(Sensor.LOC_EXTERNAL);
@@ -155,7 +155,7 @@
         // parse data, update sensor and fire events
         var data = sensor.parseData(buf);
         data.temp.should.approximately(19.5, 0.01); // Centigrade
-        data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
+        data.humidity.should.approximately(.323, 0.0001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 1);
         should.deepEqual(sensor.data, data);
         should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
@@ -174,7 +174,7 @@
         humidity_eventValue = null;
         var data = sensor.parseData(buf);
         should(data.temp).equal(null);
-        data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
+        data.humidity.should.approximately(.323, 0.0001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 3);
         should.deepEqual(sensor.data, data);
         should(temp_event).equal(null); // no event
@@ -205,7 +205,7 @@
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{}));
         var data = sensor.parseData(buf); 
         data.temp.should.approximately(19.5, 0.01); // Centigrade
-        data.humidity.should.approximately(32.3, 0.0001); // %relative humidity
+        data.humidity.should.approximately(.323, 0.0001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 1);
         should.deepEqual(sensor.data, data);
 
@@ -246,7 +246,7 @@
                 should.deepEqual(i2cOut[0], Buffer.from([0x03, 0x00, 0x04])); // wakeup
                 should.deepEqual(i2cOut[1], Buffer.from([0x03, 0x00, 0x04])); // read
                 should(i2cOut.length).equal(2);
-                should(data.humidity).approximately(32.3, 0.01);
+                should(data.humidity).approximately(.323, 0.0001);
                 should(data.timestamp - Date.now()).approximately(0,5);
                 should.deepEqual(data, sensor.data);
 

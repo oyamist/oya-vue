@@ -139,7 +139,7 @@
                 ],
                 tempScale: 0.1,
                 tempOffset: 0,
-                humidityScale: 0.1,
+                humidityScale: 0.001,
                 humidityOffset: 0,
                 address: 0x5C,
                 addresses: [0x5C],
