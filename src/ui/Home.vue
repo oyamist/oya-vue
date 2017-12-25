@@ -7,7 +7,7 @@
         </v-expansion-panel-content>
         <v-expansion-panel-content>
             <div slot="header">Charts</div>
-            <oya-chart-panel/>
+            <oya-chart-panel service='test'/>
         </v-expansion-panel-content>
     </v-expansion-panel>
 
