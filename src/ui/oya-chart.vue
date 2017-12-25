@@ -10,7 +10,8 @@
             property name of sensor</rb-about-item>
     </rb-about>
 
-    <div class="pt-3" style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
+    <div class="pt-3" v-if='linechartData && linechartData.datasets.length'
+        style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
         <div style="width: 8em; display:flex; flex-flow: column; ">
             <p class="text-xs-center subheading">{{sensorLabels[sensorProp]}}</p>
             <oya-sensor :service='service' :sensorProp="sensorProp"/>

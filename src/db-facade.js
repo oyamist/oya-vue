@@ -95,7 +95,7 @@
             if (!this.isOpen) {
                 return Promise.reject(DbFacade.ERROR_NOT_OPEN);
             }
-            return Promise.resolve(mockData)
+            return Promise.resolve(sql.indexOf('temp')>=0 ? mockData : []);
         }
 
         logSensor(vname, evt, value, date=new Date()) {

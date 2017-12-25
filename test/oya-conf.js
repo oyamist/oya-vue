@@ -12,8 +12,12 @@
         type: 'OyaConf',
         tempUnit: 'F',
         vessels: [
-            OyaConf.createVesselConfig(0),
-            OyaConf.createVesselConfig(1),
+            OyaConf.createVesselConfig(0,{
+                guid: 'testguid0',
+            }),
+            OyaConf.createVesselConfig(1, {
+                guid: 'testguid1',
+            }),
         ],
         lights: [
             new Light(Light.LIGHT_FULL),
@@ -64,7 +68,14 @@
     winston.level = 'error';
 
     it("toJSON() serializes configuration", function() {
-        should.deepEqual(new OyaConf().toJSON(), defaultConf);
+        var conf = new OyaConf({
+            vessels: [{
+                guid: 'testguid0',
+            },{
+                guid: 'testguid1',
+            }],
+        });
+        should.deepEqual(conf.toJSON(), defaultConf);
     });
     it("ctor creates default configuration", function() {
         var oc = new OyaConf();
@@ -92,6 +103,7 @@
             vessels: [
                 OyaConf.createVesselConfig(0, {
                     name: 'test1',
+                    guid: 'test1guid',
                     type: 'new-type',
                     startCycle: OyaVessel.CYCLE_COOL,
                     hotCycle: OyaVessel.CYCLE_COOL,
@@ -111,6 +123,7 @@
         }
         var updatedVessel = OyaConf.createVesselConfig();
         updatedVessel.name = 'test1';
+        updatedVessel.guid= 'test1guid';
         updatedVessel.enabled = false;
         updatedVessel.startCycle = OyaVessel.CYCLE_COOL;
         updatedVessel.coolThreshold = 72;
@@ -142,8 +155,12 @@
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
-        should.deepEqual(OyaConf.createVesselConfig(), {
+        var opts = {
+            guid: 'vessel1guid',
+        };
+        should.deepEqual(OyaConf.createVesselConfig(0, opts), {
             name: "vessel1",
+            guid: 'vessel1guid',
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
@@ -153,8 +170,9 @@
             maxCycles: 0,
             cycles: defaultCycles,
         });
-        should.deepEqual(OyaConf.createVesselConfig(1), {
+        should.deepEqual(OyaConf.createVesselConfig(1, opts), {
             name: "vessel2",
+            guid: 'vessel1guid',
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
@@ -166,6 +184,7 @@
         });
         var opts = {
             name: "dubba",
+            guid: 'dubbaguid',
             type: "testtype",
             enabled: true,
             startCycle: OyaVessel.CYCLE_COOL,
@@ -176,6 +195,7 @@
         }
         should.deepEqual(OyaConf.createVesselConfig(1, opts), {
             name: "dubba",
+            guid: 'dubbaguid',
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
@@ -187,9 +207,11 @@
         });
         var opts = { 
             type: 'some-type',
+            guid: 'vessel3guid',
         };
         should.deepEqual(OyaConf.createVesselConfig(2,opts), {
             name: "vessel3",
+            guid: 'vessel3guid',
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
@@ -222,6 +244,7 @@
             vessels: [{
             },{
                 name: 'test2',
+                guid: 'test2guid',
                 type: 'new-type',
                 startCycle: OyaVessel.CYCLE_COOL,
                 hotCycle: OyaVessel.CYCLE_STANDARD,
@@ -242,6 +265,7 @@
 
         var updatedVessel = OyaConf.createVesselConfig(1);
         updatedVessel.name = 'test2';
+        updatedVessel.guid = 'test2guid';
         updatedVessel.enabled = false;
         updatedVessel.startCycle = OyaVessel.CYCLE_COOL;
         updatedVessel.hotCycle = OyaVessel.CYCLE_STANDARD;
@@ -260,13 +284,16 @@
 
         // vessels are not changed by update
         should.equal(vessel0, oc.vessels[0]);
-
+        should(vessel0.guid).match(/.*-.*-.*-.*-.*/);
+        ocv0 = oc.vessels[0];
         should.deepEqual(oc.toJSON(), {
             name: 'foo',
             type: 'OyaConf',
             tempUnit: 'C',
             vessels: [
-                OyaConf.createVesselConfig(0),
+                OyaConf.createVesselConfig(0, {
+                    guid: ocv0.guid,
+                }),
                 updatedVessel,
             ],
             actuators,

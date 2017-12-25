@@ -16,7 +16,10 @@
             <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
         </div>
         <div class="oya-dashboard-controls">
-            <div class="title pb-3">{{name}}</div>
+            <div class="title text-xs-center">
+                {{name}}
+                <div class='caption oya-guid' >{{guid}}</div>
+            </div>
             <oya-light :service='service'/>
             <oya-progress :service='service'/>
             <div >
@@ -88,6 +91,9 @@ export default {
         name() {
             return this.vessel && this.vessel.name;
         },
+        guid() {
+            return this.vessel && this.vessel.guid;
+        },
     },
     components: {
         OyaProgress,
@@ -128,5 +134,11 @@ export default {
     flex-flow: column nowrap;
     justify-content: space-around;
     align-items:center;
+}
+.oya-guid {
+    color: #ccc;
+}
+div:hover>div.oya-guid {
+    color: black;
 }
 </style>

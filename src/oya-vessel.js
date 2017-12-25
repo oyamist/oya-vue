@@ -2,6 +2,7 @@
     const EventEmitter = require("events");
     const winston = require("winston");
     const DbFacade = require("./db-facade");
+    const uuidv4 = require('uuid/v4');
 
     var id = 1;
 
@@ -63,6 +64,7 @@
                 },
             };
             OyaVessel.applyDelta(this, opts);
+            this.guid == null && (this.guid = uuidv4().toString());
             this._state.cycle = this.startCycle;
 
             this.nextCycle = this._state.cycle,
@@ -160,6 +162,7 @@
         toJSON() {
             return {
                 name: this.name,
+                guid: this.guid,
                 sensorExpRate: this.sensorExpRate,
                 type: 'OyaVessel',
                 enabled: this.enabled,
@@ -172,7 +175,7 @@
         }
 
         static applyDelta(vessel, delta={}) {
-            ['name', 'enabled', 'startCycle', 'hotCycle', 'coolThreshold', 'maxCycles']
+            ['name', 'enabled', 'startCycle', 'hotCycle', 'coolThreshold', 'maxCycles', 'guid']
             .forEach(prop => {
                 vessel[prop] = delta[prop] == null ? vessel[prop] : delta[prop];
             });
@@ -201,7 +204,7 @@
         onHumidity(value, field, sense) {
             winston.debug(`onHumidity ${field} ${value}`);
             this.dbfacade.isOpen && this.dbfacade
-                .logSensor(this.name, sense, value)
+                .logSensor(this.guid, sense, value)
                 .catch(e => {
                     winston.debug(e); // ignore sensor errors
                 });
@@ -218,7 +221,7 @@
         onTemp(value, field, sense) {
             winston.debug(`onTemp ${field} ${value}`);
             this.dbfacade.isOpen && this.dbfacade
-                .logSensor(this.name, sense, value)
+                .logSensor(this.guid, sense, value)
                 .catch(e => {
                     winston.debug(e); // ignore sensor errors
                 });

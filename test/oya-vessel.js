@@ -70,6 +70,7 @@
     function createTestVessel(opts) {
         var vessel = new OyaVessel({
             name: opts.name || 'unknown',
+            guid: 'testguid',
             maxCycles: opts.maxCycles,
             startCycle: opts.startCycle,
         });
@@ -92,8 +93,10 @@
         var vessel1 = new OyaVessel({
             name: 'test1a',
         });
+        should(vessel1.guid).match(/.*-.*-.*-.*-.*/);
         should.deepEqual(vessel1.toJSON(), {
             name: 'test1a',
+            guid: vessel1.guid,
             sensorExpRate: 0.01,
             type: 'OyaVessel',
             enabled: true,
@@ -108,10 +111,19 @@
         // Custom ctor
         var vessel2 = new OyaVessel({
             name: 'test1c',
+            guid: 'testguid',
             startCycle: 'fan',
         });
         should(vessel2.startCycle).equal('fan');
+        should(vessel2.guid).equal('testguid');
         should(vessel2.cycle).equal('fan');
+
+        // guid is different
+        var vessel3 = new OyaVessel({
+            name: 'test1c',
+        });
+        should(vessel3.guid).match(/.*-.*-.*-.*-.*/);
+        should(vessel1.guid).not.equal(vessel3.guid);
     });
     it ("vessel responds to emitter sensor events", function() {
         var dbfacade = new DbTest();
