@@ -90,7 +90,7 @@ export default {
             this.$http.get(url).then(res=>{
                 var resData = res.data;
                 this.linechartData.datasets = this.responseDatasets(resData, opts);
-                this.$refs.lineChart.update();
+                this.$refs.lineChar && this.$refs.lineChart.update();
             }).catch(e=>{
                 console.error(e);
             });
