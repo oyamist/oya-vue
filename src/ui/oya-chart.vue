@@ -101,7 +101,7 @@ export default {
             var chartOpts = {
                 precision: 1,
             };
-            if (opts.tempUnit === 'F') {
+            if (opts.tempUnit === 'F' && this.sensorProp.startsWith('temp')) {
                 chartOpts.scale = 1.8;
                 chartOpts.offset = 32;
             };
