@@ -144,10 +144,10 @@ export default {
             return {
                 tempInternal: "Internal/Root Temperature",
                 humidityInternal: "Internal/Root Humidity",
-                tempExternal: "External/Root Temperature",
-                humidityExternal: "External/Root Humidity",
-                tempAmbient: "Ambient/Root Temperature",
-                humidityAmbient: "Ambient/Root Humidity",
+                tempExternal: "Vessel External Temperature",
+                humidityExternal: "Vessel External Humidity",
+                tempAmbient: "Ambient Temperature",
+                humidityAmbient: "Ambient Humidity",
             };
         },
         labelHours() {
