@@ -101,9 +101,14 @@ export default {
             var chartOpts = {
                 precision: 1,
             };
-            if (opts.tempUnit === 'F' && this.sensorProp.startsWith('temp')) {
-                chartOpts.scale = 1.8;
-                chartOpts.offset = 32;
+            if (this.sensorProp.startsWith('humidity')) {
+                chartOpts.scale = 100;
+                chartOpts.offset = 0;
+            } else if (this.sensorProp.startsWith('temp')) {
+                if (opts.tempUnit === 'F') {
+                    chartOpts.scale = 1.8;
+                    chartOpts.offset = 32;
+                }
             };
 
             var data = res.data;
