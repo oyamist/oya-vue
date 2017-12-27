@@ -20,8 +20,8 @@
                 {{name}}
                 <div class='caption oya-guid' >{{guid}}</div>
             </div>
-            <oya-light :service='service'/>
-            <oya-progress :service='service'/>
+            <oya-light :service='service' v-if="showLightCycle"/>
+            <oya-progress :service='service' v-if="showPumpCycle"/>
             <div >
                 <v-switch v-show="rbService.active"
                     value input-value="true"
@@ -78,10 +78,13 @@ export default {
             var bgMist = `repeating-linear-gradient(45deg, transparent, #bbddff 3px, blue 4px)`;
             var bgAir = `repeating-linear-gradient(45deg, transparent, #ccdfff 3px, #ccdfff 4px)`;
             var lights = this.rbService.lights;
-            var light = lights && lights.white.active;
+            var light = lights && lights.white.active || !this.showLightCycle;
+            var mist = this.rbService.Mist && this.showPumpCycle;
             var bg = [];
-            this.rbService.active && bg.push(light ? bgLight : bgDark);
-            this.rbService.active && bg.push(this.rbService.Mist ? bgMist : bgAir);
+            if (this.rbService.active) {
+                bg.push(light ? bgLight : bgDark);
+                bg.push(mist ? bgMist : bgAir);
+            }
             return bg.length ? `background: ${bg.join(',')};` : '';
         },
         vessel() {
@@ -93,6 +96,12 @@ export default {
         },
         guid() {
             return this.vessel && this.vessel.guid;
+        },
+        showLightCycle() {
+            return this.apiModel && this.apiModel.lights.reduce((a,l) => a || l.pin>=0,false);
+        },
+        showPumpCycle() {
+            return this.apiModel && this.apiModel.actuators.reduce((a,ac) => a || ac.pin>=0,false);
         },
     },
     components: {

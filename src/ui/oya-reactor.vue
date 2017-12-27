@@ -13,7 +13,8 @@
     <div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
         <v-card flat >
             <v-card-text class="text-xs-center" style="position:relative">
-                <div style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
+                <div v-if="showPumpCycle"
+                    style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
                     <div style="min-width: 20em">
                         <div v-if="curCycle " class="pl-3">
                             <v-select
@@ -319,6 +320,9 @@ export default {
         },
     },
     computed: {
+        showPumpCycle() {
+            return this.apiModel && this.apiModel.actuators.reduce((a,ac) => a || ac.pin>=0,false);
+        },
         coolThreshold: {
             get: function () {
                 if (this.apiModelCopy == null) {
