@@ -49,7 +49,7 @@
             type: 'Light:spst:no'
         });
     });
-    it("DLight cycle can be specified", ()=>{
+    it("Light cycle can be specified", ()=>{
         var light = new Light({
             spectrum: Light.SPECTRUM_FULL,
             cycleStartTime: '01:30',
@@ -70,7 +70,7 @@
             type: 'Light:spst:no'
         });
     });
-    it("DCreate cycle returns an array of cycle events", ()=>{
+    it("Create cycle returns an array of cycle events", ()=>{
         var light = new Light({
             spectrum: Light.SPECTRUM_FULL,
             cycleStartTime: '01:30',
@@ -141,6 +141,29 @@
             tStart + 2*offSec + 1*onSec, tStart + 2*offSec + 2*onSec,
             tStart + 3*offSec + 2*onSec, tStart + 3*offSec + 3*onSec,
         ]);
+    });
+    it("TESTTESTcycle parameters can be expressed in different ways", ()=>{
+        var lightExpected = new Light({
+            spectrum: Light.SPECTRUM_FULL,
+            cycleStartTime: '01:30',
+            cycleDays: 3,
+            cycleOn: 14,
+            cycleOff: 4,
+        });
+        var date = new Date(2017,0,1,02,30); // Sunday Jan 1, 2017
+
+        var cycleExpected = lightExpected.createCycle(date);
+
+        var light = new Light({
+            spectrum: Light.SPECTRUM_FULL,
+            cycleStartTime: '1:30',
+            cycleDays: "3.0",
+            cycleOn: "14.0",
+            cycleOff: "4.0",
+        });
+        var cycle = light.createCycle(date);
+        should.deepEqual(cycle, cycleExpected);
+
     });
     it("runCycle(emitter,cycle) starts event emitter daemon", function(done) {
         (async function() {

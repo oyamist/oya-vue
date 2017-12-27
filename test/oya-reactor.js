@@ -17,6 +17,7 @@
     const Actuator = exports.Actuator || require("../index").Actuator;
     const OyaReactor = exports.OyaReactor || require("../index").OyaReactor;
     const OyaConf = require("../index").OyaConf;
+    const Light = require("../index").Light;
     const OyaVessel = require("../index").OyaVessel;
     const STANDARD_ON = 0.005;
     const STANDARD_OFF = 0.01;
@@ -417,6 +418,55 @@
             }
         }();
         async.next();
+    });
+    it("TESTTESTdeactivating reactor turns off everything", function(done) {
+        (async function() {
+            try {
+                var reactor = new OyaReactor('test', {
+                    apiFile: '(non-existent file)',
+                    autoActivate: false,
+                    lights: [{
+                        spectrum: Light.SPECTRUM_FULL,
+                        cycleOn: 24,
+                        cycleOff: 0,
+                        pin: 3,
+                    }],
+                    actuators: [{
+                        usage: Actuator.USAGE_MIST,
+                        pin: 2,
+                        vesselIndex: 0,
+                    }],
+                });
+                var pinstate = {};
+                reactor.emitter.on(OyaReactor.EVENT_RELAY, (v,pin) => (pinstate[pin] = v));
+                var LIGHT_WAIT = 10;
+
+                // activate turns things on
+                reactor.activate(); 
+                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),LIGHT_WAIT));
+                should(reactor.getState().Mist).equal(true);
+                should(reactor.getState().lights.white.active).equal(true);
+                should.deepEqual(pinstate, {
+                    2: true,
+                    3: true,
+                });
+
+                // deactivate turns things off
+                reactor.activate(false);
+                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),LIGHT_WAIT));
+                should(reactor.getState().Mist).equal(false);
+                should(reactor.getState().lights.white.active).equal(false);
+                should.deepEqual(pinstate, {
+                    2: false,
+                    3: false,
+                });
+
+                done();
+            } catch(err) {
+                winston.error(err.stack);
+                done(err);
+            }
+        })();
     });
     it("POST /reactor changes vessel state", function(done) {
         var async = function* () {

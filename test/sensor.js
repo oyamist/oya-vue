@@ -27,7 +27,7 @@
         var sensor = new Sensor();
         should(sensor).properties(Sensor.TYPE_NONE);
     });
-    it("TESTTESTsupports 1-wire DS18B20", function(done) {
+    it("supports 1-wire DS18B20", function(done) {
         (async function() {
             try {
                 Sensor.TYPE_DS18B20.should.properties({

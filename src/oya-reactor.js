@@ -33,7 +33,7 @@
                     this.resourceMethod("post", "sensor", this.postSensor),
                 ]),
             });
-            this.apiFile = `${srcPkg.name}.${this.name}.oya-conf`;
+            this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
             this.lights = {
                 white: {
@@ -78,9 +78,6 @@
                 vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
                     this.onActuator(OyaVessel.EVENT_MIST, value, iv);
                 });
-                vessel.emitter.on(OyaVessel.EVENT_PUMP_MANUAL, (value) => {
-                    this.onActuator(OyaVessel.EVENT_PUMP_MANUAL, value, iv);
-                });
                 vessel.emitter.on(OyaVessel.EVENT_COOL, (value) => {
                     this.onActuator(OyaVessel.EVENT_COOL, value, iv);
                 });
@@ -90,6 +87,7 @@
                 return vessel;
             });
             this.vessel = this.vessels[0];
+            this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             this.loadApiModel(this.apiFile).then(() => this.onApiModelLoaded());
         }
 
@@ -118,7 +116,14 @@
 
         onApiModelLoaded() {
             winston.info("OyaReactor api model loaded");
-            this.loadApiModel(this.apiFile).then(() => this.activate(true));
+            this.loadApiModel(this.apiFile).then(() => {
+                if (this.autoActivate) {
+                    winston.info(`api model loaded from ${this.apiFile} activate:true`);
+                    this.activate(true);
+                } else {
+                    winston.info(`api model loaded from ${this.apiFile} activate:false`);
+                }
+            });
         }
 
         updateConf(conf) {
@@ -280,8 +285,8 @@
             return req.body;
         }
 
-        activate(value) {
-            winston.info(`${value?'activating':'de-activating'} ${this.vessel.name}`);
+        activate(value=true) {
+            winston.info(`activate:${value} vessel:${this.vessel.name}`);
             this.vessel.activate(value);
             if (this.stopLight) {
                 this.stopLight.forEach(stop => stop());
@@ -291,6 +296,12 @@
                 this.stopLight = this.oyaConf.lights.forEach(l=>{
                     var cycle = l.createCycle();
                     return l.runCycle(this.emitter, cycle);
+                });
+            } else {
+                this.oyaConf.lights.forEach(l=>{ // turn lights off
+                    if (l.pin >= 0) {
+                        this.emitter.emit(l.event, false);
+                    }
                 });
             }
             return value;

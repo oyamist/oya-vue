@@ -80,9 +80,10 @@
 
         createCycle(date = new Date()) {
             var cycle = [];
-            var startSec = Number(this.cycleStartTime.substr(0,2)) * 60 * 60 +
-                Number(this.cycleStartTime.substr(3)) * 60;
-            var cycleDay = (7 + date.getDay() - this.cycleStartDay) % 7;
+            var cycleStartTime = ('0000' + this.cycleStartTime.replace(/:/,'')).substr(-4);
+            var startSec = Number(cycleStartTime.substr(0,2)) * 60 * 60 +
+                Number(cycleStartTime.substr(-2)) * 60;
+            var cycleDay = (7 + date.getDay() - Number(this.cycleStartDay)) % 7;
             var dateSec = 
                 cycleDay * 60 * 60 * 24 +
                 date.getHours() * 60 * 60 + 
@@ -91,7 +92,7 @@
             var cycleOn = Number(this.cycleOn);
             var cycleOff = Number(this.cycleOff);
             var periodSec = (cycleOn + cycleOff) * 60 * 60;
-            var daysSec = 60*60*24 * this.cycleDays;
+            var daysSec = 60*60*24 * Number(this.cycleDays);
             var nPeriods = Math.round(daysSec / periodSec);
             var cycleSec = (dateSec + periodSec - startSec) % periodSec;
             var onSec = cycleOn * 60 * 60;
