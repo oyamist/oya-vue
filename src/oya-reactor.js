@@ -49,7 +49,7 @@
                     countdown: 0,
                 },
             };
-            this.emitter = new EventEmitter(),
+            this.emitter = opts.emitter || new EventEmitter();
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.lights.white.active = !!value;
                 var whiteConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
@@ -115,14 +115,11 @@
         }
 
         onApiModelLoaded() {
-            winston.info("OyaReactor api model loaded");
             this.loadApiModel(this.apiFile).then(() => {
-                if (this.autoActivate) {
-                    winston.info(`api model loaded from ${this.apiFile} activate:true`);
-                    this.activate(true);
-                } else {
-                    winston.info(`api model loaded from ${this.apiFile} activate:false`);
-                }
+                winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} autoActivate:${this.autoActivate}`);
+                this.activate(!!this.autoActivate);
+            }).catch(e => {
+                winston.error('oya-reactor:', e.stack);
             });
         }
 
@@ -245,7 +242,7 @@
         putOyaConf(req, res, next) {
             var result = this.putApiModel(req, res, next, this.apiFile);
             if (this.vessel.isActive) {
-                winston.info("updated configuration");
+                winston.info("OyaReactor updated configuration");
                 this.activate(false);
                 setTimeout(() => this.activate(true), 500);
             }
@@ -286,7 +283,7 @@
         }
 
         activate(value=true) {
-            winston.info(`activate:${value} vessel:${this.vessel.name}`);
+            winston.info(`OyaReactor.activate:${value} vessel:${this.vessel.name}`);
             this.vessel.activate(value);
             if (this.stopLight) {
                 this.stopLight.forEach(stop => stop());

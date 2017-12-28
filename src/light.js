@@ -22,8 +22,8 @@
             this.cycleStartDay = opts.cycleStartDay || 0; // Sunday
             this.cycleStartTime = opts.cycleStartTime || '06:00';
             this.cycleDays = opts.cycleDays || 1;
-            this.cycleOn = opts.cycleOn || 12;
-            this.cycleOff = opts.cycleOff || 12;
+            this.cycleOn = opts.cycleOn == null ?  12 : opts.cycleOn;;
+            this.cycleOff = opts.cycleOff == null ? 12 : opts.cycleOff;
             this.spectrum = spectrum;
             this.desc = opts.desc || actDefault.desc || 'generic Light';
             this.pin = opts.pin || Light.NOPIN;
@@ -134,7 +134,7 @@
             }
 
             emitter.on(this.event, value => {
-                this.pin >= 0 && winston.info(`${this.name} ${value ? 'on':'off'}`);
+                this.pin >= 0 && winston.info(`Light(${this.event}) name:${this.name} value:${value}`);
             });
 
             var timers = [];

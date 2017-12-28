@@ -422,8 +422,11 @@
     it("TESTTESTdeactivating reactor turns off everything", function(done) {
         (async function() {
             try {
+                var emitter = new EventEmitter();
+                emitter.on(OyaReactor.EVENT_RELAY, (v,pin) => (pinstate[pin] = v));
                 var reactor = new OyaReactor('test', {
                     apiFile: '(non-existent file)',
+                    emitter,
                     autoActivate: false,
                     lights: [{
                         spectrum: Light.SPECTRUM_FULL,
@@ -438,28 +441,30 @@
                     }],
                 });
                 var pinstate = {};
-                reactor.emitter.on(OyaReactor.EVENT_RELAY, (v,pin) => (pinstate[pin] = v));
-                var LIGHT_WAIT = 10;
+                var EVENT_WAIT = 1;
+                
+                // wait till reactor is initialized
+                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
 
                 // activate turns things on
-                reactor.activate(); 
-                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),LIGHT_WAIT));
-                should(reactor.getState().Mist).equal(true);
-                should(reactor.getState().lights.white.active).equal(true);
+                reactor.activate();
+                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
                 should.deepEqual(pinstate, {
                     2: true,
                     3: true,
                 });
+                should(reactor.getState().Mist).equal(true);
+                should(reactor.getState().lights.white.active).equal(true);
 
                 // deactivate turns things off
                 reactor.activate(false);
-                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),LIGHT_WAIT));
-                should(reactor.getState().Mist).equal(false);
-                should(reactor.getState().lights.white.active).equal(false);
+                await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
                 should.deepEqual(pinstate, {
                     2: false,
                     3: false,
                 });
+                should(reactor.getState().Mist).equal(false);
+                should(reactor.getState().lights.white.active).equal(false);
 
                 done();
             } catch(err) {

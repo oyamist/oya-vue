@@ -70,7 +70,7 @@
             type: 'Light:spst:no'
         });
     });
-    it("Create cycle returns an array of cycle events", ()=>{
+    it("createCycle returns an array of cycle events", ()=>{
         var light = new Light({
             spectrum: Light.SPECTRUM_FULL,
             cycleStartTime: '01:30',
@@ -141,8 +141,21 @@
             tStart + 2*offSec + 1*onSec, tStart + 2*offSec + 2*onSec,
             tStart + 3*offSec + 2*onSec, tStart + 3*offSec + 3*onSec,
         ]);
+
+        var light = new Light({
+            spectrum: Light.SPECTRUM_FULL,
+            cycleOn: 24,
+            cycleOff: 0,
+        });
+        light.cycleOff.should.equal(0);
+        var cycle = light.createCycle(date);
+        should.deepEqual(cycle[0], {
+            event: Light.EVENT_LIGHT_FULL,
+            t: 0,
+            value: true,
+        });
     });
-    it("TESTTESTcycle parameters can be expressed in different ways", ()=>{
+    it("cycle parameters can be expressed in different ways", ()=>{
         var lightExpected = new Light({
             spectrum: Light.SPECTRUM_FULL,
             cycleStartTime: '01:30',

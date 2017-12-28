@@ -247,13 +247,15 @@
 
         activate(value=true) {
             if (this.isActive === value) {
-                winston.debug(`${this.name} redundant activate ignored`);
+                winston.info(`OyaVessel.activate() vessel:${this.name} redundant activate ignored`);
             } else if (value === true) {
+                winston.info(`OyaVessel.activate(true) vessel:${this.name} `);
                 this._state.active = value;
                 this._state.cycleNumber = 0;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
+                winston.info(`OyaVessel.activate(false) vessel:${this.name} `);
                 this._state.active = value;
                 this._state.countdown = 0;
                 this._state.countstart = 0;
@@ -304,9 +306,15 @@
     function updatePhase(self, value) {
         var cycle = self.cycles[self.cycle];
         self._state.countdown = 0;
-        if (!cycle || !self.isActive) {
+        if (!cycle) {
+            winston.info(`updatePhase no cycle`);
             return;
         }
+        if (!self.isActive) {
+            winston.info(`updatePhase inactive`);
+            return;
+        }
+        winston.debug(`updatePhase vessel:${self.name} mist:${value}`);
         if (value) {
             if (!self.maxCycles || self._state.cycleNumber <= self.maxCycles) {
                 self._state.cycleNumber++;
