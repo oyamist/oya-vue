@@ -1,6 +1,7 @@
 module.exports = {
     Actuator: require("./src/actuator"),
     Sensor: require("./src/sensor"),
+    Switch: require('./src/switch'),
     Light: require("./src/light"),
     DbFacade: require("./src/db-facade"),
     SystemFacade: require("./src/system-facade"),
