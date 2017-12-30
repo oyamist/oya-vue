@@ -19,13 +19,17 @@
         }();
         async.next();
     });
-    it("TESTTESTipv4Candidates() returns list of ipv4 host candidates", function(done) {
+    it("ipv4Candidates() returns list of ipv4 host candidates", function(done) {
         (async function() {
             try {
                 var onet = new OyaNet();
                 var addrs = onet.ipv4Candidates();
                 should(addrs.length).above(1);
-                addrs.forEach(addr => should(addr).match(/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/));
+                addrs.forEach(addr => {
+                    should(addr).properties(["host","port"]);
+                    should(addr.host).match(/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/);
+                    should(addr.port+"").match(/80|8080/);
+                });
                 should(addrs[0]).not.equal(addrs[addrs.length-1]);
                 done();
             } catch (e) {
@@ -33,7 +37,7 @@
             }
         })();
     });
-    it("TESTTESTprobeHost(host) returns promise resolved if given host supports OyaMist", function(done) {
+    it("probeHost(host) returns promise resolved if given host supports OyaMist", function(done) {
         (async function() {
             try {
                 var onet = new OyaNet();
@@ -73,13 +77,13 @@
             }
         })();
     });
-    it("TESTTESTidentifyHosts() returns ipv4 array of local OyaMist host identities", function(done) {
+    it("identifyHosts() returns ipv4 array of local OyaMist host identities", function(done) {
         (async function() {
             try {
                 var onet = new OyaNet();
                 var hosts = await onet.identifyHosts();
                 should(hosts).instanceOf(Array);
-                console.log('hosts', hosts);
+                should(hosts.length).above(0);
                 done();
             } catch (e) {
                 done(e);

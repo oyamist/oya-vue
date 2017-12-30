@@ -7,6 +7,7 @@
     const Light = require("./light");
     const Sensor = require("./sensor");
     const OyaVessel = require("./oya-vessel");
+    const OyaNet = require('./oya-net');
     const path = require("path");
     const rb = require("rest-bundle");
     const SENSOR_EVENTS = {
@@ -24,6 +25,7 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
+                    this.resourceMethod("get", "net/hosts/:service", this.getNetHosts),
                     this.resourceMethod("get", "sensor/data-by-hour/:field/:days/:endDate", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
@@ -314,6 +316,13 @@
                 throw new Error("invalid reactor request: " + JSON.stringify(req.body));
             }
             return result;
+        }
+
+        getNetHosts(req,res,next) {
+            var onet = new OyaNet({
+                service: req.params.service,
+            });
+            return onet.identifyHosts();
         }
 
         getState() {

@@ -128,6 +128,39 @@
         }();
         async.next();
     });
+    it("TESTTESTGET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/net/hosts/test").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    var hosts = res.body;
+                    should(hosts).instanceOf(Array);
+                    should(hosts.length).above(0);
+
+                    // we're running the test service, and the last host will be localhost
+                    var lastHost = hosts[hosts.length-1];
+                    should(lastHost).properties({
+                        ip: '127.0.0.1',
+                        package: 'oya-vue',
+                        name: 'test',
+                    });
+                    should(lastHost).properties([
+                        'freemem',
+                        'totalmem',
+                        'loadavg',
+                        'uptime',
+                        'version',
+                    ]);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
     it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
@@ -217,7 +250,7 @@
         }();
         async.next();
     });
-    it("GET /oya-conf returns OyaMist apiModel", function(done) {
+    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -229,7 +262,6 @@
                     var apiModel = res.body.apiModel;
                     should(apiModel).properties({
                         type: 'OyaConf',
-                        name: 'test',
                         tempUnit: 'F',
                     });
                     should(apiModel.vessels[0].cycles).properties([

@@ -7,6 +7,7 @@
     class OyaNet {
         constructor(opts={}) {
             this.timeout = opts.timeout || 100;
+            this.service = opts.service || 'test';
         }
 
         ipv4Candidates() {
@@ -21,10 +22,17 @@
             var addrs = ipv4.reduce( (a,iface) => {
                 var block = new Netmask(iface.address, iface.netmask);
                 block.forEach((ip,long,i) => {
-                    a.push(ip);
+                    a.push({
+                        host:ip,
+                        port: 80,
+                    });
                 });
                 return a;
             }, []);
+            addrs.push({
+                host: '127.0.0.1',
+                port: 8080,
+            });
             return addrs;
         }
 
@@ -38,7 +46,7 @@
                 host: '127.0.0.1',
                 port: 80, 
                 family: 4,
-                path: '/oyapi/identity',
+                path: `/${this.service}/identity`,
                 timeout: this.timeout,
             }, opts);
             return new Promise((resolve, reject) => {
