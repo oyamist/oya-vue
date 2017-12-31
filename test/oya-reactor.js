@@ -109,6 +109,49 @@
         should(relayValue).equal(true);
         should(relayPin).equal(4);
     });
+    it("EVENT_CYCLE_MIST sets next cycle to standard", function() {
+        var reactor = new OyaReactor();
+        reactor.activate(true);
+        should(reactor.vessel.isActive).equal(true);
+        reactor.vessel.setCycle(OyaVessel.CYCLE_COOL);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+
+        // do nothing on false
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_MIST, false);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+
+        // set cycle on true
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_MIST, true);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+    });
+    it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
+        var reactor = new OyaReactor();
+        reactor.activate(true);
+        should(reactor.vessel.isActive).equal(true);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+
+        // do nothing on false
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_COOL, false);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+
+        // set cycle on true
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_COOL, true);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+    });
+    it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
+        var reactor = new OyaReactor();
+        reactor.activate(true);
+        should(reactor.vessel.isActive).equal(true);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+
+        // do nothing on false
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_PRIME, false);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+
+        // set cycle on true
+        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_PRIME, true);
+        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_PRIME);
+    });
     it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
@@ -128,7 +171,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
+    it("GET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -250,7 +293,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
+    it("GET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -451,7 +494,7 @@
         }();
         async.next();
     });
-    it("TESTTESTdeactivating reactor turns off everything", function(done) {
+    it("deactivating reactor turns off everything", function(done) {
         (async function() {
             try {
                 var emitter = new EventEmitter();

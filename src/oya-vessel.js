@@ -291,6 +291,7 @@
             }
             //this.nextCycle = this._state.cycle;
             this.nextCycle = this.cycles[this._state.cycle].nextCycle;
+            winston.info(`oya-vessel nextCycle:${this.nextCycle}`);
             return this;
         }
 
