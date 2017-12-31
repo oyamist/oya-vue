@@ -81,6 +81,29 @@
                 </v-card>
             </v-expansion-panel-content>
             <v-expansion-panel-content>
+                <div slot="header">Switches</div>
+                <v-card>
+                    <v-card-text>
+                        <rb-dialog-row v-for="(sw,i) in mutableSwitches" :key="sw.name+i"
+                            :label="sw.name" >
+                            <v-select v-bind:items="switchEventItems" 
+                                v-model='sw.event'
+                                label="Activation Event"
+                                class="input-group"
+                                ></v-select>
+                            <v-select v-bind:items="switchActionItems" 
+                                v-model='sw.type'
+                                label="MCU Input"
+                                class="input-group"
+                                ></v-select>
+                            <v-text-field type="number" v-model="sw.pin"
+                                required :rules="pinRules(sw.pin)"
+                                label="MCU Pin" class="input-group" />
+                        </rb-dialog-row>
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
                 <div slot="header">Light cycles</div>
                 <v-card>
                     <v-card-text>
@@ -119,20 +142,20 @@
                         <rb-dialog-row :label="cycleCopy.name" 
                             v-for="(cycleCopy,i) in editCycles" :key="cycleCopy.name+i">
                             <v-text-field v-model='cycleCopy.cycle.desc'
-                                label="Description" class="input-group--focused" />
+                                label="Description" class="input-group" />
                             <v-layout>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.on' type="number"
-                                        label="On seconds" class="input-group--focused pr-1" />
+                                        label="On seconds" class="input-group pr-1" />
                                 </v-flex>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.off' type="number"
-                                        label="Off seconds" class="input-group--focused pr-1" />
+                                        label="Off seconds" class="input-group pr-1" />
                                 </v-flex>
                                 <v-select v-bind:items="cycleItems" 
                                     v-model='cycleCopy.cycle.nextCycle' 
                                     label="Next cycle"
-                                    class="input-group--focused"
+                                    class="input-group"
                                     ></v-select>
                             </v-layout>
                         </rb-dialog-row>
@@ -347,6 +370,27 @@ export default {
                 }
             },
         },
+        switchActionItems() {
+            return [{
+                text: 'Activate on MCU high input (3.3-5V)',
+                value: 'active:high',
+            },{
+                text: 'Activate on MCU low input (0V)',
+                value: 'active:low',
+            }];
+        },
+        switchEventItems() {
+            return [{
+                text: 'Prime misting system',
+                value: 'event:cycle-prime',
+            },{
+                text: 'Start cooling cycle',
+                value: 'event:cycle-cool',
+            },{
+                text: 'Start standard mist cycle',
+                value: 'event:cycle-mist',
+            }];
+        },
         cycleItems() {
             return [
                 "Cycle #1",
@@ -410,6 +454,53 @@ export default {
             var vessels = this.apiModel && this.apiModel.vessels;
             return vessels && vessels[this.vesselIndex];
         },
+        mutableSwitches( ){
+            return this.apiModelCopy && this.apiModelCopy.switches;
+        },
+        mutableActuators( ){
+            return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
+                a.vesselIndex === this.vesselIndex);
+        },
+        mutableLights( ){
+            return this.apiModelCopy && this.apiModelCopy.lights;
+        },
+        mutableSensors( ){
+            return this.apiModelCopy && this.apiModelCopy.sensors.filter(a => 
+                a.vesselIndex === this.vesselIndex);
+        },
+        actuators( ){
+            return this.apiModel && this.apiModel.actuators.filter(a => 
+                a.vesselIndex === this.vesselIndex);
+        },
+        name() {
+            return this.vessel && this.vessel.name;
+        },
+        httpErr() {
+            return this.rbResource.httpErr;
+        },
+        cycleKeys() {
+            var vessel = this.vessel;
+            if (vessel  == null) {
+                return [];
+            }
+            return Object.keys(this.vessel.cycles).sort();
+        },
+        cycles() {
+            var keys = this.cycleKeys;
+            return this.cycleKeys.map(key => this.vessel.cycles[key]);
+        },
+        editCycles() {
+            var cycleNames = Object.keys(this.vessel.cycles).sort();
+            var vessel = this.apiModelCopy.vessels[this.vesselIndex];
+            return cycleNames.map(name => {
+                return {
+                    name: name,
+                    cycle: vessel.cycles[name],
+                }
+            });
+        },
+    },
+    components: {
         mutableActuators( ){
             return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
                 a.vesselIndex === this.vesselIndex);

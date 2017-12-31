@@ -3,6 +3,7 @@
     const Actuator = require('./actuator');
     const Sensor = require('./sensor');
     const Light = require('./light');
+    const Switch = require('./switch');
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -99,6 +100,25 @@
                 this.lights.push(new Light(Light.LIGHT_BLUE));
                 this.lights.push(new Light(Light.LIGHT_RED));
             }
+            if (opts.switches) {
+                this.switches = opts.switches.map((s,i) => {
+                    return new Switch(s);
+                });
+            } else if (this.switches == null) {
+                this.switches = [];
+                this.switches.push(new Switch({
+                    name: 'Prime',
+                    event: OyaConf.EVENT_CYCLE_PRIME,
+                }));
+                this.switches.push(new Switch({
+                    name: 'Cool',
+                    event: OyaConf.EVENT_CYCLE_COOL,
+                }));
+                this.switches.push(new Switch({
+                    name: 'Mist',
+                    event: OyaConf.EVENT_CYCLE_MIST,
+                }));
+            }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
 
@@ -107,6 +127,9 @@
 
         static get TEMP_FAHRENHEIT() { return "F"; }
         static get TEMP_CENTIGRADE() { return "C"; }
+        static get EVENT_CYCLE_MIST() { return "event:cycle-mist"; }
+        static get EVENT_CYCLE_COOL() { return "event:cycle-cool"; }
+        static get EVENT_CYCLE_PRIME() { return "event:cycle-prime"; }
 
         toJSON() {
             return {
@@ -117,6 +140,7 @@
                 actuators: this.actuators,
                 sensors: this.sensors,
                 lights: this.lights,
+                switches: this.switches,
             };
         }
 

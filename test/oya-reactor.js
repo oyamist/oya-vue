@@ -117,11 +117,11 @@
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
 
         // do nothing on false
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_MIST, false);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, false);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
 
         // set cycle on true
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_MIST, true);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, true);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
     });
     it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
@@ -131,11 +131,11 @@
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // do nothing on false
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_COOL, false);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, false);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // set cycle on true
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_COOL, true);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, true);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
     });
     it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
@@ -145,11 +145,11 @@
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // do nothing on false
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_PRIME, false);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, false);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
 
         // set cycle on true
-        reactor.emitter.emit(OyaReactor.EVENT_CYCLE_PRIME, true);
+        reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_PRIME);
     });
     it("GET /identity returns reactor identity", function(done) {

@@ -73,13 +73,13 @@
                     this.emitter.emit(OyaReactor.EVENT_RELAY, value, redConf.pin);
                 }
             });
-            this.emitter.on(OyaReactor.EVENT_CYCLE_MIST, value => {
+            this.emitter.on(OyaConf.EVENT_CYCLE_MIST, value => {
                 value && this.vessel.setCycle(OyaVessel.CYCLE_STANDARD);
             });
-            this.emitter.on(OyaReactor.EVENT_CYCLE_COOL, value => {
+            this.emitter.on(OyaConf.EVENT_CYCLE_COOL, value => {
                 value && this.vessel.setCycle(OyaVessel.CYCLE_COOL);
             });
-            this.emitter.on(OyaReactor.EVENT_CYCLE_PRIME, value => {
+            this.emitter.on(OyaConf.EVENT_CYCLE_PRIME, value => {
                 value && this.vessel.setCycle(OyaVessel.CYCLE_PRIME);
             });
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
@@ -105,9 +105,6 @@
         static get EVENT_RELAY() { return "event:relay"; }
         static get EVENT_BUTTON1() { return "event:button1"; }
         static get EVENT_PUMP_OVERRIDE() { return "event:pump-override"; }
-        static get EVENT_CYCLE_MIST() { return "event:cycle-mist"; }
-        static get EVENT_CYCLE_COOL() { return "event:cycle-cool"; }
-        static get EVENT_CYCLE_PRIME() { return "event:cycle-prime"; }
         static get DEFAULT_PINS() { return [ 
             33, // Pimoroni Automation Hat relay 1
             35, // Pimoroni Automation Hat relay 2

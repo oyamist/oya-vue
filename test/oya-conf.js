@@ -5,6 +5,7 @@
     const Actuator = require("../index").Actuator;
     const Light = require("../index").Light;
     const Sensor = require("../index").Sensor;
+    const Switch = require("../index").Switch;
     const OyaVessel = require("../index").OyaVessel;
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
@@ -23,6 +24,20 @@
             new Light(Light.LIGHT_FULL),
             new Light(Light.LIGHT_BLUE),
             new Light(Light.LIGHT_RED),
+        ],
+        switches: [
+            new Switch({
+                name: 'Prime',
+                event: OyaConf.EVENT_CYCLE_PRIME,
+            }),
+            new Switch({
+                name: 'Cool',
+                event: OyaConf.EVENT_CYCLE_COOL,
+            }),
+            new Switch({
+                name: 'Mist',
+                event: OyaConf.EVENT_CYCLE_MIST,
+            }),
         ],
         actuators: [
             new Actuator({usage:Actuator.USAGE_MIST}),
@@ -147,6 +162,7 @@
             ],
             actuators,
             lights: defaultConf.lights,
+            switches: defaultConf.switches,
             sensors: [
                 defaultConf.sensors[0],
                 defaultConf.sensors[1],
@@ -299,6 +315,7 @@
             actuators,
             lights: defaultConf.lights,
             sensors: defaultConf.sensors,
+            switches: defaultConf.switches,
         });
 
     });
