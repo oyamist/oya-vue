@@ -15,7 +15,7 @@
             type: Switch.ACTIVE_HIGH,
             pin: -1,
             event: Switch.EVENT_SWITCH,
-            desc: 'Switch active:high',
+            desc: '(Switch description)',
         });
 
         // specify each property
@@ -38,7 +38,7 @@
             type: Switch.ACTIVE_LOW,
             pin: -1,
             event: Switch.EVENT_SWITCH,
-            desc: 'Switch active:low',
+            desc: '(Switch description)',
         });
     })
     it("emitTo(emitter, rawInput) emits event with mapped value", function(done) {

@@ -8,7 +8,7 @@
             // serializable toJSON() properties
             this.name = opts.name || 'Switch';
             this.type = opts.type || Switch.ACTIVE_HIGH;
-            this.desc = opts.desc || `Switch active:${this.type === Switch.ACTIVE_HIGH ? 'high' : 'low'}`;
+            this.desc = opts.desc || `(${this.name} description)`;
             this.pin = opts.pin || Switch.NOPIN;
             this.event = opts.event || Switch.EVENT_SWITCH;
         }
