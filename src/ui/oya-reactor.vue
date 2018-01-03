@@ -75,15 +75,20 @@
                             label="Name" class="input-group--focused" />
                         <v-text-field v-model='coolThreshold' 
                             type="number"
-                            :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group--focused" />
+                            :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group" />
                         <v-select v-bind:items="tempItems" 
                             v-model='apiModelCopy.tempUnit' 
                             label="Temperature unit"
-                            class="input-group--focused"
+                            class="input-group"
+                            ></v-select>
+                        <v-select v-bind:items="mcuHatItems" 
+                            v-model='apiModelCopy.mcuHat' 
+                            label="MCU hardware extension hats"
+                            class="input-group"
                             ></v-select>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
                             type="number"
-                            :label="`Sensor trend sensitivity (exponential smoothing rate)`" class="input-group--focused" />
+                            :label="`Sensor trend sensitivity (exponential smoothing rate)`" class="input-group" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -259,6 +264,7 @@ export default {
             cycleToggle: false,
             mockPhase: 0,
             cycleStartTimeMenu: false,
+            mcuHatItems: null,
         }
     },
     methods: {
@@ -584,6 +590,12 @@ export default {
         this.sensorLocations = [];
         this.$http.get(url).then(r => {
             this.sensorLocations = r.data;
+        }).catch(e => {
+            console.error("error", e);
+        });
+        var url = [this.restOrigin(), this.service, 'mcu/hats'].join('/');
+        this.$http.get(url).then(r => {
+            this.mcuHatItems = r.data;
         }).catch(e => {
             console.error("error", e);
         });

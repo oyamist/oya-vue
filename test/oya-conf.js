@@ -12,6 +12,7 @@
         name: 'test',
         type: 'OyaConf',
         tempUnit: 'F',
+        mcuHat: 'mcu-hat:none',
         vessels: [
             OyaConf.createVesselConfig(0,{
                 guid: 'testguid0',
@@ -157,6 +158,7 @@
             name: 'foo',
             type: 'OyaConf',
             tempUnit: 'C',
+            mcuHat: 'mcu-hat:none',
             vessels: [
                 updatedVessel,
             ],
@@ -306,6 +308,7 @@
             name: 'foo',
             type: 'OyaConf',
             tempUnit: 'C',
+            mcuHat: 'mcu-hat:none',
             vessels: [
                 OyaConf.createVesselConfig(0, {
                     guid: ocv0.guid,

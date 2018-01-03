@@ -18,13 +18,20 @@
             return vessel.toJSON();
         }
 
+        static get MCU_HAT_NONE() { return { text:"(none)", value:"mcu-hat:none"}; }
+        static get TEMP_FAHRENHEIT() { return "F"; }
+        static get TEMP_CENTIGRADE() { return "C"; }
+        static get EVENT_CYCLE_MIST() { return "event:cycle-mist"; }
+        static get EVENT_CYCLE_COOL() { return "event:cycle-cool"; }
+        static get EVENT_CYCLE_PRIME() { return "event:cycle-prime"; }
+
         update(opts = {}) {
             var i2cRead = opts.i2cRead;
             var i2cWrite = opts.i2cWrite;
 
             this.name = opts.name || this.name || 'test';
 
-            this.relayController = opts.relayController || "pmi-automation";
+            this.mcuHat = opts.mcuHat || OyaConf.MCU_HAT_NONE.value;
 
             if (this.vessels == null) {
                 if (opts.vessels) {
@@ -121,21 +128,17 @@
             }
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
+            this.mcuHat = opts.mcuHat || this.mcuHat || OyaConf.MCU_HAT_NONE.value;
 
             return this;
         }
-
-        static get TEMP_FAHRENHEIT() { return "F"; }
-        static get TEMP_CENTIGRADE() { return "C"; }
-        static get EVENT_CYCLE_MIST() { return "event:cycle-mist"; }
-        static get EVENT_CYCLE_COOL() { return "event:cycle-cool"; }
-        static get EVENT_CYCLE_PRIME() { return "event:cycle-prime"; }
 
         toJSON() {
             return {
                 name: this.name,
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
+                mcuHat: this.mcuHat,
                 vessels: this.vessels,
                 actuators: this.actuators,
                 sensors: this.sensors,

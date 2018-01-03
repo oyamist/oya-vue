@@ -27,6 +27,7 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
+                    this.resourceMethod("get", "mcu/hats", this.getMcuHats),
                     this.resourceMethod("get", "net/hosts/:service", this.getNetHosts),
                     this.resourceMethod("get", "sensor/data-by-hour/:field/:days/:endDate", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
@@ -195,6 +196,10 @@
 
         getOyaConf(req, res, next) {
             return this.getApiModel(req, res, next, this.apiFile);
+        }
+
+        getMcuHats(req, res, next) {
+            return [ OyaConf.MCU_HAT_NONE ];
         }
 
         getSensorDataByHour(req, res, next) {

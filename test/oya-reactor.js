@@ -152,6 +152,24 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_PRIME);
     });
+    it("GET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/mcu/hats").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should.deepEqual(res.body, [{
+                        text: '(none)',
+                        value: 'mcu-hat:none',
+                    }]);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch (e) {
+                done(e);
+            }
+        }();
+        async.next();
+    });
     it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
