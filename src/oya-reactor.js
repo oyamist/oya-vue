@@ -6,10 +6,12 @@
     const Actuator = require("./actuator");
     const Light = require("./light");
     const Sensor = require("./sensor");
+    const fs = require('fs');
     const OyaVessel = require("./oya-vessel");
     const OyaNet = require('./oya-net');
     const path = require("path");
     const rb = require("rest-bundle");
+    const DiffUpsert = require('diff-upsert').DiffUpsert;
     const SENSOR_EVENTS = {
         tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
         humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
@@ -51,6 +53,7 @@
                     countdown: 0,
                 },
             };
+            this.diffUpsert = new DiffUpsert();
             this.emitter = opts.emitter || new EventEmitter();
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.lights.white.active = !!value;
@@ -126,8 +129,10 @@
         }
 
         onApiModelLoaded() {
-            this.loadApiModel(this.apiFile).then(() => {
-                winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} autoActivate:${this.autoActivate}`);
+            this.loadApiModel(this.apiFile).then(apiModel => {
+                var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+                winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} `+
+                    `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
                 this.activate(!!this.autoActivate);
             }).catch(e => {
                 winston.error('oya-reactor:', e.stack);
@@ -251,9 +256,14 @@
         }
 
         putOyaConf(req, res, next) {
+            var confnew = JSON.parse(JSON.stringify(req.body.apiModel));
+            this.apiHash(confnew);
+            var confold = JSON.parse(JSON.stringify(this.oyaConf));
+            var delta = this.diffUpsert.diff(confnew, confold);
+            winston.info('OyaReactor.putOyaConf delta:', delta);
             var result = this.putApiModel(req, res, next, this.apiFile);
             if (this.vessel.isActive) {
-                winston.info("OyaReactor updated configuration");
+                winston.debug("OyaReactor.putOyaConf() re-activating...");
                 this.activate(false);
                 setTimeout(() => this.activate(true), 500);
             }
@@ -294,7 +304,6 @@
         }
 
         activate(value=true) {
-            winston.info(`OyaReactor.activate:${value} vessel:${this.vessel.name}`);
             this.vessel.activate(value);
             if (this.stopLight) {
                 this.stopLight.forEach(stop => stop());
