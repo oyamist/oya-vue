@@ -59,6 +59,13 @@
     </div>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
+        <v-footer fixed dark v-show="alertRestart('pin')">
+            <div style="width:100%">
+                <v-alert type=warning color="orange " v-show="alertRestart('pin')">
+                    NOTE: Pin configuration changes require system restart
+                </v-alert>
+            </div>
+        </v-footer>
         <v-expansion-panel >
             <v-expansion-panel-content>
                 <div slot="header">General</div>
@@ -255,6 +262,15 @@ export default {
         }
     },
     methods: {
+        alertRestart(key) {
+            var s1 = "";
+            s1 = this.apiModel.actuators.reduce((acc,a)=>acc+a.pin,s1);  
+            s1 = this.apiModel.switches.reduce((acc,a)=>acc+a.pin,s1);  
+            var s2 = "";
+            s2 = this.apiModelCopy.actuators.reduce((acc,a)=>acc+a.pin,s2);  
+            s2 = this.apiModelCopy.switches.reduce((acc,a)=>acc+a.pin,s2);  
+            return s1 !== s2;
+        },
         sensorAddresses(sensor) {
             return sensor.addresses.map(a => {
                 if (typeof a === "number") {
