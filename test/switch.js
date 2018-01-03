@@ -56,10 +56,12 @@
             event: evt,
             type: Switch.ACTIVE_HIGH,
         });
-        swHigh.emitTo(emitter, true);
+        var active = swHigh.emitTo(emitter, true);
+        should(active).equal(true);
         should(eCount).equal(1);
         should(eValue).equal(true);
-        swHigh.emitTo(emitter, false);
+        var active = swHigh.emitTo(emitter, false);
+        should(active).equal(false);
         should(eCount).equal(2);
         should(eValue).equal(false);
         eCount = 0;
@@ -70,10 +72,12 @@
             event: evt,
             type: Switch.ACTIVE_LOW,
         });
-        swLow.emitTo(emitter, true);
+        var active = swLow.emitTo(emitter, true);
+        should(active).equal(false);
         should(eCount).equal(1);
         should(eValue).equal(false);
-        swLow.emitTo(emitter, false);
+        var active = swLow.emitTo(emitter, false);
+        should(active).equal(true);
         should(eCount).equal(2);
         should(eValue).equal(true);
 

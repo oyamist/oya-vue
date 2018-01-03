@@ -21,6 +21,7 @@
         emitTo(emitter, rawInput) {
             var evtValue = this.type === Switch.ACTIVE_HIGH ? rawInput : !rawInput;
             emitter.emit(this.event, evtValue);
+            return evtValue;
         }
 
         toJSON() {
