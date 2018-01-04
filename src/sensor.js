@@ -24,7 +24,6 @@
             this.name = opts.name || sensorDefault.name;
             this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
             this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
-            this.pin = opts.pin == null ? sensorDefault.pin : Number(opts.pin);
             this.comm = opts.comm || sensorDefault.comm;
             this.loc = opts.loc || sensorDefault.loc;
             this.tempRegExp = opts.tempRegExp;
@@ -91,7 +90,6 @@
                 crcInit: 0xff,
                 crcPoly: 0x31,
                 vesselIndex: 0,
-                pin: -1,
                 dataRead: [
                     Sensor.BYTE_TEMP_HIGH,
                     Sensor.BYTE_TEMP_LOW,
@@ -126,7 +124,6 @@
                 cmdRead: [0x03, 0x00, 0x04],
                 crc: Sensor.CRC_MODBUS,
                 vesselIndex: 0,
-                pin: -1,
                 dataRead: [
                     Sensor.BYTE_IGNORE,
                     Sensor.BYTE_IGNORE,
@@ -154,7 +151,6 @@
                 desc: "DS18B20 Temperature 1-Wire sensor",
                 comm: Sensor.COMM_W1,
                 loc: Sensor.LOC_INTERNAL,
-                pin: -1,
                 tempRegExp: ".*\n.*t=([0-9-]+)\n.*",
                 tempScale: 0.001,
                 tempOffset: 0,
@@ -173,7 +169,6 @@
                 readTemp: null,
                 readHumidity: null,
                 addresses: [],
-                pin: -1,
                 address: null,
             }
         }
