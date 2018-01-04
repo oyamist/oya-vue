@@ -105,8 +105,9 @@
             });
             this.vessel = this.vessels[0];
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
-            this.loadApiModel(this.apiFile).then(apiModel => {
-                this.onApiModelLoaded(apiModel);
+            this.loadApiModel(this.apiFile).then(apiModelCopy => {
+                var oyaConf = this.oyaConf;
+                this.onApiModelLoaded(oyaConf);
             }).catch(e => {
                 winston.error('oya-reactor:', e.stack);
             });
@@ -137,7 +138,7 @@
 
         onApiModelLoaded(apiModel) {
             var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
-            winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} `+
+            winston.info(`OyaReactor-${this.name}.onApiModelLoaded file:${this.apiFile} `+
                 `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
             this.activate(!!this.autoActivate);
         }
@@ -149,7 +150,9 @@
                     conf && conf.vessels.forEach((v,i) => {
                         OyaVessel.applyDelta(this.vessels[i], v);
                     });
-                    resolve( that.oyaConf.update(conf) );
+                    that.oyaConf.update(conf);
+                    resolve( that.oyaConf) ;
+
                 } catch (err) {
                     winston.warn(err.stack);
                     reject(err);
@@ -159,13 +162,18 @@
 
         loadApiModel(filePath) {
             return new Promise((resolve, reject) => {
-                super.loadApiModel(filePath)
-                    .then(model => {
+                super.loadApiModel(filePath).then(model => {
                         try {
                             if (model) {
-                                this.updateConf(model).then(r=>resolve(r.toJSON())).catch(e=>reject(e));
+                                this.updateConf(model).then(r=> {
+                                    winston.info(`OyaReactor-${this.name}.loadApiModel() restoring model:${model.rbHash} `);
+                                    resolve(r.toJSON());
+                                }).catch(e=>reject(e));
                             } else if (filePath === this.apiFile) {
-                                this.updateConf().then(r=>resolve(r.toJSON())).catch(e=>reject(e));
+                                this.updateConf().then(r=> {
+                                    winston.info(`OyaReactor-${this.name}.loadApiModel() using default model `);
+                                    resolve(r.toJSON());
+                                }).catch(e=>reject(e));
                             } else {
                                 throw new Error("unknown api model:" + filePath);
                             }
