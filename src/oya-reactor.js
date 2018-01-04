@@ -36,6 +36,7 @@
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
                     this.resourceMethod("post", "app/update", this.postAppUpdate),
+                    this.resourceMethod("post", "app/restart", this.postAppRestart),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "actuator", this.postActuator),
                     this.resourceMethod("post", "sensor", this.postSensor),
@@ -343,6 +344,28 @@
                 });
             }
             return value;
+        }
+        postAppRestart(req, res, next) {
+            return new Promise((resolve,reject) => {
+                winston.info('OyaReactor.postAppRestart() restart server');
+                try {
+                    var script = exec(`shutdown -r now`, (error, stdout, stderr) => {
+                        winston.info(`${stdout}`);
+                        winston.info(`${stderr}`);
+                        if (error) {
+                            winston.error(error.stack);
+                            reject(error);
+                        } else {
+                            resolve({
+                                stdout,
+                                stderr,
+                            });
+                        }
+                    });
+                } catch(e) {
+                    reject(e);
+                }
+            });
         }
         postAppUpdate(req, res, next) {
             return new Promise((resolve,reject) => {

@@ -1,2 +1,6 @@
 #!/bin/bash
-echo -e "UPDATE\t: $0 (placeholder)"
+echo -e "UPDATE\t: $0 start "
+echo -e "UPDATE\t: this is the application mock update script"
+sleep 5
+echo -e "UPDATE\t: $0 end "
+exit 0

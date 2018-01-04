@@ -52,6 +52,7 @@
                 </div>
                 <v-btn color="primary" @click="clickSettings">Settings</v-btn>
                 <v-btn color="primary" @click="clickUpdate">Update</v-btn>
+                <v-btn color="error" @click="clickRestart">Restart</v-btn>
                 <v-dialog persistent v-model="updateToggle">
                     <v-card>
                         <v-card-title>Update application and restart system?</v-card-title>
@@ -60,8 +61,20 @@
                             <v-btn @click="cancelUpdate">Cancel</v-btn>
                         </v-card-actions>
                         <v-alert type=error v-show="alertUpdate">
-                            <div v-show="!updateStatus"> Update in progress...  </div>
+                            <div v-show="!updateStatus"> Update in progress:{{updateSeconds}} ...  </div>
                             <div v-show="updateStatus"> STATUS: {{updateStatus}} </div>
+                        </v-alert>
+                    </v-card>
+                </v-dialog>
+                <v-dialog persistent v-model="restartToggle">
+                    <v-card>
+                        <v-card-title>Restart system?</v-card-title>
+                        <v-card-actions >
+                            <v-btn color="error" :disabled="alertRestarting" @click="confirmRestart">Restart</v-btn>
+                            <v-btn @click="cancelRestart">Cancel</v-btn>
+                        </v-card-actions>
+                        <v-alert type=error v-show="alertRestarting">
+                            <div > {{restartStatus}} {{updateSeconds}} ...  </div>
                         </v-alert>
                     </v-card>
                 </v-dialog>
@@ -277,7 +290,12 @@ export default {
     data: function() {
         return {
             apiEditDialog: false,
+            alertRestarting: false,
+            restartStatus: "",
+            restartToggle: false,
             updateToggle: false,
+            msUpdate: null,
+            updateSeconds: null,
             alertUpdate: false,
             updateStatus: null,
             cycleToggle: false,
@@ -351,6 +369,36 @@ export default {
                 this.apiEdit();
             });
         },
+        clickRestart() {
+            this.restartToggle = true;
+            this.alertRestarting = false;
+            this.restartStatus = "";
+        },
+        cancelRestart() {
+            this.restartToggle = false;
+        },
+        confirmRestart() {
+            this.alertRestarting = true;
+            this.restartStatus = "Restart in progress...";
+            this.msUpdate = Date.now();
+            setInterval(()=>{
+                this.updateSeconds = ((Date.now()-this.msUpdate)/1000).toFixed(0);
+            }, 100);
+            var url = [this.restOrigin(), this.service, 'app', 'restart'].join('/');
+            this.$http.post(url, {
+                // empty
+            }).then(r => {
+                console.log('restart response:',r);
+                if (r.data.stderr) {
+                    this.restartStatus = r.data.stderr;
+                } else {
+                    this.restartToggle = false;
+                }
+            }).catch(e => {
+                this.restartStatus = `Restart failed:${e.message} ${JSON.stringify(e.response.data)}`;
+                console.error("error", e);
+            });
+        },
         clickUpdate() {
             this.updateToggle = true;
             this.updateStatus = null;
@@ -361,6 +409,10 @@ export default {
         },
         confirmUpdate() {
             this.alertUpdate = true;
+            this.msUpdate = Date.now();
+            setInterval(()=>{
+                this.updateSeconds = ((Date.now()-this.msUpdate)/1000).toFixed(0);
+            }, 100);
             var url = [this.restOrigin(), this.service, 'app', 'update'].join('/');
             this.$http.post(url, {
                 // empty
