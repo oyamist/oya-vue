@@ -50,7 +50,21 @@
                         </v-list>
                     </div>
                 </div>
-                <v-btn color="primary" @click="clickMenu">Settings</v-btn>
+                <v-btn color="primary" @click="clickSettings">Settings</v-btn>
+                <v-btn color="primary" @click="clickUpdate">Update</v-btn>
+                <v-dialog persistent v-model="updateToggle">
+                    <v-card>
+                        <v-card-title>Update application and restart system?</v-card-title>
+                        <v-card-actions v-show="!alertUpdate">
+                            <v-btn color="error" @click="confirmUpdate">Update</v-btn>
+                            <v-btn @click="cancelUpdate">Cancel</v-btn>
+                        </v-card-actions>
+                        <v-alert type=error v-show="alertUpdate">
+                            <div v-show="!updateStatus"> Update in progress...  </div>
+                            <div v-show="updateStatus"> STATUS: {{updateStatus}} </div>
+                        </v-alert>
+                    </v-card>
+                </v-dialog>
             </v-card-text>
             <v-system-bar v-if='httpErr' class='error' dark>
                 <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
@@ -59,9 +73,9 @@
     </div>
     <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
         <div slot="title">Bioreactor Settings</div>
-        <v-footer fixed dark v-show="alertRestart('pin')">
+        <v-footer fixed dark v-show="alertRestart() ">
             <div style="width:100%">
-                <v-alert type=warning color="orange " v-show="alertRestart('pin')">
+                <v-alert type=warning color="orange " v-show="alertRestart()">
                     NOTE: Pin configuration changes require system restart
                 </v-alert>
             </div>
@@ -73,17 +87,17 @@
                     <v-card-text>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
                             label="Name" class="input-group--focused" />
+                        <v-select v-bind:items="mcuHatItems" 
+                            v-model='apiModelCopy.mcuHat' 
+                            label="MCU hardware extension hats"
+                            class="input-group"
+                            ></v-select>
                         <v-text-field v-model='coolThreshold' 
                             type="number"
                             :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group" />
                         <v-select v-bind:items="tempItems" 
                             v-model='apiModelCopy.tempUnit' 
                             label="Temperature unit"
-                            class="input-group"
-                            ></v-select>
-                        <v-select v-bind:items="mcuHatItems" 
-                            v-model='apiModelCopy.mcuHat' 
-                            label="MCU hardware extension hats"
                             class="input-group"
                             ></v-select>
                         <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
@@ -261,6 +275,9 @@ export default {
     data: function() {
         return {
             apiEditDialog: false,
+            updateToggle: false,
+            alertUpdate: false,
+            updateStatus: null,
             cycleToggle: false,
             mockPhase: 0,
             cycleStartTimeMenu: false,
@@ -268,12 +285,10 @@ export default {
         }
     },
     methods: {
-        alertRestart(key) {
+        alertRestart() {
             var s1 = "";
-            s1 = this.apiModel.actuators.reduce((acc,a)=>acc+a.pin,s1);  
             s1 = this.apiModel.switches.reduce((acc,a)=>acc+a.pin,s1);  
             var s2 = "";
-            s2 = this.apiModelCopy.actuators.reduce((acc,a)=>acc+a.pin,s2);  
             s2 = this.apiModelCopy.switches.reduce((acc,a)=>acc+a.pin,s2);  
             return s1 !== s2;
         },
@@ -327,9 +342,33 @@ export default {
             var cycle = cycle || this.rbService && this.rbService.cycle;
             return vessel && cycle && vessel.cycles[cycle];
         },
-        clickMenu() {
+        clickSettings() {
             this.rbDispatch("apiLoad").then(r => {
                 this.apiEdit();
+            });
+        },
+        clickUpdate() {
+            this.updateToggle = true;
+            this.updateStatus = null;
+            this.alertUpdate = false;
+        },
+        cancelUpdate() {
+            this.updateToggle = false;
+        },
+        confirmUpdate() {
+            this.alertUpdate = true;
+            var url = [this.restOrigin(), this.service, 'app', 'update'].join('/');
+            this.$http.post(url, {
+                // empty
+            }).then(r => {
+                console.log('update response:',r);
+                if (r.data.stderr) {
+                    this.updateStatus = r.data.stderr;
+                } else {
+                    this.updateToggle = false;
+                }
+            }).catch(e => {
+                console.error("error", e);
             });
         },
         clickActuator(actuator) {

@@ -8,14 +8,14 @@
 
     class OyaVessel {
         constructor(opts = {}) {
-            const COOLTHRESHOLD = 70;
+            const COOLTHRESHOLD = (70 - 32) / 1.8;
 
             // serializable toJSON() properties
             this.name = `vessel${id++}`;
             this.enabled = true; // can be activated
             this.startCycle = OyaVessel.CYCLE_STANDARD;
             this.hotCycle = OyaVessel.CYCLE_COOL;
-            this.coolThreshold = (COOLTHRESHOLD - 32)/1.8;  
+            this.coolThreshold = COOLTHRESHOLD;
             this.sensorExpRate = opts.sensorExpRate || 0.01; // exponential average rate
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
@@ -227,12 +227,12 @@
                 });
             if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
-                    winston.info("onTemp ${field}: reverting to default cycle");
+                    winston.info("OyaVessel.onTemp() ${field}: reverting to default cycle");
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
             } else if (this.nextCycle !== this.hotCycle) {
-                winston.info("onTemp ${field}: next cycle will be cooling cycle");
+                winston.info("OyaVessel.onTemp() ${field}: next cycle will be cooling cycle");
                 this.nextCycle = this.hotCycle;
             }
             this._state[field].value = value;
@@ -247,15 +247,15 @@
 
         activate(value=true) {
             if (this.isActive === value) {
-                winston.info(`OyaVessel.activate() vessel:${this.name} redundant activate ignored`);
+                winston.debug(`OyaVessel.activate() vessel:${this.name} redundant activate ignored`);
             } else if (value === true) {
-                winston.info(`OyaVessel.activate(true) vessel:${this.name} `);
+                winston.debug(`OyaVessel.activate(true) vessel:${this.name} `);
                 this._state.active = value;
                 this._state.cycleNumber = 0;
                 this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
-                winston.info(`OyaVessel.activate(false) vessel:${this.name} `);
+                winston.debug(`OyaVessel.activate(false) vessel:${this.name} `);
                 this._state.active = value;
                 this._state.countdown = 0;
                 this._state.countstart = 0;

@@ -12,6 +12,7 @@
     const path = require("path");
     const rb = require("rest-bundle");
     const DiffUpsert = require('diff-upsert').DiffUpsert;
+    const exec = require('child_process').exec;
     const SENSOR_EVENTS = {
         tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
         humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
@@ -33,6 +34,7 @@
                     this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
+                    this.resourceMethod("post", "app/update", this.postAppUpdate),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "actuator", this.postActuator),
                     this.resourceMethod("post", "sensor", this.postSensor),
@@ -103,7 +105,11 @@
             });
             this.vessel = this.vessels[0];
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
-            this.loadApiModel(this.apiFile).then(() => this.onApiModelLoaded());
+            this.loadApiModel(this.apiFile).then(apiModel => {
+                this.onApiModelLoaded(apiModel);
+            }).catch(e => {
+                winston.error('oya-reactor:', e.stack);
+            });
         }
 
         static get EVENT_RELAY() { return "event:relay"; }
@@ -129,15 +135,11 @@
             });
         }
 
-        onApiModelLoaded() {
-            this.loadApiModel(this.apiFile).then(apiModel => {
-                var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
-                winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} `+
-                    `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
-                this.activate(!!this.autoActivate);
-            }).catch(e => {
-                winston.error('oya-reactor:', e.stack);
-            });
+        onApiModelLoaded(apiModel) {
+            var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+            winston.info(`OyaReactor.onApiModelLoaded file:${this.apiFile} `+
+                `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
+            this.activate(!!this.autoActivate);
         }
 
         updateConf(conf) {
@@ -265,7 +267,7 @@
             this.apiHash(confnew);
             var confold = JSON.parse(JSON.stringify(this.oyaConf));
             var delta = this.diffUpsert.diff(confnew, confold);
-            winston.info('OyaReactor.putOyaConf delta:', delta);
+            winston.info('OyaReactor.putOyaConf() delta:', delta);
             var result = this.putApiModel(req, res, next, this.apiFile);
             if (this.vessel.isActive) {
                 winston.debug("OyaReactor.putOyaConf() re-activating...");
@@ -328,15 +330,42 @@
             }
             return value;
         }
+        postAppUpdate(req, res, next) {
+            return new Promise((resolve,reject) => {
+                winston.info('OyaReactor.postAppUpdate() update application');
+                var scriptPath = path.join(__appdir, 'scripts', 'update');
+                try {
+                    var script = exec(`${scriptPath} -r`, (error, stdout, stderr) => {
+                        winston.info(`${stdout}`);
+                        winston.info(`${stderr}`);
+                        if (error) {
+                            winston.error(error.stack);
+                            reject(error);
+                        } else {
+                            resolve({
+                                stdout,
+                                stderr,
+                            });
+                        }
+                    });
+                } catch(e) {
+                    reject(e);
+                }
+            });
+        }
         postReactor(req, res, next) {
             var result = {};
             if (req.body.hasOwnProperty('activate')) {
+                winston.info(`OyaReactor.postReactor() activate:${req.body.activate}`);
                 result.activate = this.activate(req.body.activate);
             } else if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.setCycle(req.body.cycle);
+                winston.info(`OyaReactor.postReactor() cycle:${req.body.cycle}`);
                 result.cycle = req.body.cycle;
             } else {
-                throw new Error("invalid reactor request: " + JSON.stringify(req.body));
+                var err = new Error("OyaReactor.postReactor() invalid request: " + JSON.stringify(req.body));
+                winston.error(err.stack);
+                throw err;
             }
             return result;
         }

@@ -10,6 +10,8 @@ const DbSqlite3 = require('../index').DbSqlite3;
 const DbFacade = require('../index').DbFacade;
 const winston = require("winston");
 
+global.__appdir = path.dirname(__dirname);
+
 app.use(compression());
 
 // ensure argv is actually for script instead of mocha
