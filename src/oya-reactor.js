@@ -6,6 +6,7 @@
     const Actuator = require("./actuator");
     const Light = require("./light");
     const Sensor = require("./sensor");
+    const Switch = require("./switch");
     const fs = require('fs');
     const OyaVessel = require("./oya-vessel");
     const OyaNet = require('./oya-net');
@@ -272,8 +273,13 @@
             return Sensor.LOCATION_LIST;
         }
 
+        applyMcuHatDefaults(confnew) {
+            return confnew;
+        }
+
         putOyaConf(req, res, next) {
             var confnew = JSON.parse(JSON.stringify(req.body.apiModel));
+            confnew = this.applyMcuHatDefaults(confnew);
             this.apiHash(confnew);
             var confold = JSON.parse(JSON.stringify(this.oyaConf));
             var delta = this.diffUpsert.diff(confnew, confold);
