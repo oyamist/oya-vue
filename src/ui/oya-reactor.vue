@@ -289,8 +289,10 @@ export default {
     methods: {
         alertRestart() {
             var s1 = "";
+            s1 += this.apiModel.mcuHat;
             s1 = this.apiModel.switches.reduce((acc,a)=>acc+a.pin,s1);  
             var s2 = "";
+            s2 += this.apiModel.mcuHat;
             s2 = this.apiModelCopy.switches.reduce((acc,a)=>acc+a.pin,s2);  
             return s1 !== s2;
         },
