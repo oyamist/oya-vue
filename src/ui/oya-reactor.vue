@@ -55,8 +55,8 @@
                 <v-dialog persistent v-model="updateToggle">
                     <v-card>
                         <v-card-title>Update application and restart system?</v-card-title>
-                        <v-card-actions v-show="!alertUpdate">
-                            <v-btn color="error" @click="confirmUpdate">Update</v-btn>
+                        <v-card-actions >
+                            <v-btn color="error" :disabled="alertUpdate" @click="confirmUpdate">Update</v-btn>
                             <v-btn @click="cancelUpdate">Cancel</v-btn>
                         </v-card-actions>
                         <v-alert type=error v-show="alertUpdate">
@@ -368,6 +368,7 @@ export default {
                     this.updateToggle = false;
                 }
             }).catch(e => {
+                this.updateStatus = `Update failed:${e.message}`;
                 console.error("error", e);
             });
         },
