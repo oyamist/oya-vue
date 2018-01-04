@@ -22,9 +22,9 @@
             // serializable toJSON() properties
             this.type = type;
             this.name = opts.name || sensorDefault.name;
-            this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : opts.vesselIndex;
+            this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
             this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
-            this.pin = opts.pin == null ? sensorDefault.pin : opts.pin;
+            this.pin = opts.pin == null ? sensorDefault.pin : Number(opts.pin);
             this.comm = opts.comm || sensorDefault.comm;
             this.loc = opts.loc || sensorDefault.loc;
             this.tempRegExp = opts.tempRegExp;
@@ -32,16 +32,16 @@
             this.cmdRead = opts.cmdRead || sensorDefault.cmdRead;
             this.dataRead = opts.dataRead || sensorDefault.dataRead;
             this.address = opts.address || sensorDefault.address;
-            this.tempScale = opts.tempScale == null ? sensorDefault.tempScale : opts.tempScale;
-            this.tempOffset = opts.tempOffset == null ? sensorDefault.tempOffset : opts.tempOffset;
+            this.tempScale = opts.tempScale == null ? sensorDefault.tempScale : Number(opts.tempScale);
+            this.tempOffset = opts.tempOffset == null ? sensorDefault.tempOffset : Number(opts.tempOffset);
             this.heater = opts.heater || sensorDefault.heater;
-            this.humidityScale = opts.humidityScale == null ? sensorDefault.humidityScale : opts.humidityScale;
-            this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : opts.humidityOffset;
+            this.humidityScale = opts.humidityScale == null ? sensorDefault.humidityScale : Number(opts.humidityScale);
+            this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : Number(opts.humidityOffset);
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
-            this.readDelay = opts.readDelay || sensorDefault.readDelay;
+            this.readDelay = Number(opts.readDelay) || sensorDefault.readDelay;
             this.clear();
-            this.maxReadErrors = opts.maxReadErrors == null ? 5 : opts.maxReadErrors;
+            this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.crcInit = opts.crcInit || sensorDefault.crcInit;
@@ -91,7 +91,7 @@
                 crcInit: 0xff,
                 crcPoly: 0x31,
                 vesselIndex: 0,
-                pin: null,
+                pin: -1,
                 dataRead: [
                     Sensor.BYTE_TEMP_HIGH,
                     Sensor.BYTE_TEMP_LOW,
@@ -126,7 +126,7 @@
                 cmdRead: [0x03, 0x00, 0x04],
                 crc: Sensor.CRC_MODBUS,
                 vesselIndex: 0,
-                pin: null,
+                pin: -1,
                 dataRead: [
                     Sensor.BYTE_IGNORE,
                     Sensor.BYTE_IGNORE,
@@ -154,6 +154,7 @@
                 desc: "DS18B20 Temperature 1-Wire sensor",
                 comm: Sensor.COMM_W1,
                 loc: Sensor.LOC_INTERNAL,
+                pin: -1,
                 tempRegExp: ".*\n.*t=([0-9-]+)\n.*",
                 tempScale: 0.001,
                 tempOffset: 0,
@@ -172,6 +173,7 @@
                 readTemp: null,
                 readHumidity: null,
                 addresses: [],
+                pin: -1,
                 address: null,
             }
         }

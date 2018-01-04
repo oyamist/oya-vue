@@ -19,14 +19,14 @@
             // serializable toJSON() properties
             this.name = opts.name || actDefault.name || `${spectrum} light`;
             this.type = opts.type || actDefault.type || Light.Light_SPST_NO;
-            this.cycleStartDay = opts.cycleStartDay || 0; // Sunday
+            this.cycleStartDay = Number(opts.cycleStartDay) || 0; // Sunday
             this.cycleStartTime = opts.cycleStartTime || '06:00';
-            this.cycleDays = opts.cycleDays || 1;
-            this.cycleOn = opts.cycleOn == null ?  12 : opts.cycleOn;;
-            this.cycleOff = opts.cycleOff == null ? 12 : opts.cycleOff;
+            this.cycleDays = Number(opts.cycleDays) || 1;
+            this.cycleOn = opts.cycleOn == null ?  12 : Number(opts.cycleOn);
+            this.cycleOff = opts.cycleOff == null ? 12 : Number(opts.cycleOff);
             this.spectrum = spectrum;
             this.desc = opts.desc || actDefault.desc || 'generic Light';
-            this.pin = opts.pin || Light.NOPIN;
+            this.pin = Number(opts.pin) || Light.NOPIN;
             this.event = opts.event || actDefault.event;
         }
 

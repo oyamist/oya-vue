@@ -18,9 +18,9 @@
             this.name = opts.name || `${usage}`;
             this.type = opts.type || actDefault.type || Actuator.ACTUATOR_SPST_NO;
             this.usage = usage;
-            this.vesselIndex = opts.vesselIndex || 0;
+            this.vesselIndex = Number(opts.vesselIndex) || 0;
             this.desc = opts.desc || actDefault.desc || 'generic actuator';
-            this.pin = opts.pin || Actuator.NOPIN;
+            this.pin = Number(opts.pin) || Actuator.NOPIN;
             this.activate = opts.activate || actDefault.activate;
         }
 

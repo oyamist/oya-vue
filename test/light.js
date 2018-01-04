@@ -3,10 +3,7 @@
     const should = require("should");
     const Light = exports.Light || require("../index").Light;
     const EventEmitter = require("events");
-
-    it("Default light is full spectrum", ()=>{
-        var light = new Light();
-        should(light).properties( {
+    const defaultProps = {
             event: 'event:Full light',
             cycleStartTime: '06:00',
             cycleDays: 1,
@@ -17,6 +14,31 @@
             pin: -1,
             spectrum: 'Full spectrum',
             type: 'Light:spst:no'
+        }
+    it("Default light is full spectrum", ()=>{
+        var light = new Light();
+        should(light).properties(defaultProps);
+
+        // Strings are converted to numbers
+        var light = new Light({
+            cycleDays: "1",
+            cycleOn: "12",
+            cycleOff: "12",
+            pin: "-1",
+        });
+        should(light).properties(defaultProps);
+
+        var light = new Light({
+            cycleDays: "2",
+            cycleOn: "13",
+            cycleOff: "11",
+            pin: "1",
+        });
+        should(light).properties({
+            cycleDays: 2,
+            cycleOn: 13,
+            cycleOff: 11,
+            pin: 1,
         });
     });
     it("Light can be blue", ()=>{

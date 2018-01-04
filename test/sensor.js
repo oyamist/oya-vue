@@ -26,6 +26,10 @@
     it("default sensor is none", function() {
         var sensor = new Sensor();
         should(sensor).properties(Sensor.TYPE_NONE);
+        var sensor2 = new Sensor({
+            pin: "-1",
+        });
+        should.deepEqual(sensor, sensor2);
     });
     it("supports 1-wire DS18B20", function(done) {
         (async function() {
@@ -78,7 +82,7 @@
         should(sensor.tempOffset).equal(0);
         should(sensor.humidityScale).equal(0.001);
         should(sensor.humidityOffset).equal(0);
-        should(sensor.pin).equal(null);
+        should(sensor.pin).equal(-1);
         should(sensor.loc).equal(Sensor.LOC_EXTERNAL);
         should(sensor.comm).equal(Sensor.COMM_I2C);
         should(sensor.crc).equal(Sensor.CRC_MODBUS);

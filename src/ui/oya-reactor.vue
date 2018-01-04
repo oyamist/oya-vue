@@ -100,9 +100,6 @@
                             label="Temperature unit"
                             class="input-group"
                             ></v-select>
-                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
-                            type="number"
-                            :label="`Sensor trend sensitivity (exponential smoothing rate)`" class="input-group" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -211,6 +208,11 @@
                 <div slot="header">Sensors</div>
                 <v-card>
                     <v-card-text>
+                        <rb-dialog-row label="All Sensors">
+                            <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
+                            type="number"
+                            :label="`Trending sensitivity (exponential smoothing rate)`" class="input-group" />
+                        </rb-dialog-row>
                         <rb-dialog-row v-for="(sensor,i) in mutableSensors" :key="name+i"
                             :label="`Sensor #${i+1}`" >
                             <v-select

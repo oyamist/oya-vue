@@ -278,7 +278,6 @@
 
         putOyaConf(req, res, next) {
             var confnew = JSON.parse(JSON.stringify(req.body.apiModel));
-            confnew = this.applyMcuHatDefaults(confnew);
             this.apiHash(confnew);
             var confold = JSON.parse(JSON.stringify(this.oyaConf));
             var delta = this.diffUpsert.diff(confnew, confold);
