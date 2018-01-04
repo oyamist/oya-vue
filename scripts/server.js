@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const path = require("path");
+const winston = require("winston");
 const compression = require("compression");
 const express = require('express');
 const app = module.exports = express();
@@ -8,7 +9,6 @@ const rb = require("rest-bundle");
 const OyaReactor = require("../index").OyaReactor;
 const DbSqlite3 = require('../index').DbSqlite3;
 const DbFacade = require('../index').DbFacade;
-const winston = require("winston");
 
 global.__appdir = path.dirname(__dirname);
 

@@ -141,8 +141,7 @@
             var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
             // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
             // been extended. Difference will persist until model is saved
-            winston.info(`OyaReactor-${this.name}.onApiModelLoaded file:${this.apiFile} `+
-                `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
+            winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
             this.activate(!!this.autoActivate);
         }
 
@@ -169,12 +168,12 @@
                         try {
                             if (model) {
                                 this.updateConf(model).then(r=> {
-                                    winston.info(`OyaReactor-${this.name}.loadApiModel() restoring model:${model.rbHash} `);
+                                    winston.info(`OyaReactor-${this.name}.loadApiModel() rbHash:${model.rbHash} `);
                                     resolve(r.toJSON());
                                 }).catch(e=>reject(e));
                             } else if (filePath === this.apiFile) {
                                 this.updateConf().then(r=> {
-                                    winston.info(`OyaReactor-${this.name}.loadApiModel() using default model `);
+                                    winston.info(`OyaReactor-${this.name}.loadApiModel() model:default `);
                                     resolve(r.toJSON());
                                 }).catch(e=>reject(e));
                             } else {
