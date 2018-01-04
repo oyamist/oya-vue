@@ -138,12 +138,12 @@
                 name: this.name,
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
-                mcuHat: this.mcuHat,
                 vessels: this.vessels,
                 actuators: this.actuators,
                 sensors: this.sensors,
                 lights: this.lights,
                 switches: this.switches,
+                mcuHat: this.mcuHat,
             };
         }
 

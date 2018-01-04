@@ -138,6 +138,8 @@
 
         onApiModelLoaded(apiModel) {
             var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+            // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
+            // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onApiModelLoaded file:${this.apiFile} `+
                 `autoActivate:${this.autoActivate} rbHash:${rbHash}`);
             this.activate(!!this.autoActivate);
