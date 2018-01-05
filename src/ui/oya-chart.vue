@@ -114,9 +114,9 @@ export default {
             var data = res.data;
             data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
             var dataMap = {};
-            console.log("palette",this.palette);
             data.forEach(d=>{
                 var date = d.hr.substr(0,10);
+                var hr = d.hr.substr(-4);
                 if (dataMap[date] == null) {
                     var n = ds.length;
                     dataMap[date] = {
@@ -129,10 +129,12 @@ export default {
                         pointBorderColor: LineChart.colors(this.palette,n),
                         backgroundColor: 'transparent',
                         spanGaps,
+                        hours:[],
                     }
                     ds.unshift(dataMap[date]);
                 }
                 dataMap[date].data.unshift(d);
+                dataMap[date].hours.push(hr);
             });
             ds = ds.reverse();
             ds.forEach(d=>(d.data = dataByHour(d.data, chartOpts)));

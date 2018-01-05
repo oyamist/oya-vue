@@ -612,6 +612,15 @@
         }();
         async.next();
     });
+    it ("TESTTEST normalizeDataByHour fills in missing data", function() {
+        var reactor =  new OyaReactor();
+        var data = [
+            {"hr":"1999-12-08 1300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
+            {"hr":"1999-12-08 1200","vavg":18.074496982104563,"vmin":17.99795274789553,"vmax":18.104765901172403},
+        ];
+        var normData = reactor.normalizeDataByHour(data);
+        console.log('normData',normData);
+    });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
         testReactor().vessels[0].activate(false);

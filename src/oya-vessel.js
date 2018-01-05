@@ -282,6 +282,12 @@
         }
 
         setCycle(value) {
+            var nextCycle = this.cycles[this._state.cycle].nextCycle;
+            if (value === this.cycle) {
+                winston.debug(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle} no change`);
+            } else {
+                winston.info(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle}`);
+            }
             if (this.isActive) {
                 this.activate(false);
                 this._state.cycle = value;
@@ -289,8 +295,7 @@
             } else {
                 this._state.cycle = value;
             }
-            this.nextCycle = this.cycles[this._state.cycle].nextCycle;
-            winston.info(`OyaVessel.setCycle() cycle:${value} nextCycle:${this.nextCycle}`);
+            this.nextCycle = nextCycle;
             return this;
         }
 
