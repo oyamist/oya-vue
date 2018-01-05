@@ -282,7 +282,7 @@
         }
 
         setCycle(value) {
-            var nextCycle = this.cycles[this._state.cycle].nextCycle;
+            var nextCycle = this.cycles[value].nextCycle;
             if (value === this.cycle) {
                 winston.debug(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle} no change`);
             } else {

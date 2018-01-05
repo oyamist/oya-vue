@@ -9,7 +9,6 @@
     const FAN_ON = 2*STANDARD_ON;
     const FAN_OFF = 2*STANDARD_OFF;
     const PRIME_ON = 3*STANDARD_ON;
-    const SETTLE_MS = 5;
     class DbTest extends DbFacade {
         constructor(opts={}) {
             super(opts);
