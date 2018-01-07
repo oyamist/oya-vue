@@ -9,6 +9,10 @@
             <div slot="header">Charts</div>
             <oya-chart-panel service='test'/>
         </v-expansion-panel-content>
+        <v-expansion-panel-content>
+            <div slot="header">Netowrk</div>
+            <oya-network />
+        </v-expansion-panel-content>
     </v-expansion-panel>
 
 </template><script>

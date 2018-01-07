@@ -27,19 +27,20 @@
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
-                    this.resourceMethod("get", "oya-conf", this.getOyaConf),
-                    this.resourceMethod("put", "oya-conf", this.putOyaConf),
                     this.resourceMethod("get", "mcu/hats", this.getMcuHats),
                     this.resourceMethod("get", "net/hosts/:service", this.getNetHosts),
-                    this.resourceMethod("get", "sensor/data-by-hour/:field/:days/:endDate", this.getSensorDataByHour),
+                    this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
-                    this.resourceMethod("get", "sensor/types", this.getSensorTypes),
+                    this.resourceMethod("get", "sensor/data-by-hour/:field/:days/:endDate", this.getSensorDataByHour),
                     this.resourceMethod("get", "sensor/locations", this.getSensorLocations),
-                    this.resourceMethod("post", "app/update", this.postAppUpdate),
-                    this.resourceMethod("post", "app/restart", this.postAppRestart),
-                    this.resourceMethod("post", "reactor", this.postReactor),
+                    this.resourceMethod("get", "sensor/types", this.getSensorTypes),
                     this.resourceMethod("post", "actuator", this.postActuator),
+                    this.resourceMethod("post", "app/restart", this.postAppRestart),
+                    this.resourceMethod("post", "app/update", this.postAppUpdate),
+                    this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "sensor", this.postSensor),
+                    this.resourceMethod("put", "oya-conf", this.putOyaConf),
+
                 ]),
             });
             this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
@@ -442,6 +443,17 @@
                 service: req.params.service,
             });
             return onet.identifyHosts();
+        }
+
+        getIdentity(req, res, next) {
+                console.log('getidentity', this.vessel.name);
+            return new Promise((resolve, reject) => {
+                var r = super.getIdentity(req,res,next);
+                r.vessel = this.vessel.name;
+                resolve(r);
+            }).catch(e => {
+                reject(e);
+            });
         }
 
         getState() {
