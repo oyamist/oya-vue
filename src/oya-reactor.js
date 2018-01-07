@@ -446,7 +446,6 @@
         }
 
         getIdentity(req, res, next) {
-                console.log('getidentity', this.vessel.name);
             return new Promise((resolve, reject) => {
                 var r = super.getIdentity(req,res,next);
                 r.vessel = this.vessel.name;
