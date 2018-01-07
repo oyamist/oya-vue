@@ -129,6 +129,7 @@
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.mcuHat = opts.mcuHat || this.mcuHat || OyaConf.MCU_HAT_NONE.value;
+            this.hostTimeout = opts.hostTimeout == null ? 500 : opts.hostTimeout;
 
             return this;
         }
@@ -144,6 +145,7 @@
                 lights: this.lights,
                 switches: this.switches,
                 mcuHat: this.mcuHat,
+                hostTimeout: this.hostTimeout,
             };
         }
 

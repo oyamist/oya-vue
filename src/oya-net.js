@@ -6,7 +6,7 @@
 
     class OyaNet {
         constructor(opts={}) {
-            this.timeout = opts.timeout || 100;
+            this.timeout = opts.timeout || 500;
             this.service = opts.service || 'test';
         }
 

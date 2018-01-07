@@ -28,6 +28,7 @@
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
                     this.resourceMethod("get", "mcu/hats", this.getMcuHats),
+                    this.resourceMethod("get", "net/hosts", this.getNetHosts),
                     this.resourceMethod("get", "net/hosts/:service", this.getNetHosts),
                     this.resourceMethod("get", "oya-conf", this.getOyaConf),
                     this.resourceMethod("get", "sensor/data-by-hour/:field", this.getSensorDataByHour),
@@ -440,7 +441,7 @@
 
         getNetHosts(req,res,next) {
             var onet = new OyaNet({
-                service: req.params.service,
+                service: req.params.service || this.name,
             });
             return onet.identifyHosts();
         }

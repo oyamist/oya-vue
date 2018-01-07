@@ -193,6 +193,31 @@
         var async = function* () {
             try {
                 var app = testInit();
+
+                // default service
+                var response = yield supertest(app).get("/test/net/hosts").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    var hosts = res.body;
+                    should(hosts).instanceOf(Array);
+                    should(hosts.length).above(0);
+
+                    // we're running the test service, and the last host will be localhost
+                    var lastHost = hosts[hosts.length-1];
+                    should(lastHost).properties({
+                        ip: '127.0.0.1',
+                        package: 'oya-vue',
+                        name: 'test',
+                    });
+                    should(lastHost).properties([
+                        'freemem',
+                        'totalmem',
+                        'loadavg',
+                        'uptime',
+                        'version',
+                    ]);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+
+                // custom service
                 var response = yield supertest(app).get("/test/net/hosts/test").expect((res) => {
                     res.statusCode.should.equal(200);
                     var hosts = res.body;
