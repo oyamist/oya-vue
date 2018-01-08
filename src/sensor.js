@@ -64,7 +64,7 @@
         static get EVENT_HUMIDITY_MAP() {
             return {
                 [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_HUMIDITY_EXTERNAL,
+                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_HUMIDITY_CANOPY,
                 [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
             };
         }
@@ -72,7 +72,7 @@
         static get EVENT_TEMP_MAP() {
             return {
                 [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
-                [Sensor.LOC_EXTERNAL]: OyaVessel.SENSE_TEMP_EXTERNAL,
+                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_TEMP_CANOPY,
                 [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
             };
         }
@@ -173,7 +173,7 @@
             }
         }
         static get LOC_INTERNAL() { return "internal"; }
-        static get LOC_EXTERNAL() { return "external"; }
+        static get LOC_CANOPY() { return "canopy"; }
         static get LOC_AMBIENT() { return "ambient"; }
         static get LOC_NONE() { return "none"; }
         static get COMM_I2C() { return "I\u00B2C"; }
@@ -201,8 +201,8 @@
                 id: Sensor.LOC_INTERNAL,
                 desc: "Vessel internal (at plant roots)",
             }, {
-                id: Sensor.LOC_EXTERNAL,
-                desc: "Vessel external (at plant stem)",
+                id: Sensor.LOC_CANOPY,
+                desc: "Plant canopy",
             }, {
                 id: Sensor.LOC_AMBIENT,
                 desc: "Ambient (shaded, 5' above earth)",

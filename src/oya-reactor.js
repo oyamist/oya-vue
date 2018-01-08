@@ -267,13 +267,13 @@
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));
-                    } else if (req.params.field === 'tempExternal') {
-                        var evt = OyaVessel.SENSE_TEMP_EXTERNAL;
+                    } else if (req.params.field === 'tempCanopy') {
+                        var evt = OyaVessel.SENSE_TEMP_CANOPY;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));
-                    } else if (req.params.field === 'humidityExternal') {
-                        var evt = OyaVessel.SENSE_HUMIDITY_EXTERNAL;
+                    } else if (req.params.field === 'humidityCanopy') {
+                        var evt = OyaVessel.SENSE_HUMIDITY_CANOPY;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));

@@ -33,7 +33,7 @@
                 unit: "C",
                 value: null,
             },
-            tempExternal: {
+            tempCanopy: {
                 avg1: null,
                 avg2: null,
                 unit: "C",
@@ -51,7 +51,7 @@
                 unit: "%RH",
                 value: null,
             },
-            humidityExternal: {
+            humidityCanopy: {
                 avg1: null,
                 avg2: null,
                 unit: "%RH",

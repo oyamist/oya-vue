@@ -57,7 +57,7 @@
     });
     it("ctor defaults can be overridden", function() {
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-            loc: Sensor.LOC_EXTERNAL,
+            loc: Sensor.LOC_CANOPY,
         }));
         should(sensor.name).equal("AM2315");
         should(sensor.type).equal(Sensor.TYPE_AM2315.type);
@@ -78,7 +78,7 @@
         should(sensor.tempOffset).equal(0);
         should(sensor.humidityScale).equal(0.001);
         should(sensor.humidityOffset).equal(0);
-        should(sensor.loc).equal(Sensor.LOC_EXTERNAL);
+        should(sensor.loc).equal(Sensor.LOC_CANOPY);
         should(sensor.comm).equal(Sensor.COMM_I2C);
         should(sensor.crc).equal(Sensor.CRC_MODBUS);
         should(sensor.vesselIndex).equal(0);

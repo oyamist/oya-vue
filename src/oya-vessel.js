@@ -32,7 +32,7 @@
                     avg2: null,
                     unit: "C",
                 },
-                tempExternal: {
+                tempCanopy: {
                     value: null,
                     avg1: null,
                     avg2: null,
@@ -50,7 +50,7 @@
                     avg2: null,
                     unit: "%RH",
                 },
-                humidityExternal: {
+                humidityCanopy: {
                     value: null,
                     avg1: null,
                     avg2: null,
@@ -88,16 +88,16 @@
             });
             this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (v) => 
                 this.onTemp(v,'tempInternal',OyaVessel.SENSE_TEMP_INTERNAL));
-            this.emitter.on(OyaVessel.SENSE_TEMP_EXTERNAL, (v) => 
-                this.onTemp(v,'tempExternal',OyaVessel.SENSE_TEMP_EXTERNAL));
+            this.emitter.on(OyaVessel.SENSE_TEMP_CANOPY, (v) => 
+                this.onTemp(v,'tempCanopy',OyaVessel.SENSE_TEMP_CANOPY));
             this.emitter.on(OyaVessel.SENSE_TEMP_AMBIENT, (v) => 
                 this.onTemp(v,'tempAmbient',OyaVessel.SENSE_TEMP_AMBIENT));
             this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (v) => 
                 this.onHumidity(v,'humidityInternal', OyaVessel.SENSE_HUMIDITY_INTERNAL));
             this.emitter.on(OyaVessel.SENSE_HUMIDITY_AMBIENT, (v) => 
                 this.onHumidity(v,'humidityAmbient', OyaVessel.SENSE_HUMIDITY_AMBIENT));
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_EXTERNAL, (v) => 
-                this.onHumidity(v,'humidityExternal', OyaVessel.SENSE_HUMIDITY_EXTERNAL));
+            this.emitter.on(OyaVessel.SENSE_HUMIDITY_CANOPY, (v) => 
+                this.onHumidity(v,'humidityCanopy', OyaVessel.SENSE_HUMIDITY_CANOPY));
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
@@ -151,10 +151,10 @@
         static get EVENT_PRIME() { return "event:Prime"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
-        static get SENSE_TEMP_EXTERNAL() { return "sense: temp-external"; }
+        static get SENSE_TEMP_CANOPY() { return "sense: temp-canopy"; }
         static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
         static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
-        static get SENSE_HUMIDITY_ExTERNAL() { return "sense: humidity-external"; }
+        static get SENSE_HUMIDITY_CANOPY() { return "sense: humidity-canopy"; }
         static get SENSE_HUMIDITY_AMBIENT() { return "sense: humidity-ambient"; }
         static get SENSE_PH() { return "sense: pH"; }
         static get SENSE_PPM() { return "sense: ppm"; }

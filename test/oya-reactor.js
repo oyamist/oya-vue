@@ -323,7 +323,7 @@
                 var response = yield supertest(app).get("/test/sensor/locations").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body[0]).properties({ id: 'internal' });
-                    should(res.body[1]).properties({ id: 'external' });
+                    should(res.body[1]).properties({ id: 'canopy' });
                     should(res.body[2]).properties({ id: 'ambient' });
                     should(res.body[3]).properties({ id: 'none' });
                     should(res.body.length).equal(4);

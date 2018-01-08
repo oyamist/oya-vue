@@ -23,7 +23,7 @@
                     <a :href="link(hosts.item)" > {{ hosts.item.version }} </a>
                 </td>
                 <td class="text-xs-left">
-                    <a :href="link(hosts.item)" > {{ hosts.item.hostname }} </a>
+                    <a :href="link(hosts.item)" slot="activator"> {{ hosts.item.hostname }} </a>
                 </td>
                 <td class="text-xs-left">
                     <a :href="link(hosts.item)" > {{ hosts.item.ip }} </a>
