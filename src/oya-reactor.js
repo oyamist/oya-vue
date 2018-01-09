@@ -63,25 +63,13 @@
             this.diffUpsert = new DiffUpsert();
             this.emitter = opts.emitter || new EventEmitter();
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
-                this.lights.white.active = !!value;
-                var whiteConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
-                if (whiteConf && whiteConf.pin >= 0) {
-                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, whiteConf.pin);
-                }
+                this.onLight(Light.SPECTRUM_FULL, value, 'white');
             });
             this.emitter.on(Light.EVENT_LIGHT_BLUE, value => {
-                this.lights.blue.active = !!value;
-                var blueConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
-                if (blueConf && blueConf.pin >= 0) {
-                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, blueConf.pin);
-                }
+                this.onLight(Light.SPECTRUM_BLUE, value, 'blue');
             });
             this.emitter.on(Light.EVENT_LIGHT_RED, value => {
-                this.lights.red.active = !!value;
-                var redConf = this.oyaConf.lights.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
-                if (redConf && redConf.pin >= 0) {
-                    this.emitter.emit(OyaReactor.EVENT_RELAY, value, redConf.pin);
-                }
+                this.onLight(Light.SPECTRUM_RED, value, 'red');
             });
             this.emitter.on(OyaConf.EVENT_CYCLE_MIST, value => {
                 value && this.vessel.setCycle(OyaVessel.CYCLE_STANDARD);
@@ -126,6 +114,14 @@
             36, // Pimoroni Automation Hat relay 3
         ]};
 
+        onLight(spectrum, value, key) {
+            var light = this.oyaConf.lights.filter(l=>l.spectrum === spectrum)[0];
+            light && this.emitter.on(light.event, value => {
+                winston.info(`OyaReactor-${this.name}.onLight() ${spectrum} value:${value} `);
+                this.lights[key].active = !!value;
+                light.pin >= 0 && this.emitter.emit(OyaReactor.EVENT_RELAY, value, light.pin);
+            });
+        }
         onActuator(event, value, vesselIndex) {
             var vessel = this.vessels[vesselIndex];
             this.oyaConf.actuators.map((a,ia) => {
