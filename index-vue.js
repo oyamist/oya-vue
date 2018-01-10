@@ -1,15 +1,17 @@
-import OyaReactor from "./src/ui/oya-reactor.vue";
-import OyaPlant from "./src/ui/oya-plant.vue";
 import OyaChart from "./src/ui/oya-chart.vue";
 import OyaChartPanel from "./src/ui/oya-chart-panel.vue";
+import OyaHealth from "./src/ui/oya-health.vue";
 import OyaLight from "./src/ui/oya-light.vue";
-import OyaSensor from "./src/ui/oya-sensor.vue";
-import OyaProgress from "./src/ui/oya-progress.vue";
 import OyaNetwork from "./src/ui/oya-network.vue";
+import OyaPlant from "./src/ui/oya-plant.vue";
+import OyaProgress from "./src/ui/oya-progress.vue";
+import OyaReactor from "./src/ui/oya-reactor.vue";
+import OyaSensor from "./src/ui/oya-sensor.vue";
 
 var components = {
     OyaChart,
     OyaChartPanel,
+    OyaHealth,
     OyaLight,
     OyaNetwork,
     OyaPlant,

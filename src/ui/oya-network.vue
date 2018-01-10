@@ -19,6 +19,9 @@
                 <td class="text-xs-left" >
                     <a :href="link(hosts.item)" > {{ hosts.item.vessel }} </a>
                 </td>
+                <td class="text-xs-left" >
+                    <a :href="link(hosts.item)" > <oya-health :host="hosts.item.ip"/> </a>
+                </td>
                 <td class="text-xs-left">
                     <a :href="link(hosts.item)" > {{ hosts.item.version }} </a>
                 </td>
@@ -79,6 +82,7 @@ export default {
         headers() {
             return [
                 { text: 'Vessel', align: 'left', value: 'vessel' },
+                { text: 'Status', align: 'left', value: 'health' },
                 { text: 'Version', align: 'left', value: 'version' },
                 { text: 'Host', align: 'left', value: 'hostname' },
                 { text: 'Address', align: 'left', value: 'ip' },

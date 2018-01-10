@@ -241,6 +241,21 @@
             return data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
         }
 
+        health() {
+            // true: nominal
+            // false: error
+            // Error(): error
+            // null: not configured
+            var result = {
+                active: this.vessel.isActive,
+            }
+            this.oyaConf.sensors.forEach(sensor => {
+                sensor.loc !== Sensor.LOC_NONE && Object.assign(result, sensor.health());
+            });
+
+            return result;
+        }
+
         getSensorDataByHour(req, res, next) {
             return new Promise((resolve, reject) => {
                 try {
@@ -451,6 +466,7 @@
             return new Promise((resolve, reject) => {
                 var r = super.getIdentity(req,res,next);
                 r.vessel = this.vessel.name;
+                r.health = this.health();
                 resolve(r);
             }).catch(e => {
                 reject(e);
@@ -458,27 +474,33 @@
         }
 
         getState() {
-            var lightConf = this.oyaConf.lights;
-            var white = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
-            var blue = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
-            var red = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
-            var active = this.vessel.isActive;
-            lightConf.forEach(l => {
-                if (l.spectrum === Light.SPECTRUM_FULL) {
-                    this.lights.white.countdown = l.countdown();
-                    this.lights.white.active = active && Light.isLightOnAt(l);
-                } else if (l.spectrum === Light.SPECTRUM_BLUE) {
-                    this.lights.blue.countdown = l.countdown();
-                    this.lights.blue.active = active && Light.isLightOnAt(l);
-                } else if (l.spectrum === Light.SPECTRUM_RED) {
-                    this.lights.red.countdown = l.countdown();
-                    this.lights.red.active = active && Light.isLightOnAt(l);
-                }
-            });
-            return Object.assign(this.vessel.state, {
-                api: 'oya-reactor',
-                lights: this.lights,
-            });
+            try {
+                var lightConf = this.oyaConf.lights;
+                var white = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
+                var blue = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
+                var red = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
+                var active = this.vessel.isActive;
+                lightConf.forEach(l => {
+                    if (l.spectrum === Light.SPECTRUM_FULL) {
+                        this.lights.white.countdown = l.countdown();
+                        this.lights.white.active = active && Light.isLightOnAt(l);
+                    } else if (l.spectrum === Light.SPECTRUM_BLUE) {
+                        this.lights.blue.countdown = l.countdown();
+                        this.lights.blue.active = active && Light.isLightOnAt(l);
+                    } else if (l.spectrum === Light.SPECTRUM_RED) {
+                        this.lights.red.countdown = l.countdown();
+                        this.lights.red.active = active && Light.isLightOnAt(l);
+                    }
+                });
+                return Object.assign(this.vessel.state, {
+                    api: 'oya-reactor',
+                    lights: this.lights,
+                    health: this.health(),
+                });
+            } catch (e) {
+                winston.error(`OyaReactor-${this.name}.getState()`, e.stack);
+                return e;
+            }
         }
 
 

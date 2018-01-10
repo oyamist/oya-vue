@@ -39,6 +39,8 @@
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readDelay = Number(opts.readDelay) || sensorDefault.readDelay;
+            this.lastRead = opts.lastRead;
+            this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.clear();
             this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.addresses = opts.addresses || [];
@@ -252,7 +254,7 @@
 
         heat(enable) {
             if (this.heater == null) {
-                return Promise.reject(new Error("Sensor has no heater"));
+                return Promise.reject(new Error("Sensor ${this.key}has no heater"));
             }
             return new Promise((resolve, reject) => {
                 try {
@@ -262,6 +264,10 @@
                     reject(err);
                 }
             });
+        }
+
+        get key() {
+            return `${this.type}@${this.loc}`;
         }
 
         write(cmd) {
@@ -292,7 +298,7 @@
                                 resolve(data);
                             } catch(e) {
                                 if (++this.readErrors >= this.maxReadErrors) {
-                                    this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors) [E1]`);
+                                    this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E1]`);
                                 }
                                 reject(e);
                             }
@@ -316,11 +322,31 @@
                     }
                 } catch (e) {
                     if (++this.readErrors >= this.maxReadErrors) {
-                        this.fault = new Error(`disabled sensor ${this.name}/${this.loc} (too many errors) [E2]`);
+                        this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E2]`);
                     }
                     reject(e);
                 }
             });
+        }
+
+        health() {
+            var key = `${this.type}@${this.loc}`;
+            if (this.loc === Sensor.LOC_NONE) {
+                var value = null;
+            } else if (this.fault instanceof Error) {
+                var value = this.fault.message;
+            } else if (this.fault) {
+                var value = this.fault;
+            } else if (this.lastRead == null) {
+                var value = `Sensor is completely unresponsive`;
+            } else if ((Date.now() - this.lastRead.getTime()) > this.healthTimeout * 1000) {
+                var value = `Sensor is failing. Last read:${new Date(this.lastRead).toISOString()}`;
+            } else {
+                var value = true;
+            }
+            return {
+                [key]: value,
+            }
         }
 
         clear() {

@@ -55,6 +55,68 @@
             }
         })();
     });
+    it("health() returns health object", function(done) {
+        (async function() {
+            try {
+                var sensor = new Sensor();
+                var healthTimeout = 1; // seconds
+
+                // sensor with no location is null
+                should.deepEqual(sensor.health(), {
+                    "none@none": null,
+                });
+
+                // sensor with no data ever is dead
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+                    loc: Sensor.LOC_CANOPY,
+                    healthTimeout,
+                }));
+                should.deepEqual(sensor.health(), {
+                    "AM2315@canopy": "Sensor is completely unresponsive",
+                });
+
+                // healthy sensor has recently read data
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+                    loc: Sensor.LOC_CANOPY,
+                    healthTimeout,
+                    lastRead: new Date(Date.now() - healthTimeout/2 * 1000),
+                }));
+                should.deepEqual(sensor.health(), {
+                    "AM2315@canopy": true,
+                });
+
+                // unhealthy sensor has stale data
+                var lastRead = new Date(Date.now() - (healthTimeout * 1000 + 1));
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+                    loc: Sensor.LOC_CANOPY,
+                    healthTimeout,
+                    lastRead,
+                }));
+                should(sensor.health(), {
+                    "AM2315@canopy": `Sensor is failing. Last read:${lastRead.toISOString()}`,
+                });
+
+                // a read fault is fatal
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+                    loc: Sensor.LOC_CANOPY,
+                    healthTimeout,
+                    maxReadErrors: 2,
+                }));
+                try { var promise = await sensor.read(); } catch(e) { /* ignore */ }
+                should.deepEqual(sensor.health(), {
+                    "AM2315@canopy": "Sensor is completely unresponsive",
+                });
+                try { var promise = await sensor.read(); } catch(e) { /* ignore */ }
+                should.deepEqual(sensor.health(), {
+                    "AM2315@canopy": "Sensor AM2315@canopy disabled (too many errors) [E2]",
+                });
+                done();
+            } catch(e) {
+                winston.error(e.stack);
+                done(e);
+            }
+        })();
+    });
     it("ctor defaults can be overridden", function() {
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
             loc: Sensor.LOC_CANOPY,

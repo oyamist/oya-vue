@@ -14,8 +14,9 @@
     const app = require("../scripts/server.js");
     const EventEmitter = require("events");
     const winston = require('winston');
-    const Actuator = exports.Actuator || require("../index").Actuator;
-    const OyaReactor = exports.OyaReactor || require("../index").OyaReactor;
+    const Actuator = require("../index").Actuator;
+    const Sensor = require("../index").Sensor;
+    const OyaReactor = require("../index").OyaReactor;
     const OyaConf = require("../index").OyaConf;
     const Light = require("../index").Light;
     const OyaVessel = require("../index").OyaVessel;
@@ -152,6 +153,42 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
         should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_PRIME);
     });
+    it("GET /state returns push state", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/state").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    var keys = Object.keys(res.body).sort();
+                    should.deepEqual(keys, [
+                        "Cool",
+                        "Mist",
+                        "Prime",
+                        "active",
+                        "api",
+                        "countdown",
+                        "countstart",
+                        "cycle",
+                        "cycleNumber",
+                        "health",
+                        "humidityAmbient",
+                        "humidityCanopy",
+                        "humidityInternal",
+                        "lights",
+                        "nextCycle",
+                        "tempAmbient",
+                        "tempCanopy",
+                        "tempInternal",
+                        "type",
+                    ]);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch (e) {
+                done(e);
+            }
+        }();
+        async.next();
+    });
     it("GET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
         var async = function* () {
             try {
@@ -170,6 +207,33 @@
         }();
         async.next();
     });
+    it("health() returns reactor health", function(done) {
+        // an inactive reactor is not healthy
+        var reactor = new OyaReactor('test', {
+            autoActivate: false
+        });
+        should.deepEqual(reactor.health(), {
+            active: false,
+        });
+        reactor.activate();
+        should.deepEqual(reactor.health(), {
+            active: true,
+        });
+
+        // sensor health is reported
+        var reactor = new OyaReactor('test', {
+            autoActivate: false,
+            sensors: [{
+                type: Sensor.TYPE_AM2315,
+                loc: Sensor.LOC_INTERNAL,
+            }],
+        });
+        should.deepEqual(reactor.health(), {
+            active: false,
+            "AM2315@internal": "Sensor is completely unresponsive",
+        });
+        done();
+    });
     it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
@@ -179,6 +243,11 @@
                     should(res.body).properties({
                         name: 'test',
                         package: srcPkg.name,
+                    });
+
+                    // health is part of identity
+                    should(res.body.health).properties({
+                        active: true,
                     });
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
