@@ -116,11 +116,13 @@
 
         onLight(spectrum, value, key) {
             var light = this.oyaConf.lights.filter(l=>l.spectrum === spectrum)[0];
-            light && this.emitter.on(light.event, value => {
-                winston.info(`OyaReactor-${this.name}.onLight() ${spectrum} value:${value} `);
-                this.lights[key].active = !!value;
-                light.pin >= 0 && this.emitter.emit(OyaReactor.EVENT_RELAY, value, light.pin);
-            });
+            if (light && light.pin >= 0) {
+                if (value !== this.lights[key].active) {
+                    winston.info(`OyaReactor-${this.name}.onLight() ${spectrum} value:${value} `);
+                    this.lights[key].active = !!value;
+                }
+                this.emitter.emit(OyaReactor.EVENT_RELAY, value, light.pin);
+            };
         }
         onActuator(event, value, vesselIndex) {
             var vessel = this.vessels[vesselIndex];
@@ -353,6 +355,13 @@
             return req.body;
         }
 
+        syncLights(value, date=new Date()) {
+            this.oyaConf.lights.forEach(l => {
+                var v = (value == null) ? Light.isLightOnAt(l,date) : value;
+                l.pin >= 0 && this.emitter.emit(l.event, v);
+            });
+        }
+
         activate(value=true) {
             this.vessel.activate(value);
             if (this.stopLight) {
@@ -360,16 +369,12 @@
                 this.stopLight = null;
             }
             if (value) {
-                this.stopLight = this.oyaConf.lights.forEach(l=>{
-                    var cycle = l.createCycle();
-                    return l.runCycle(this.emitter, cycle);
-                });
+                const SYNC_LIGHT_SECONDS = 60;
+                var interval = setInterval(() => this.syncLights(), SYNC_LIGHT_SECONDS * 1000);
+                this.stopLight = [() => clearInterval(interval)];
+                this.syncLights();
             } else {
-                this.oyaConf.lights.forEach(l=>{ // turn lights off
-                    if (l.pin >= 0) {
-                        this.emitter.emit(l.event, false);
-                    }
-                });
+                this.syncLights(false);
             }
             return value;
         }
@@ -460,10 +465,13 @@
             lightConf.forEach(l => {
                 if (l.spectrum === Light.SPECTRUM_FULL) {
                     this.lights.white.countdown = l.countdown();
+                    this.lights.white.active = Light.isLightOnAt(l);
                 } else if (l.spectrum === Light.SPECTRUM_BLUE) {
                     this.lights.blue.countdown = l.countdown();
+                    this.lights.blue.active = Light.isLightOnAt(l);
                 } else if (l.spectrum === Light.SPECTRUM_RED) {
                     this.lights.red.countdown = l.countdown();
+                    this.lights.red.active = Light.isLightOnAt(l);
                 }
             });
             return Object.assign(this.vessel.state, {

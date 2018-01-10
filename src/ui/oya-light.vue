@@ -75,12 +75,15 @@ export default {
             var lights = apiModel.lights;
             var cycleOn = Number(lights[0].cycleOn);
             var cycleOff = Number(lights[0].cycleOff);
+            var cycleOnSec = Math.round(cycleOn * 3600);
+            var cycleOffSec = Math.round(cycleOff * 3600);
+            var periodSec = cycleOnSec + cycleOffSec;
             if (this.lightActive) {
-                var cycleAngle = 360*cycleOn/(cycleOn+cycleOff);
-                var remainingAngle = (cycleAngle*countdown/3600)/cycleOn;
+                var cycleAngle = 360*cycleOnSec/periodSec;
+                var remainingAngle = cycleAngle*(countdown/cycleOnSec);
             } else {
-                var cycleAngle = 360*cycleOff/(cycleOn+cycleOff);
-                var remainingAngle = (cycleAngle*countdown/3600)/cycleOff;
+                var cycleAngle = 360*cycleOffSec/periodSec;
+                var remainingAngle = cycleAngle*(countdown/cycleOffSec);
             }
             return 270-remainingAngle;
         },
@@ -109,7 +112,10 @@ export default {
             var lights = apiModel.lights;
             var cycleOn = Number(lights[0].cycleOn);
             var cycleOff = Number(lights[0].cycleOff);
-            return Math.round(cycleOn*100/(cycleOn+cycleOff));
+            var cycleOnSec = Math.round(cycleOn * 3600);
+            var cycleOffSec = Math.round(cycleOff * 3600);
+            var periodSec = cycleOnSec + cycleOffSec;
+            return Math.round(cycleOnSec*100/periodSec);
         },
     },
     created() {

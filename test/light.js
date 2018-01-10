@@ -1,4 +1,4 @@
-(typeof describe === 'function') && describe("Sensor", function() {
+(typeof describe === 'function') && describe("Light", function() {
     const winston = require('winston');
     const should = require("should");
     const Light = exports.Light || require("../index").Light;
@@ -55,6 +55,23 @@
             spectrum: 'Blue spectrum',
             type: 'Light:spst:no'
         });
+    });
+    it("Light is serializable", ()=>{
+        var light = new Light(Light.LIGHT_RED);
+        should.deepEqual(JSON.parse(JSON.stringify(light)), {
+            spectrum: Light.SPECTRUM_RED,
+            cycleDays: 1,
+            cycleOff: 12,
+            cycleOn: 12,
+            cycleStartDay: 0,
+            cycleStartTime: '06:00',
+            desc: 'Turn on red lights',
+            event: 'event:Red light',
+            name: 'Red light',
+            pin: -1,
+            type: 'Light:spst:no',
+        });
+        should.deepEqual(new Light(JSON.parse(JSON.stringify(light))), light);
     });
     it("Light can be red", ()=>{
         var light = new Light(Light.LIGHT_RED);
@@ -262,6 +279,82 @@
                 done(e);
             }
         })();
+    });
+    it("isLightOnAt(light,date) returns true if light is on at given time", function() {
+        var cycleOn = 13;
+        var cycleOff = 11;
+        var cycleStartTime = "06:00";
+        var light = new Light({
+            cycleOn,
+            cycleOff,
+            cycleStartTime,
+        });
+        var startDate = new Date(2017,0,1,06,30); // Sunday Jan 1, 2017
+        var secOffset = 30 * 60;
+
+        // first second of on cycle
+        var date = startDate;
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(cycleOn * 3600 - secOffset);
+
+        // last second of on cycle
+        var date = new Date(startDate.getTime() + (cycleOn*3600 - 1 - secOffset) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(1);
+
+        // first second of off cycle
+        var date = new Date(startDate.getTime() + (cycleOn*3600 - secOffset)*1000);
+        should(Light.isLightOnAt(light, date)).equal(false);
+        should(light.countdown(date)).equal(cycleOff * 3600);
+
+        // last second of off cycle
+        var date = new Date(startDate.getTime() + ((cycleOn+cycleOff)*3600 - 1 - secOffset) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(false);
+        should(light.countdown(date)).equal(1);
+
+        // first second of on cycle
+        var date = new Date(startDate.getTime() + ((cycleOn+cycleOff)*3600 - 0 - secOffset) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(cycleOn * 3600);
+    });
+    it("isLightOnAt(light,date) handles fractional hours", function() {
+        var cycleOn = 0.003;
+        var cycleOff = 0.002;
+        var cycleOnSec = Math.round(cycleOn * 3600);
+        var cycleOffSec = Math.round(cycleOff * 3600);
+        var cycleStartTime = "06:00";
+        var light = new Light({
+            cycleOn,
+            cycleOff,
+            cycleStartTime,
+        });
+        var startDate = new Date(2017,0,1,06,00); // Sunday Jan 1, 2017
+        var secOffset = 1;
+
+        // first second of on cycle
+        var date = startDate;
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(cycleOnSec );
+
+        // last second of on cycle
+        var date = new Date(startDate.getTime() + (cycleOnSec - secOffset) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(1);
+
+        // first second of off cycle
+        var date = new Date(startDate.getTime() + (cycleOnSec)*1000);
+        should(Light.isLightOnAt(light, date)).equal(false);
+        should(light.countdown(date)).equal(cycleOffSec);
+
+        // last second of off cycle
+        var date = new Date(startDate.getTime() + (cycleOnSec + cycleOffSec - secOffset) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(false);
+        should(light.countdown(date)).equal(1);
+
+        // first second of on cycle
+        var date = new Date(startDate.getTime() + (cycleOnSec + cycleOffSec ) * 1000);
+        should(Light.isLightOnAt(light, date)).equal(true);
+        should(light.countdown(date)).equal(cycleOnSec);
     });
     it("countdown(date) returns seconds till next light transition", function() {
         var light = new Light({

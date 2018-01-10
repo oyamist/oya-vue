@@ -146,8 +146,8 @@ export default {
             return {
                 tempInternal: "Internal/Root Temperature",
                 humidityInternal: "Internal/Root Humidity",
-                tempExternal: "Vessel External Temperature",
-                humidityExternal: "Vessel External Humidity",
+                tempCanopy: "Canopy Temperature",
+                humidityCanopy: "Canopy Humidity",
                 tempAmbient: "Ambient Temperature",
                 humidityAmbient: "Ambient Humidity",
             };

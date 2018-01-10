@@ -537,7 +537,7 @@
         }();
         async.next();
     });
-    it("deactivating reactor turns off everything", function(done) {
+    it("Deactivating reactor turns off everything", function(done) {
         (async function() {
             try {
                 var emitter = new EventEmitter();

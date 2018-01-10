@@ -28,6 +28,8 @@
             this.desc = opts.desc || actDefault.desc || 'generic Light';
             this.pin = Number(opts.pin) || Light.NOPIN;
             this.event = opts.event || actDefault.event;
+
+            this.jsonKeys = Object.keys(this).sort();
         }
 
         static get NOPIN() { return -1; }
@@ -74,8 +76,44 @@
         }
 
         countdown(date=new Date()) {
-            var cycle = this.createCycle(date);
-            return cycle[1].t;
+            var cycleStartTime = ('0000' + this.cycleStartTime.replace(/:/,'')).substr(-4);
+            var startSec = Number(cycleStartTime.substr(0,2)) * 60 * 60 +
+                Number(cycleStartTime.substr(-2)) * 60;
+            var cycleDay = (7 + date.getDay() - Number(this.cycleStartDay)) % 7;
+            var dateSec = 
+                cycleDay * 60 * 60 * 24 +
+                date.getHours() * 60 * 60 + 
+                date.getMinutes() * 60 + 
+                date.getSeconds();
+            var cycleOn = Number(this.cycleOn);
+            var cycleOff = Number(this.cycleOff);
+            var cycleOnSec = Math.round(cycleOn * 3600);
+            var cycleOffSec = Math.round(cycleOff * 3600);
+            var periodSec = cycleOnSec + cycleOffSec;
+            var cycleSec = (dateSec + periodSec - startSec) % periodSec;
+
+            return cycleSec < cycleOnSec
+                ? cycleOnSec - cycleSec 
+                : periodSec - cycleSec;
+        }
+
+        static isLightOnAt(light, date = new Date()) {
+            var cycleStartTime = ('0000' + light.cycleStartTime.replace(/:/,'')).substr(-4);
+            var startSec = Number(cycleStartTime.substr(0,2)) * 60 * 60 +
+                Number(cycleStartTime.substr(-2)) * 60;
+            var cycleDay = (7 + date.getDay() - Number(light.cycleStartDay)) % 7;
+            var dateSec = 
+                cycleDay * 60 * 60 * 24 +
+                date.getHours() * 60 * 60 + 
+                date.getMinutes() * 60 + 
+                date.getSeconds();
+            var cycleOn = Number(light.cycleOn);
+            var cycleOff = Number(light.cycleOff);
+            var cycleOnSec = Math.round(cycleOn * 3600);
+            var cycleOffSec = Math.round(cycleOff * 3600);
+            var periodSec = cycleOnSec + cycleOffSec;
+            var cycleSec = (dateSec + periodSec - startSec) % periodSec;
+            return cycleSec < cycleOnSec;
         }
 
         createCycle(date = new Date()) {
@@ -98,7 +136,7 @@
             var onSec = cycleOn * 60 * 60;
             var offSec = cycleOff * 60 * 60;
             var t = 0;
-            var value = cycleSec < onSec;
+            var value = Light.isLightOnAt(this, date);
             cycle.push({
                 t,
                 event: this.event,
@@ -106,17 +144,14 @@
             });
             t = value ? onSec - cycleSec : periodSec - cycleSec;
             while (cycle.length < 2*nPeriods) {
-                value = !value;
+                var d = new Date(date.getTime() + t*1000);
+                value = Light.isLightOnAt(this, d);
                 cycle.push({
                     t,
                     event: this.event,
                     value,
                 });
-                if (value) {
-                    t += onSec;
-                } else {
-                    t += offSec;
-                }
+                t += value ? onSec : offSec;
             }
 
             return cycle;
@@ -164,7 +199,7 @@
         }
 
         toJSON() {
-            return this;
+            return this.jsonKeys.reduce((acc,k) => ((acc[k] = this[k]),acc), {});
         }
 
     } //// class Light

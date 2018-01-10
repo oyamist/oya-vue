@@ -10,8 +10,12 @@
             <oya-chart-panel service='test'/>
         </v-expansion-panel-content>
         <v-expansion-panel-content>
-            <div slot="header">Netowrk</div>
+            <div slot="header">Network</div>
             <oya-network />
+        </v-expansion-panel-content>
+        <v-expansion-panel-content>
+            <div slot="header">Developer</div>
+            <rb-state />
         </v-expansion-panel-content>
     </v-expansion-panel>
 
