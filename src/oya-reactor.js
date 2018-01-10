@@ -462,16 +462,17 @@
             var white = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_FULL)[0];
             var blue = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_BLUE)[0];
             var red = lightConf.filter(l=>l.spectrum === Light.SPECTRUM_RED)[0];
+            var active = this.vessel.isActive;
             lightConf.forEach(l => {
                 if (l.spectrum === Light.SPECTRUM_FULL) {
                     this.lights.white.countdown = l.countdown();
-                    this.lights.white.active = Light.isLightOnAt(l);
+                    this.lights.white.active = active && Light.isLightOnAt(l);
                 } else if (l.spectrum === Light.SPECTRUM_BLUE) {
                     this.lights.blue.countdown = l.countdown();
-                    this.lights.blue.active = Light.isLightOnAt(l);
+                    this.lights.blue.active = active && Light.isLightOnAt(l);
                 } else if (l.spectrum === Light.SPECTRUM_RED) {
                     this.lights.red.countdown = l.countdown();
-                    this.lights.red.active = Light.isLightOnAt(l);
+                    this.lights.red.active = active && Light.isLightOnAt(l);
                 }
             });
             return Object.assign(this.vessel.state, {

@@ -20,7 +20,7 @@
             this.name = opts.name || actDefault.name || `${spectrum} light`;
             this.type = opts.type || actDefault.type || Light.Light_SPST_NO;
             this.cycleStartDay = Number(opts.cycleStartDay) || 0; // Sunday
-            this.cycleStartTime = opts.cycleStartTime || '06:00';
+            this.cycleStartTime = ("0" +(opts.cycleStartTime || '06:00')).substr(-5);
             this.cycleDays = Number(opts.cycleDays) || 1;
             this.cycleOn = opts.cycleOn == null ?  12 : Number(opts.cycleOn);
             this.cycleOff = opts.cycleOff == null ? 12 : Number(opts.cycleOff);
@@ -114,88 +114,6 @@
             var periodSec = cycleOnSec + cycleOffSec;
             var cycleSec = (dateSec + periodSec - startSec) % periodSec;
             return cycleSec < cycleOnSec;
-        }
-
-        createCycle(date = new Date()) {
-            var cycle = [];
-            var cycleStartTime = ('0000' + this.cycleStartTime.replace(/:/,'')).substr(-4);
-            var startSec = Number(cycleStartTime.substr(0,2)) * 60 * 60 +
-                Number(cycleStartTime.substr(-2)) * 60;
-            var cycleDay = (7 + date.getDay() - Number(this.cycleStartDay)) % 7;
-            var dateSec = 
-                cycleDay * 60 * 60 * 24 +
-                date.getHours() * 60 * 60 + 
-                date.getMinutes() * 60 + 
-                date.getSeconds();
-            var cycleOn = Number(this.cycleOn);
-            var cycleOff = Number(this.cycleOff);
-            var periodSec = (cycleOn + cycleOff) * 60 * 60;
-            var daysSec = 60*60*24 * Number(this.cycleDays);
-            var nPeriods = Math.round(daysSec / periodSec);
-            var cycleSec = (dateSec + periodSec - startSec) % periodSec;
-            var onSec = cycleOn * 60 * 60;
-            var offSec = cycleOff * 60 * 60;
-            var t = 0;
-            var value = Light.isLightOnAt(this, date);
-            cycle.push({
-                t,
-                event: this.event,
-                value,
-            });
-            t = value ? onSec - cycleSec : periodSec - cycleSec;
-            while (cycle.length < 2*nPeriods) {
-                var d = new Date(date.getTime() + t*1000);
-                value = Light.isLightOnAt(this, d);
-                cycle.push({
-                    t,
-                    event: this.event,
-                    value,
-                });
-                t += value ? onSec : offSec;
-            }
-
-            return cycle;
-        }
-
-        runCycle(emitter, cycle, period=this.cycleDays*60*60*24) { 
-            if (! emitter instanceof EventEmitter) {
-                throw new Error("expected EventEmitter");
-            }
-            if (! cycle instanceof Array) {
-                throw new Error("expected cycle Array");
-            }
-            if (typeof period !== 'number') {
-                throw new Error("expected number of seconds for period");
-            }
-
-            emitter.on(this.event, value => {
-                this.pin >= 0 && winston.info(`Light(${this.event}) name:${this.name} value:${value}`);
-            });
-
-            var timers = [];
-            var context = {};
-            var periodMs = period * 1000;
-            var createTimers = () => {
-                cycle.forEach(c => {
-                    var timer = setTimeout(() => {
-                        emitter.emit(c.event, c.value);
-                    }, 1000*c.t);
-                    timers.push(timer);
-                });
-            };
-            createTimers();
-            context.interval = setInterval(() => createTimers(), periodMs);
-
-            var stopTimers = () => {
-                context.interval && clearInterval(context.interval);
-                context.interval = null;
-                var timer;
-                while ((timer = timers.pop())) {
-                    clearTimeout(timer);
-                }
-            };
-
-            return stopTimers;
         }
 
         toJSON() {
