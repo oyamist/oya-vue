@@ -22,9 +22,6 @@
             } else {
                 var type = Sensor.TYPE_NONE.type;
             }
-            if (typeof type !== 'string') {
-                throw new Error('expected string');
-            }
             var sensorDefault = Sensor.TYPE_LIST.filter(
                 ud => (ud.type===type))[0] || {};
 
@@ -39,9 +36,6 @@
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.type = type;
-            if (typeof type !== 'string') {
-                throw new Error('expected string');
-            }
             this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
             // END serializable toJSON() properties
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
