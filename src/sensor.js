@@ -22,46 +22,41 @@
             } else {
                 var type = Sensor.TYPE_NONE.type;
             }
-            var sensorDefault = Sensor.TYPE_LIST.filter(
+            var typeProps = Sensor.TYPE_LIST.filter(
                 ud => (ud.type===type))[0] || {};
 
             // BEGIN serializable toJSON() properties
-            this.address = opts.address || sensorDefault.address;
-            this.comm = opts.comm || sensorDefault.comm;
-            this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
+            this.address = opts.address || typeProps.address;
+            this.comm = opts.comm || typeProps.comm;
+            this.desc = opts.desc || typeProps.desc || 'generic sensor';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.loc = opts.loc || Sensor.LOC_NONE;
             this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
-            this.name = opts.name || sensorDefault.name;
-            this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
-            this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
+            this.name = opts.name || typeProps.name;
+            this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
+            this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
             this.type = type;
-            this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
+            this.vesselIndex = opts.vesselIndex == null ? typeProps.vesselIndex : Number(opts.vesselIndex);
             // END serializable toJSON() properties
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
 
-            // other properties
-            this.tempRegExp = opts.tempRegExp || null;
-            this.cmdWakeup = opts.cmdWakeup || sensorDefault.cmdWakeup;
-            this.cmdRead = opts.cmdRead || sensorDefault.cmdRead;
-            this.dataRead = opts.dataRead || sensorDefault.dataRead;
-            this.tempScale = opts.tempScale == null ? sensorDefault.tempScale : Number(opts.tempScale);
-            this.tempOffset = opts.tempOffset == null ? sensorDefault.tempOffset : Number(opts.tempOffset);
-            this.heater = opts.heater || sensorDefault.heater;
-            this.humidityScale = opts.humidityScale == null ? sensorDefault.humidityScale : Number(opts.humidityScale);
-            this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : Number(opts.humidityOffset);
-            this.readDelay = Number(opts.readDelay) || sensorDefault.readDelay;
-            this.clear();
-            this.addresses = opts.addresses || [];
-            this.crc = opts.crc || sensorDefault.crc;
-            this.crcInit = opts.crcInit || sensorDefault.crcInit;
-            this.crcPoly = opts.crcPoly || sensorDefault.crcPoly;
-            this.data = {
-                temp: null,
-                humidity: null,
-            };
+            // sensor type properties
+            this.tempRegExp = typeProps.tempRegExp;
+            this.cmdWakeup = typeProps.cmdWakeup;
+            this.cmdRead = typeProps.cmdRead;
+            this.dataRead = typeProps.dataRead;
+            this.tempScale = typeProps.tempScale;
+            this.tempOffset = typeProps.tempOffset;
+            this.heater = typeProps.heater;
+            this.humidityScale = typeProps.humidityScale;
+            this.humidityOffset = typeProps.humidityOffset;
+            this.addresses = typeProps.addresses;
+            this.crc = typeProps.crc;
+            this.crcInit = typeProps.crcInit;
+            this.crcPoly = typeProps.crcPoly;
 
-            // other properties
+            // unserialized custom properties
+            this.readDelay = Number(opts.readDelay) || typeProps.readDelay;
             this.lastRead = opts.lastRead;
             this.emitter = opts.emitter;
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
@@ -70,6 +65,13 @@
             this.i2cWrite = opts.i2cWrite || ((i2cAddr, dataBuf) => {
                 throw new Error("no I2C driver");
             });
+
+            // internal properties
+            this.clear();
+            this.data = {
+                temp: null,
+                humidity: null,
+            };
         }
 
         get serializableKeys() {

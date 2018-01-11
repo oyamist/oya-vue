@@ -221,7 +221,7 @@
         var data = sensor.parseData(buf);
         data.temp.should.approximately(19.5, 0.01); // Centigrade
         data.humidity.should.approximately(.323, 0.0001); // %relative humidity
-        should(data.timestamp - new Date()).approximately(0, 1);
+        should(data.timestamp - new Date()).approximately(0, 2);
         should.deepEqual(sensor.data, data);
         should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
         should(temp_eventValue).equal(data.temp);
