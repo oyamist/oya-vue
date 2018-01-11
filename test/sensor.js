@@ -37,6 +37,7 @@
                 });
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_DS18B20, {
                     address: "28-MOCK2",
+                    loc: Sensor.LOC_INTERNAL,
                 }));
                 sensor.address.should.equal("28-MOCK2");
                 sensor.comm.should.equal("1-wire");
@@ -172,7 +173,9 @@
         should(Sensor.crcModbus(buf)).equal(0); // zero if CRC data is included
     });
     it("parseData() parses SHT31-DIS", function() {
-        var sensor = new Sensor(Sensor.TYPE_SHT31_DIS);
+        var sensor = new Sensor(Sensor.TYPE_SHT31_DIS, {
+            loc: Sensor.LOC_INTERNAL,
+        });
 
         var buf = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
         var data = sensor.parseData(buf);
@@ -192,6 +195,7 @@
         var emitter = new EventEmitter();
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
             emitter,
+            loc: Sensor.LOC_INTERNAL,
         }));
         should(sensor.emitter).equal(emitter);
         var temp_event = null;
@@ -227,6 +231,7 @@
         // temp events are suppressed if readTemp is false
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
             emitter,
+            loc: Sensor.LOC_INTERNAL,
             readTemp: false,
         }));
         temp_event = null;
@@ -246,6 +251,7 @@
         // humidity events are suppressed if readHumidity is false
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
             emitter,
+            loc: Sensor.LOC_INTERNAL,
             readHumidity: false,
         }));
         temp_event = null;
@@ -263,7 +269,9 @@
         should(humidity_eventValue).equal(null);
 
         // events are suppressed if emitter is not provided
-        var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{}));
+        var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
+            loc: Sensor.LOC_INTERNAL,
+        }));
         var data = sensor.parseData(buf); 
         data.temp.should.approximately(19.5, 0.01); // Centigrade
         data.humidity.should.approximately(.323, 0.0001); // %relative humidity
@@ -287,6 +295,7 @@
                 var readDelay = 15;
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
+                    loc: Sensor.LOC_INTERNAL,
                     maxReadErrors: 1,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
@@ -349,6 +358,7 @@
                 var msRead = null;
                 var testData = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_SHT31_DIS, {
+                    loc: Sensor.LOC_AMBIENT,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
                         testData.copy(buf);
@@ -373,5 +383,38 @@
             }
         }();
         async.next();
+    });
+    it("TESTTESTupdate(sensor, ...opts) updates sensor properties", function() {
+        var a = {};
+        should(a.x === null).equal(false);
+        should(a.x == null).equal(true);
+        should(a.x === undefined).equal(true);
+        should(Object.hasOwnProperty("x")).equal(false);
+        should(JSON.stringify(a)).equal('{}');
+
+        var sensor = new Sensor();
+
+        // update does not change sensor
+        var sensorExpected = sensor.toJSON();
+        should(Sensor.update(sensor)).equal(sensor);
+        should.deepEqual(sensor.toJSON(), sensorExpected);
+
+        // sensor can change type
+        var sensor = new Sensor(Sensor.TYPE_SHT31_DIS);
+        var sensorExpected = new Sensor(Sensor.TYPE_DS18B20);
+        should(Sensor.update(sensor, Sensor.TYPE_DS18B20)).equal(sensor);
+        should.deepEqual(sensor, sensorExpected);
+
+        // changing sensor type does not affect location
+        var sensor = new Sensor(Sensor.TYPE_SHT31_DIS, {
+            loc: Sensor.LOC_CANOPY,
+        });
+        var sensorExpected = new Sensor(Sensor.TYPE_DS18B20, {
+            loc: Sensor.LOC_CANOPY,
+        });
+        should(Sensor.update(sensor, {
+            type: Sensor.TYPE_DS18B20.type,
+        })).equal(sensor);
+        should.deepEqual(sensor, sensorExpected);
     });
 })

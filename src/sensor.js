@@ -4,7 +4,11 @@
     const SystemFacade = require("./system-facade");
 
     class Sensor {
-        constructor(opts = {}) {
+        constructor(...optArgs) {
+            var opts = optArgs.reduce((acc,a) => {
+                Object.assign(acc, a);
+                return acc;
+            }, {});
             var type = opts.type;
             if (typeof type === "object") {
                 type = type.type;
@@ -25,8 +29,8 @@
             this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
             this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
             this.comm = opts.comm || sensorDefault.comm;
-            this.loc = opts.loc || sensorDefault.loc;
-            this.tempRegExp = opts.tempRegExp;
+            this.loc = opts.loc || Sensor.LOC_NONE;
+            this.tempRegExp = opts.tempRegExp || null;
             this.cmdWakeup = opts.cmdWakeup || sensorDefault.cmdWakeup;
             this.cmdRead = opts.cmdRead || sensorDefault.cmdRead;
             this.dataRead = opts.dataRead || sensorDefault.dataRead;
@@ -39,7 +43,6 @@
             this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
             this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readDelay = Number(opts.readDelay) || sensorDefault.readDelay;
-            this.lastRead = opts.lastRead;
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.clear();
             this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
@@ -54,6 +57,7 @@
             this.serializableKeys = Object.keys(this);
 
             // other properties
+            this.lastRead = opts.lastRead;
             this.emitter = opts.emitter;
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
@@ -61,6 +65,28 @@
             this.i2cWrite = opts.i2cWrite || ((i2cAddr, dataBuf) => {
                 throw new Error("no I2C driver");
             });
+        }
+
+        static update(sensor=new Sensor(), ...args) {
+            var opts = args.reduce((a,arg) => {
+                Object.assign(a, arg);
+                return a;
+            }, {});
+
+            if (opts.hasOwnProperty('type')) {
+                var types = Sensor.TYPE_LIST.filter(t => t.type === opts.type);
+                var defaultType = types && types[0] || Sensor.TYPE_NONE;
+                opts = Object.assign({}, defaultType, opts);
+            }
+
+            // serializable toJSON() properties
+            Object.keys(Sensor.TYPE_NONE).forEach(propName => {
+                if (opts.hasOwnProperty(propName)) {
+                    sensor[propName] = opts[propName];
+                }
+            });
+
+            return sensor;
         }
 
         static get EVENT_HUMIDITY_MAP() {
@@ -80,13 +106,11 @@
         }
 
         static get TYPE_SHT31_DIS() {
-            return {
+            return Object.assign(Sensor.TYPE_NONE, {
                 type: "SHT31-DIS",
                 name: "SHT31-DIS",
                 desc: "SHT31-DIS Temperature/Humidity I2C sensor",
                 comm: Sensor.COMM_I2C,
-                loc: Sensor.LOC_INTERNAL,
-                cmdWakeup: null, 
                 cmdRead: [0x24, 0x00],
                 crc: Sensor.CRC_8_FF_31,
                 crcInit: 0xff,
@@ -113,20 +137,17 @@
                     on: [0x30, 0x6d],
                     off: [0x30, 0x66],
                 },
-            }
+            });
         }
         static get TYPE_AM2315() {
-            return {
-                type: "AM2315",
-                name: "AM2315",
-                desc: "AM2315 Temperature/Humidity I2C sensor",
-                comm: Sensor.COMM_I2C,
-                loc: Sensor.LOC_INTERNAL,
-                cmdWakeup: [0x03, 0x00, 0x04], 
+            return Object.assign(Sensor.TYPE_NONE, {
+                address: 0x5C,
+                addresses: [0x5C],
                 cmdRead: [0x03, 0x00, 0x04],
+                cmdWakeup: [0x03, 0x00, 0x04], 
+                comm: Sensor.COMM_I2C,
                 crc: Sensor.CRC_MODBUS,
-                vesselIndex: 0,
-                dataRead: [
+                dataRead: [ 
                     Sensor.BYTE_IGNORE,
                     Sensor.BYTE_IGNORE,
                     Sensor.BYTE_RH_HIGH,
@@ -136,42 +157,55 @@
                     Sensor.BYTE_CRC_LOW,
                     Sensor.BYTE_CRC_HIGH,
                 ],
-                tempScale: 0.1,
-                tempOffset: 0,
-                humidityScale: 0.001,
+                desc: "AM2315 Temperature/Humidity I2C sensor",
                 humidityOffset: 0,
-                address: 0x5C,
-                addresses: [0x5C],
-                readTemp: true,
+                humidityScale: 0.001,
+                name: "AM2315",
                 readHumidity: true,
-            }
+                readTemp: true,
+                tempOffset: 0,
+                tempScale: 0.1,
+                type: "AM2315",
+            });
         }
         static get TYPE_DS18B20() {
-            return {
-                type: "DS18B20",
-                name: "DS18B20",
-                desc: "DS18B20 Temperature 1-Wire sensor",
+            return Object.assign(Sensor.TYPE_NONE, {
+                addresses: SystemFacade.oneWireAddresses(),
                 comm: Sensor.COMM_W1,
-                loc: Sensor.LOC_INTERNAL,
+                desc: "DS18B20 Temperature 1-Wire sensor",
+                name: "DS18B20",
+                readTemp: true,
+                tempOffset: 0,
                 tempRegExp: ".*\n.*t=([0-9-]+)\n.*",
                 tempScale: 0.001,
-                tempOffset: 0,
-                address: null,
-                addresses: SystemFacade.oneWireAddresses(),
-                readTemp: true,
-            }
+                type: "DS18B20",
+            });
         }
         static get TYPE_NONE() {
             return {
-                type: "none",
-                name: "No sensor",
-                desc: "No sensor",
-                loc: Sensor.LOC_NONE,
-                vesselIndex: 0,
-                readTemp: null,
-                readHumidity: null,
-                addresses: [],
                 address: null,
+                addresses: [],
+                cmdRead: null,
+                cmdWakeup: null, 
+                comm: null,
+                crc: null,
+                crcInit: null,
+                crcPoly: null,
+                dataRead: null,
+                desc: "No sensor",
+                heater: null,
+                humidityOffset: null,
+                humidityScale: null,
+                name: "No sensor",
+                readDelay: null,
+                readHumidity: null,
+                readTemp: null,
+                tempOffset: null,
+                tempRegExp: null,
+                tempScale: null,
+                type: "none",
+                vesselIndex: 0,
+
             }
         }
         static get LOC_INTERNAL() { return "internal"; }

@@ -257,6 +257,7 @@
                 pin: 3
             }),
         ];
+
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
@@ -281,6 +282,7 @@
             }],
             actuators,
         });
+
 
         // vessels are not changed by update
         should.equal(vessel0, oc.vessels[0]);
@@ -328,4 +330,21 @@
         });
 
     });
+    it("TESTTESTupdate(opts) retains sensor instances", function() {
+        var oc = new OyaConf();
+        var sensor0 = oc.sensors[0];
+        var sensor1 = oc.sensors[1];
+
+        oc.update({});
+        should(oc.sensors[0]).equal(sensor0);
+        should(oc.sensors[1]).equal(sensor1);
+
+        oc.update({
+            sensors: [{
+            }]
+        });
+        //should(oc.sensors[0]).equal(sensor0);
+        //should(oc.sensors[1]).equal(sensor1);
+    });
+
 });
