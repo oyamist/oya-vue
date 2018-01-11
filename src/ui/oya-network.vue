@@ -20,7 +20,9 @@
                     <a :href="link(hosts.item)" > {{ hosts.item.vessel }} </a>
                 </td>
                 <td class="text-xs-left" >
-                    <a :href="link(hosts.item)" > <oya-health :host="hosts.item.ip"/> </a>
+                    <a :href="link(hosts.item)" > 
+                        <oya-health :host="hosts.item.ip" :service="service"/> 
+                    </a>
                 </td>
                 <td class="text-xs-left">
                     <a :href="link(hosts.item)" > {{ hosts.item.version }} </a>

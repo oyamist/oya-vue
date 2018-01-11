@@ -115,8 +115,11 @@ export default {
     created() {
     },
     mounted() {
-        this.refresh();
-        setInterval(() => this.refresh(), 5000);
+        this.onApiModelLoaded('oya-conf').then(apiModel=>{
+            this.refresh();
+            var healthPoll = (apiModel.healthPoll || 60) * 1000;
+            setInterval(() => this.refresh(), healthPoll);
+        });
     },
 }
 

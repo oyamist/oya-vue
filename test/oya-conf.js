@@ -13,6 +13,7 @@
         type: 'OyaConf',
         tempUnit: 'F',
         hostTimeout: 200,
+        healthPoll: 60,
         mcuHat: 'mcu-hat:none',
         vessels: [
             OyaConf.createVesselConfig(0,{
@@ -160,6 +161,7 @@
             type: 'OyaConf',
             tempUnit: 'C',
             hostTimeout: 200,
+            healthPoll: 60,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 updatedVessel,
@@ -311,6 +313,7 @@
             type: 'OyaConf',
             tempUnit: 'C',
             hostTimeout: 200,
+            healthPoll: 60,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 OyaConf.createVesselConfig(0, {
