@@ -295,6 +295,7 @@
                                 this.i2cRead(this.address, buf);
                                 var data = this.parseData(buf);
                                 this.readErrors = 0;
+                                this.lastRead = new Date();
                                 resolve(data);
                             } catch(e) {
                                 if (++this.readErrors >= this.maxReadErrors) {
@@ -315,6 +316,7 @@
                                 this.data.humidity = r.humidity;
                                 this.emit(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
                             }
+                            this.lastRead = new Date();
                             resolve(r);
                         }).catch(e=>reject(e));
                     } else {
