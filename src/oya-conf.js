@@ -78,18 +78,11 @@
             }
             if (opts.sensors) {
                 var oldSensors = this.sensors || [];
-                this.sensors = opts.sensors.map((s,i) => {
-                    if (0) {
-                        return Sensor.update(oldSensors[i], s, {
-                            i2cRead,
-                            i2cWrite,
-                        });
-                    }else{
-                        return new Sensor(Object.assign({
-                            i2cRead,
-                            i2cWrite,
-                        }, s));
-                    }
+                this.sensors = opts.sensors.map((newSensor,i) => {
+                    return Sensor.update(oldSensors[i], newSensor, {
+                        i2cRead,
+                        i2cWrite,
+                    });
                 });
             } else if (this.sensors == null) {
                 this.sensors = [];

@@ -228,9 +228,18 @@
                 loc: Sensor.LOC_INTERNAL,
             }],
         });
+        reactor.oyaConf.sensors.length.should.equal(1);
+        var sensor0 = reactor.oyaConf.sensors[0];
+        sensor0.type.should.equal(Sensor.TYPE_AM2315.type);
+        sensor0.loc.should.equal(Sensor.LOC_INTERNAL);
+        should(sensor0.lastRead == null).equal(true);
+        should.deepEqual(sensor0.health(), {
+            "AM2315@internal": 'Sensor is completely unresponsive',
+        });
+
         should.deepEqual(reactor.health(), {
             active: false,
-            "AM2315@internal": "Sensor is completely unresponsive",
+            "AM2315@internal": 'Sensor is completely unresponsive',
         });
         done();
     });

@@ -3,6 +3,8 @@
     const OyaVessel = require('./oya-vessel');
     const SystemFacade = require("./system-facade");
 
+    var SERIALIZABLE_KEYS;
+
     class Sensor {
         constructor(...optArgs) {
             var opts = optArgs.reduce((acc,a) => {
@@ -20,32 +22,42 @@
             } else {
                 var type = Sensor.TYPE_NONE.type;
             }
+            if (typeof type !== 'string') {
+                throw new Error('expected string');
+            }
             var sensorDefault = Sensor.TYPE_LIST.filter(
                 ud => (ud.type===type))[0] || {};
 
-            // serializable toJSON() properties
-            this.type = type;
-            this.name = opts.name || sensorDefault.name;
-            this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
-            this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
+            // BEGIN serializable toJSON() properties
+            this.address = opts.address || sensorDefault.address;
             this.comm = opts.comm || sensorDefault.comm;
+            this.desc = opts.desc || sensorDefault.desc || 'generic sensor';
+            this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.loc = opts.loc || Sensor.LOC_NONE;
+            this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
+            this.name = opts.name || sensorDefault.name;
+            this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
+            this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
+            this.type = type;
+            if (typeof type !== 'string') {
+                throw new Error('expected string');
+            }
+            this.vesselIndex = opts.vesselIndex == null ? sensorDefault.vesselIndex : Number(opts.vesselIndex);
+            // END serializable toJSON() properties
+            SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
+
+            // other properties
             this.tempRegExp = opts.tempRegExp || null;
             this.cmdWakeup = opts.cmdWakeup || sensorDefault.cmdWakeup;
             this.cmdRead = opts.cmdRead || sensorDefault.cmdRead;
             this.dataRead = opts.dataRead || sensorDefault.dataRead;
-            this.address = opts.address || sensorDefault.address;
             this.tempScale = opts.tempScale == null ? sensorDefault.tempScale : Number(opts.tempScale);
             this.tempOffset = opts.tempOffset == null ? sensorDefault.tempOffset : Number(opts.tempOffset);
             this.heater = opts.heater || sensorDefault.heater;
             this.humidityScale = opts.humidityScale == null ? sensorDefault.humidityScale : Number(opts.humidityScale);
             this.humidityOffset = opts.humidityOffset == null ? sensorDefault.humidityOffset : Number(opts.humidityOffset);
-            this.readTemp = opts.readTemp == null ? sensorDefault.readTemp : opts.readTemp;
-            this.readHumidity = opts.readHumidity == null ? sensorDefault.readHumidity : opts.readHumidity;
             this.readDelay = Number(opts.readDelay) || sensorDefault.readDelay;
-            this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.clear();
-            this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.addresses = opts.addresses || [];
             this.crc = opts.crc || sensorDefault.crc;
             this.crcInit = opts.crcInit || sensorDefault.crcInit;
@@ -54,7 +66,6 @@
                 temp: null,
                 humidity: null,
             };
-            this.serializableKeys = Object.keys(this);
 
             // other properties
             this.lastRead = opts.lastRead;
@@ -67,6 +78,10 @@
             });
         }
 
+        get serializableKeys() {
+            return SERIALIZABLE_KEYS;
+        }
+
         static update(sensor=new Sensor(), ...args) {
             var opts = args.reduce((a,arg) => {
                 Object.assign(a, arg);
@@ -74,13 +89,22 @@
             }, {});
 
             if (opts.hasOwnProperty('type')) {
+                if (typeof opts.type === 'object') {
+                    opts.type = opts.type.type;
+                }
+                if (typeof opts.type !== 'string') {
+                    throw new Error("expected type to be string");
+                }
                 var types = Sensor.TYPE_LIST.filter(t => t.type === opts.type);
-                var defaultType = types && types[0] || Sensor.TYPE_NONE;
-                opts = Object.assign({}, defaultType, opts);
+                var newType = types && types[0] || Sensor.TYPE_NONE;
+                winston.info(`Changing sensor old:${sensor.type} new:${newType.type}`);
+                Object.keys(newType).forEach(propName => {
+                    sensor[propName] = newType[propName];
+                });
             }
 
             // serializable toJSON() properties
-            Object.keys(Sensor.TYPE_NONE).forEach(propName => {
+            sensor.serializableKeys.forEach(propName => {
                 if (opts.hasOwnProperty(propName)) {
                     sensor[propName] = opts[propName];
                 }
@@ -282,7 +306,7 @@
 
         toJSON() {
             var result = {};
-            this.serializableKeys.forEach(key => (result[key] = this[key]));
+            SERIALIZABLE_KEYS.forEach(key => (result[key] = this[key]));
             return result;
         }
 

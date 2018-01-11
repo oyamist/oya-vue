@@ -405,16 +405,51 @@
         should(Sensor.update(sensor, Sensor.TYPE_DS18B20)).equal(sensor);
         should.deepEqual(sensor, sensorExpected);
 
-        // changing sensor type does not affect location
+        // changing sensor type does not affect critical properties
+        var date = new Date();
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS, {
             loc: Sensor.LOC_CANOPY,
+            lastRead: date,
         });
         var sensorExpected = new Sensor(Sensor.TYPE_DS18B20, {
             loc: Sensor.LOC_CANOPY,
+            lastRead: date,
         });
         should(Sensor.update(sensor, {
             type: Sensor.TYPE_DS18B20.type,
         })).equal(sensor);
         should.deepEqual(sensor, sensorExpected);
+    });
+    it("TESTTESTtoJSON() only serializes some properties", function() {
+        var sensor = new Sensor();
+        var json = sensor.toJSON();
+        var serializableKeys = [
+            'address',
+            'comm',
+            'desc',
+            'healthTimeout',
+            'loc',
+            'maxReadErrors',
+            'name',
+            'readHumidity',
+            'readTemp',
+            'type',
+            'vesselIndex',
+        ];
+        should.deepEqual(sensor.serializableKeys, serializableKeys);
+        should.deepEqual(Object.keys(json).sort(), [
+            'address',
+            'comm',
+            'desc',
+            'healthTimeout',
+            'loc',
+            'maxReadErrors',
+            'name',
+            'readHumidity',
+            'readTemp',
+            'type',
+            'vesselIndex',
+
+        ]);
     });
 })
