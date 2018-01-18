@@ -1,13 +1,15 @@
 module.exports = {
     Actuator: require("./src/actuator"),
-    Sensor: require("./src/sensor"),
-    Switch: require('./src/switch'),
-    Light: require("./src/light"),
     DbFacade: require("./src/db-facade"),
-    SystemFacade: require("./src/system-facade"),
     DbSqlite3: require('./src/db-sqlite3'),
+    Light: require("./src/light"),
     OyaConf: require("./src/oya-conf"),
-    OyaVessel: require("./src/oya-vessel"),
-    OyaReactor: require("./src/oya-reactor"),
     OyaNet: require('./src/oya-net'),
+    OyaReactor: require("./src/oya-reactor"),
+    OyaVessel: require("./src/oya-vessel"),
+    Sensor: require("./src/sensor"),
+    Solution: require('./src/solution'),
+    Switch: require('./src/switch'),
+    SystemFacade: require("./src/system-facade"),
+
 };
