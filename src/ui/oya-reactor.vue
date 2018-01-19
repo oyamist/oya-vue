@@ -316,7 +316,8 @@ export default {
             return s1 !== s2;
         },
         sensorAddresses(sensor) {
-            return sensor.addresses.map(a => {
+            var st =  this.sensorTypes.filter( st => st.type === sensor.type)[0];
+            return st.addresses.map(a => {
                 if (typeof a === "number") {
                     return {
                         value: a,
