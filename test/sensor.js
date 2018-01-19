@@ -39,9 +39,12 @@
                     address: "28-MOCK2",
                     loc: Sensor.LOC_INTERNAL,
                 }));
-                sensor.address.should.equal("28-MOCK2");
-                sensor.comm.should.equal("1-wire");
-                sensor.type.should.equal("DS18B20");
+                should(sensor).properties({
+                    address: "28-MOCK2",
+                    addresses: ["28-MOCK1", "28-MOCK2"],
+                    type: "DS18B20",
+                    comm: "1-wire",
+                });
                 var r = await sensor.read();
                 should.deepEqual(r, {
                     temp: 12.345,
@@ -384,7 +387,7 @@
         }();
         async.next();
     });
-    it("TESTTESTupdate(sensor, ...opts) updates sensor properties", function() {
+    it("update(sensor, ...opts) updates sensor properties", function() {
         var a = {};
         should(a.x === null).equal(false);
         should(a.x == null).equal(true);
@@ -402,8 +405,11 @@
         // sensor can change type
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS);
         var sensorExpected = new Sensor(Sensor.TYPE_DS18B20);
-        should(Sensor.update(sensor, Sensor.TYPE_DS18B20)).equal(sensor);
+        should(Sensor.update(sensor, {
+            type: Sensor.TYPE_DS18B20.type
+        })).equal(sensor);
         should.deepEqual(sensor, sensorExpected);
+        should.deepEqual(sensor.addresses, ["28-MOCK1", "28-MOCK2"]);
 
         // changing sensor type does not affect critical properties
         var date = new Date();
@@ -419,12 +425,19 @@
             type: Sensor.TYPE_DS18B20.type,
         })).equal(sensor);
         should.deepEqual(sensor, sensorExpected);
+        should(sensor).properties({
+            addresses: ["28-MOCK1", "28-MOCK2"],
+        });
+        should(sensor.toJSON()).properties({
+            addresses: ["28-MOCK1", "28-MOCK2"],
+        });
     });
-    it("TESTTESTtoJSON() only serializes some properties", function() {
+    it("toJSON() only serializes some properties", function() {
         var sensor = new Sensor();
         var json = sensor.toJSON();
         var serializableKeys = [
             'address',
+            'addresses',
             'comm',
             'desc',
             'healthTimeout',
@@ -439,6 +452,7 @@
         should.deepEqual(sensor.serializableKeys, serializableKeys);
         should.deepEqual(Object.keys(json).sort(), [
             'address',
+            'addresses',
             'comm',
             'desc',
             'healthTimeout',
@@ -451,5 +465,22 @@
             'vesselIndex',
 
         ]);
+    });
+    it("TESTTESTstrings are equal", function() {
+        var a = 'test';
+        var b = 'test';
+        var c = 'te';
+        c += 'st';
+        should(a === 'test').equal(true);
+        should(a === 'TEst').equal(false);
+        should(a !== 'test').equal(false);
+        should(a !== 'TEst').equal(true);
+        should(c !== 'test').equal(false);
+        should(c !== 'TEst').equal(true);
+        should(a === b).equal(true);
+        should(a === c).equal(true);
+        should(b === c).equal(true);
+        should(['a','b']+"").equal("a,b");
+        should([a,b,c]+"").equal("test,test,test");
     });
 })

@@ -23,10 +23,11 @@
                 var type = Sensor.TYPE_NONE.type;
             }
             var typeProps = Sensor.TYPE_LIST.filter(
-                ud => (ud.type===type))[0] || {};
+                ud => (ud.type===type))[0] || Sensor.TYPE_NONE;
 
             // BEGIN serializable toJSON() properties
             this.address = opts.address || typeProps.address;
+            this.addresses = typeProps.addresses; // read-only and serializable
             this.comm = opts.comm || typeProps.comm;
             this.desc = opts.desc || typeProps.desc || 'generic sensor';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
@@ -36,7 +37,7 @@
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
             this.type = type;
-            this.vesselIndex = opts.vesselIndex == null ? typeProps.vesselIndex : Number(opts.vesselIndex);
+            this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
 
@@ -50,7 +51,6 @@
             this.heater = typeProps.heater;
             this.humidityScale = typeProps.humidityScale;
             this.humidityOffset = typeProps.humidityOffset;
-            this.addresses = typeProps.addresses;
             this.crc = typeProps.crc;
             this.crcInit = typeProps.crcInit;
             this.crcPoly = typeProps.crcPoly;
@@ -93,9 +93,13 @@
                 }
                 var types = Sensor.TYPE_LIST.filter(t => t.type === opts.type);
                 var newType = types && types[0] || Sensor.TYPE_NONE;
-                winston.info(`Changing sensor old:${sensor.type} new:${newType.type}`);
-                Object.keys(newType).forEach(propName => {
-                    sensor[propName] = newType[propName];
+                Object.keys(newType).sort().forEach(k=> {
+                    var newValue = newType[k];
+                    var oldValue = sensor[k];
+                    if (oldValue+"" !== newValue+"") {
+                        winston.info(`Sensor.update(${sensor.name}) ${k}:${sensor[k]}=>${newType[k]}.`);
+                        sensor[k] = newType[k];
+                    }
                 });
             }
 
@@ -135,7 +139,6 @@
                 crc: Sensor.CRC_8_FF_31,
                 crcInit: 0xff,
                 crcPoly: 0x31,
-                vesselIndex: 0,
                 dataRead: [
                     Sensor.BYTE_TEMP_HIGH,
                     Sensor.BYTE_TEMP_LOW,
@@ -203,8 +206,8 @@
         }
         static get TYPE_NONE() {
             return {
-                address: null,
-                addresses: [],
+                address: SystemFacade.NO_DEVICE,
+                addresses: [SystemFacade.NO_DEVICE],
                 cmdRead: null,
                 cmdWakeup: null, 
                 comm: null,
@@ -224,7 +227,6 @@
                 tempRegExp: null,
                 tempScale: null,
                 type: "none",
-                vesselIndex: 0,
 
             }
         }

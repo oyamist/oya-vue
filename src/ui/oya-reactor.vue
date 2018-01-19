@@ -236,7 +236,6 @@
                                 v-model="sensor.type"
                                 label="Sensor type"
                                 @input="clickSensorType(sensor)"
-                                :rules="sensorRules(sensor)"
                                 item-text="desc"
                                 item-value="type"
                                 ></v-select>
@@ -258,7 +257,6 @@
                                 v-bind:items="sensorAddresses(sensor)"
                                 v-model="sensor.address"
                                 label="Address"
-                                :rules="sensorRules(sensor)"
                                 ></v-select>
                         </rb-dialog-row>
                     </v-card-text>
@@ -331,16 +329,6 @@ export default {
                     };
                 }
             });
-        },
-        sensorRules(sensor) {
-            return [
-                () => {
-                    var valid = this.mutableSensors.reduce((a,s) => 
-                        a && (s === sensor || s.address == null || sensor.address !== s.address)
-                    , true);
-                    return valid || `${sensor.comm} address conflict: ${sensor.address}`;
-                },
-            ];
         },
         nonNegRules(value) {
             return [

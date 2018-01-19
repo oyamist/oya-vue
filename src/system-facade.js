@@ -6,8 +6,11 @@
     class SystemFacade {
         constructor(opts = {}) {
             this.w1Addresses = opts.w1Addresses || [];
+            this.w1Addresses.indexOf(SystemFacade.NO_DEVICE) < 0 &&
+                this.w1Addresses.push(SystemFacade.NO_DEVICE);
         }
 
+        static get NO_DEVICE() { return '(NO DEVICE)' }
         static get facade() {
             return sfSingleton;
         }
