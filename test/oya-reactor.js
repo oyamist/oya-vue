@@ -3,6 +3,7 @@
     const should = require("should");
     const srcPkg = require("../package.json");
     const rb = require('rest-bundle');
+    const v8 = require('v8');
     const rbh = new rb.RbHash();
     const EAVG = 0.01;
     const supertest = require('supertest');
