@@ -292,6 +292,7 @@
                 Sensor.TYPE_AM2315, 
                 Sensor.TYPE_SHT31_DIS, 
                 Sensor.TYPE_DS18B20, 
+                Sensor.TYPE_EZO_EC_K1, 
                 Sensor.TYPE_NONE, 
             ];
         }

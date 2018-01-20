@@ -60,9 +60,19 @@
                             <v-btn color="error" :disabled="alertUpdate" @click="confirmUpdate">Update</v-btn>
                             <v-btn @click="cancelUpdate">Cancel</v-btn>
                         </v-card-actions>
-                        <v-alert type=error v-show="alertUpdate">
+                        <v-alert type=warning v-show="alertUpdate && !updateStatus && !updateComplete" 
+                            color="orange">
                             <div v-show="!updateStatus"> Update in progress:{{updateSeconds}} ...  </div>
+                        </v-alert>
+                        <v-alert type=error v-show="updateStatus">
                             <div v-show="updateStatus"> STATUS: {{updateStatus}} </div>
+                        </v-alert>
+                        <v-alert type=success v-show="updateComplete" color="green darken-3">
+                            <div v-show="updateComplete"> 
+                                <div v-for="line in updateComplete">
+                                    {{line}}
+                                </div>
+                            </div>
                         </v-alert>
                     </v-card>
                 </v-dialog>
@@ -299,6 +309,7 @@ export default {
             updateSeconds: null,
             alertUpdate: false,
             updateStatus: null,
+            updateComplete: null,
             cycleToggle: false,
             mockPhase: 0,
             cycleStartTimeMenu: false,
@@ -394,6 +405,7 @@ export default {
         clickUpdate() {
             this.updateToggle = true;
             this.updateStatus = null;
+            this.updateComplete = null;
             this.alertUpdate = false;
         },
         cancelUpdate() {
@@ -413,7 +425,7 @@ export default {
                 if (r.data.stderr) {
                     this.updateStatus = r.data.stderr;
                 } else {
-                    this.updateToggle = false;
+                    this.updateComplete = r.data.stdout.split("\n");
                 }
             }).catch(e => {
                 this.updateStatus = `Update failed:${e.message}`;
