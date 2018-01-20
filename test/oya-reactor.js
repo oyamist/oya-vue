@@ -560,10 +560,12 @@
                 vessel.activate(false);
                 should(vessel.state.tempInternal.value).equal(null);
                 should(vessel.state.humidityInternal.value).equal(null);
+                should(vessel.state.ecInternal.value).equal(null);
 
                 var command = {
                     tempInternal: 72,
                     humidityInternal: 0.64,
+                    ecInternal: 300,
                 }
                 var res = yield supertest(app).post("/test/sensor").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
@@ -580,7 +582,14 @@
                     avg2: 0.64,
                     unit: "%RH",
                 });
+                should.deepEqual(vessel.state.ecInternal, {
+                    value: 300,
+                    avg1: 300,
+                    avg2: 300,
+                    unit: "\u00b5S",
+                });
                 should.deepEqual(res.body, {
+                    ecInternal: 300,
                     tempInternal: 72,
                     humidityInternal: 0.64,
                 });

@@ -450,6 +450,7 @@ export default {
             var mockFactor = 0.1*Math.sin(this.mockPhase);
             this.$http.post(url, {
                 tempInternal: mockFactor + 20,
+                ecInternal: mockFactor * 10,
                 humidityInternal: 0.9 + mockFactor * 0.05,
             }).then(r => {
                 this.rbService.cycle = r.data.cycle;

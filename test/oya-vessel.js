@@ -152,6 +152,7 @@
         should(typeof coolThreshold).equal("number");
         should(vessel.state.tempInternal.value).equal(null);
         should(vessel.state.humidityInternal.value).equal(null);
+        should(vessel.state.ecInternal.value).equal(null);
 
         // just right
         dbfacade.stmts.length.should.equal(0);

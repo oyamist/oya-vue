@@ -146,10 +146,13 @@ export default {
             return {
                 tempInternal: "Internal/Root Temperature",
                 humidityInternal: "Internal/Root Humidity",
+                ecInternal: "Internal/Root EC",
                 tempCanopy: "Canopy Temperature",
                 humidityCanopy: "Canopy Humidity",
+                ecCanopy: "Canopy EC",
                 tempAmbient: "Ambient Temperature",
                 humidityAmbient: "Ambient Humidity",
+                ecAmbient: "Ambient EC",
             };
         },
         labelHours() {

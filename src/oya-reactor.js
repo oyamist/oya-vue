@@ -17,6 +17,7 @@
     const SENSOR_EVENTS = {
         tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
         humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+        ecInternal: OyaVessel.SENSE_EC_INTERNAL,
     };
 
     class OyaReactor extends rb.RestBundle {
@@ -280,6 +281,11 @@
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));
+                    } else if (req.params.field === 'ecInternal') {
+                        var evt = OyaVessel.SENSE_EC_INTERNAL;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolveNormalize(r))
+                        .catch(e => reject(e));
                     } else if (req.params.field === 'tempCanopy') {
                         var evt = OyaVessel.SENSE_TEMP_CANOPY;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
@@ -290,6 +296,11 @@
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));
+                    } else if (req.params.field === 'ecCanopy') {
+                        var evt = OyaVessel.SENSE_EC_CANOPY;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolveNormalize(r))
+                        .catch(e => reject(e));
                     } else if (req.params.field === 'tempAmbient') {
                         var evt = OyaVessel.SENSE_TEMP_AMBIENT;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
@@ -297,6 +308,10 @@
                         .catch(e => reject(e));
                     } else if (req.params.field === 'humidityAmbient') {
                         var evt = OyaVessel.SENSE_HUMIDITY_AMBIENT;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolveNormalize(r))
+                    } else if (req.params.field === 'ecAmbient') {
+                        var evt = OyaVessel.SENSE_EC_AMBIENT;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r))
                         .catch(e => reject(e));
