@@ -481,15 +481,15 @@
                     humidity = humidity == null ? 0 : humidity;
                     humidity |= buf[i];
                 } else if (action === Sensor.BYTE_EC_0) {
-                    ec = `${buf[i].toString("utf8",i-0,i+1)}`;
+                    ec = `${buf.toString("utf8",i-0,i+1)}`;
                 } else if (action === Sensor.BYTE_EC_1) {
-                    ec = `${buf[i].toString("utf8",i-1,i+1)}`;
+                    ec = `${buf.toString("utf8",i-1,i+1)}`;
                 } else if (action === Sensor.BYTE_EC_2) {
-                    ec = `${buf[i].toString("utf8",i-2,i+1)}`;
+                    ec = `${buf.toString("utf8",i-2,i+1)}`;
                 } else if (action === Sensor.BYTE_EC_3) {
-                    ec = `${buf[i].toString("utf8",i-3,i+1)}`;
+                    ec = `${buf.toString("utf8",i-3,i+1)}`;
                 } else if (action === Sensor.BYTE_EC_4) {
-                    ec = `${buf[i].toString("utf8",i-4,i+1)}`;
+                    ec = `${buf.toString("utf8",i-4,i+1)}`;
                 } else if (action === Sensor.BYTE_RES_1) {
                     if (buf[i] !== 1) {
                         var err = new Error(`Sensor ${this.name} invalid response. `+

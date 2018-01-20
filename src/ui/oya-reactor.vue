@@ -83,7 +83,7 @@
                             <v-btn color="error" :disabled="alertRestarting" @click="confirmRestart">Restart</v-btn>
                             <v-btn @click="cancelRestart">Cancel</v-btn>
                         </v-card-actions>
-                        <v-alert type=error v-show="alertRestarting">
+                        <v-alert type=warning v-show="alertRestarting" color="orange">
                             <div > {{restartStatus}} {{updateSeconds}} ...  </div>
                         </v-alert>
                     </v-card>
