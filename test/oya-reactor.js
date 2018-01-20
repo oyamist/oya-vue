@@ -595,6 +595,7 @@
                 });
 
                 var command = {
+                    ecInternal: 299,
                     tempInternal: 73,
                     humidityInternal: 0.74,
                 }
@@ -615,7 +616,15 @@
                     avg2: avg1*EAVG + (1-EAVG)*0.64,
                     unit: "%RH",
                 });
+                var avg1 = 299*EAVG + (1-EAVG)*300;
+                should.deepEqual(vessel.state.ecInternal, {
+                    value: 299,
+                    avg1,
+                    avg2: avg1*EAVG + (1-EAVG)*300,
+                    unit: "\u00b5S",
+                });
                 should.deepEqual(res.body, {
+                    ecInternal: 299,
                     tempInternal: 73,
                     humidityInternal: 0.74,
                 });

@@ -79,6 +79,15 @@ export default {
                     result = rh.toFixed(1);
                     delta = avg1 - avg2;
                 }
+            } else if (data.unit === "\u00b5S") {
+                suffix = '\u00b5S';
+                if (data.value != null) {
+                    var ec = data.value ;
+                    var avg1 = data.avg1 ;
+                    var avg2 = data.avg2 ;
+                    result = ec.toFixed(1);
+                    delta = avg1 - avg2;
+                }
             } else {
                 result = data.value.toFixed(1);
                 delta = data.avg1 - data.avg2;
