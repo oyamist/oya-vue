@@ -63,6 +63,24 @@
                 unit: "%RH",
                 value: null,
             },
+            ecInternal: {
+                avg1: null,
+                avg2: null,
+                unit: '\u00b5S', // microsiemens
+                value: null,
+            },
+            ecCanopy: {
+                avg1: null,
+                avg2: null,
+                unit: '\u00b5S', // microsiemens
+                value: null,
+            },
+            ecAmbient: {
+                avg1: null,
+                avg2: null,
+                unit: '\u00b5S', // microsiemens
+                value: null,
+            },
         };
     }
 

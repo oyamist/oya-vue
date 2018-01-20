@@ -62,6 +62,24 @@
                     avg2: null,
                     unit: "%RH",
                 },
+                ecInternal: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: '\u00b5S', // microsiemens
+                },
+                ecCanopy: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: '\u00b5S', // microsiemens
+                },
+                ecAmbient: {
+                    value: null,
+                    avg1: null,
+                    avg2: null,
+                    unit: '\u00b5S', // microsiemens
+                },
             };
             OyaVessel.applyDelta(this, opts);
             this.guid == null && (this.guid = uuidv4().toString());
@@ -98,6 +116,12 @@
                 this.onHumidity(v,'humidityAmbient', OyaVessel.SENSE_HUMIDITY_AMBIENT));
             this.emitter.on(OyaVessel.SENSE_HUMIDITY_CANOPY, (v) => 
                 this.onHumidity(v,'humidityCanopy', OyaVessel.SENSE_HUMIDITY_CANOPY));
+            this.emitter.on(OyaVessel.SENSE_EC_INTERNAL, (v) => 
+                this.onEC(v,'ecInternal', OyaVessel.SENSE_EC_INTERNAL));
+            this.emitter.on(OyaVessel.SENSE_EC_CANOPY, (v) => 
+                this.onEC(v,'ecCanopy', OyaVessel.SENSE_EC_CANOPY));
+            this.emitter.on(OyaVessel.SENSE_EC_AMBIENT, (v) => 
+                this.onEC(v,'ecAmbient', OyaVessel.SENSE_EC_AMBIENT));
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
@@ -158,6 +182,9 @@
         static get SENSE_HUMIDITY_AMBIENT() { return "sense: humidity-ambient"; }
         static get SENSE_PH() { return "sense: pH"; }
         static get SENSE_PPM() { return "sense: ppm"; }
+        static get SENSE_EC_INTERNAL() { return "sense: ec-internal"; }
+        static get SENSE_EC_CANOPY() { return "sense: ec-canopy"; }
+        static get SENSE_EC_AMBIENT() { return "sense: ec-ambient"; }
 
         toJSON() {
             return {
@@ -199,6 +226,23 @@
 
         get isActive() {
             return this._state.active;
+        }
+
+        onEC(value, field, sense) {
+            winston.debug(`onEC ${field} ${value}`);
+            this.dbfacade.isOpen && this.dbfacade
+                .logSensor(this.guid, sense, value)
+                .catch(e => {
+                    winston.debug(e); // ignore sensor errors
+                });
+            this._state[field].value = value;
+            var expRate = Number(this.sensorExpRate);
+            this._state[field].avg1 = this._state[field].avg1 == null 
+                ? value
+                : value * expRate + (1 - expRate) * this._state[field].avg1;
+            this._state[field].avg2 = this._state[field].avg2 == null 
+                ? this._state[field].avg1 
+                : this._state[field].avg1 * expRate + (1 - expRate) * this._state[field].avg2;
         }
 
         onHumidity(value, field, sense) {

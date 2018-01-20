@@ -36,6 +36,7 @@
             this.name = opts.name || typeProps.name;
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
+            this.readEC = opts.readEC == null ? typeProps.readEC : opts.readEC;
             this.type = type;
             this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
@@ -113,6 +114,14 @@
             return sensor;
         }
 
+        static get EVENT_EC_MAP() {
+            return {
+                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_EC_INTERNAL,
+                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_EC_CANOPY,
+                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_EC_AMBIENT,
+            };
+        }
+
         static get EVENT_HUMIDITY_MAP() {
             return {
                 [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
@@ -160,6 +169,7 @@
                     on: [0x30, 0x6d],
                     off: [0x30, 0x66],
                 },
+                baud: 10000,
             });
         }
         static get TYPE_AM2315() {
@@ -189,6 +199,30 @@
                 tempOffset: 0,
                 tempScale: 0.1,
                 type: "AM2315",
+                baud: 10000,
+            });
+        }
+        static get TYPE_EZO_EC_K1() {
+            return Object.assign(Sensor.TYPE_NONE, {
+                address: 0x64,
+                addresses: [0x64],
+                baud: 100000,
+                cmdRead: [0x52],
+                cmdInfo: [0x49],
+                comm: Sensor.COMM_I2C,
+                dataRead: [ 
+                    Sensor.BYTE_RES_1,
+                    Sensor.BYTE_EC_0,
+                    Sensor.BYTE_EC_1,
+                    Sensor.BYTE_EC_2,
+                    Sensor.BYTE_EC_3,
+                    Sensor.BYTE_EC_4,
+                ],
+                desc: "Atlas Scientific EZO\u2122 EC with K1 conductivity probe",
+                name: "EZO-EC-K1",
+                readDelay: 600,
+                readEC: true,
+                type: "EZO-EC-K1",
             });
         }
         static get TYPE_DS18B20() {
@@ -221,6 +255,7 @@
                 humidityScale: null,
                 name: "No sensor",
                 readDelay: null,
+                readEC: null,
                 readHumidity: null,
                 readTemp: null,
                 tempOffset: null,
@@ -236,7 +271,13 @@
         static get LOC_NONE() { return "none"; }
         static get COMM_I2C() { return "I\u00B2C"; }
         static get COMM_W1() { return "1-wire"; }
+        static get BYTE_EC_0() { return "EC string[0]"; }
+        static get BYTE_EC_1() { return "EC string[1]"; }
+        static get BYTE_EC_2() { return "EC string[2]"; }
+        static get BYTE_EC_3() { return "EC string[3]"; }
+        static get BYTE_EC_4() { return "EC string[4]"; }
         static get BYTE_IGNORE() { return "Ignored byte"; }
+        static get BYTE_RES_1() { return "Response code 1"; }
         static get BYTE_CRC_HIGH() { return "CRC high byte"; }
         static get BYTE_CRC_LOW() { return "CRC low byte"; }
         static get BYTE_CRC2() { return "CRC-8 of previous 2 bytes"; }
@@ -416,6 +457,7 @@
             if (this.dataRead == null) {
                 return {};
             }
+            var ec = null;
             var temp = null;
             var humidity = null;
             var crc = null;
@@ -437,6 +479,22 @@
                 } else if (action === Sensor.BYTE_RH_LOW) {
                     humidity = humidity == null ? 0 : humidity;
                     humidity |= buf[i];
+                } else if (action === Sensor.BYTE_EC_0) {
+                    ec = `${buf[i].toString("utf8",i-0,i+1)}`;
+                } else if (action === Sensor.BYTE_EC_1) {
+                    ec = `${buf[i].toString("utf8",i-1,i+1)}`;
+                } else if (action === Sensor.BYTE_EC_2) {
+                    ec = `${buf[i].toString("utf8",i-2,i+1)}`;
+                } else if (action === Sensor.BYTE_EC_3) {
+                    ec = `${buf[i].toString("utf8",i-3,i+1)}`;
+                } else if (action === Sensor.BYTE_EC_4) {
+                    ec = `${buf[i].toString("utf8",i-4,i+1)}`;
+                } else if (action === Sensor.BYTE_RES_1) {
+                    if (buf[i] !== 1) {
+                        var err = new Error(`Sensor ${this.name} invalid response. `+
+                            `expected:0x01 actual:0x${buf[i].toString(16)}`);
+                        throw err;
+                    }
                 } else if (action === Sensor.BYTE_CRC_HIGH) {
                     crc = crc == null ? 0 : crc;
                     crc |= (buf[i] << 8);
@@ -493,9 +551,18 @@
                     humidity = null;
                 }
             }
+            if (ec != null) {
+                if (this.readEC) {
+                    ec = Number(ec);
+                    this.emit(ec, Sensor.EVENT_EC_MAP);
+                } else {
+                    ec = null;
+                }
+            }
             return this.data = {
                 temp,
                 humidity,
+                ec,
                 timestamp: new Date(),
             }
         }
