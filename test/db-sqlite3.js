@@ -95,7 +95,7 @@
             }
         })();
     });
-    it("sensorDataByHour(vname,evt,date) summarizes sensor data by hour", function(done) {
+    it("TESTTESTsensorDataByHour(vname,evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = await new DbSqlite3().open();
@@ -104,16 +104,43 @@
                 should.deepEqual(r, { c: 0 }); 
                 await dbl.logSensor("test", "testevt", 12, testDate3);
                 await dbl.logSensor("test", "testevt", 13, testDate2);
+                await dbl.logSensor("test", "otherevt", 100, testDate2);
                 await dbl.logSensor("test", "testevt", 14, testDate);
 
+                // single event
                 var r = await dbl.sensorDataByHour('test','testevt', testDate2);
                 should(r).properties(["sql","data"]);
                 should.deepEqual(r.data, [{
+                    evt: 'testevt',
                     hr: '2017-03-08 0100',
                     vavg: 13.5,
                     vmax: 14,
                     vmin: 13,
                 },{
+                    evt: 'testevt',
+                    hr: '2017-03-07 1100',
+                    vavg: 12,
+                    vmax: 12,
+                    vmin: 12,
+                }]);
+
+                // multiple events
+                var r = await dbl.sensorDataByHour('test',['testevt','otherevt'], testDate2);
+                should(r).properties(["sql","data"]);
+                should.deepEqual(r.data, [{
+                    evt: 'otherevt',
+                    hr: '2017-03-08 0100',
+                    vavg: 100,
+                    vmax: 100,
+                    vmin: 100,
+                },{
+                    evt: 'testevt',
+                    hr: '2017-03-08 0100',
+                    vavg: 13.5,
+                    vmax: 14,
+                    vmin: 13,
+                },{
+                    evt: 'testevt',
                     hr: '2017-03-07 1100',
                     vavg: 12,
                     vmax: 12,

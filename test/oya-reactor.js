@@ -338,12 +338,12 @@
                 var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/1/2017-03-09").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
+                        'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-09 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
-                        "and evt='sense: temp-internal'\n"+
-                        "group by hr\n"+
-                        "order by hr desc\n"+
+                        "and evt in ('sense: temp-internal')\n"+
+                        "group by evt, hr\n"+
+                        "order by evt, hr desc\n"+
                         "limit 24;");
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
@@ -352,12 +352,12 @@
                 var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/7/2017-03-09").expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, min(v) vmin, max(v) vmax\n'+
+                        'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-03 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
-                        "and evt='sense: temp-internal'\n"+
-                        "group by hr\n"+
-                        "order by hr desc\n"+
+                        "and evt in ('sense: temp-internal')\n"+
+                        "group by evt, hr\n"+
+                        "order by evt, hr desc\n"+
                         "limit 168;");
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));

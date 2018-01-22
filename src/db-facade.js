@@ -95,7 +95,16 @@
             if (!this.isOpen) {
                 return Promise.reject(DbFacade.ERROR_NOT_OPEN);
             }
-            return Promise.resolve(sql.indexOf('temp')>=0 ? mockData : []);
+            if (sql.indexOf('evt in (') >= 0) {
+                return Promise.resolve(mockData.map(d=>{
+                    var iStart = sql.indexOf("evt in ('")+9;
+                    var iEnd = sql.indexOf("'", iStart);
+                    d.evt = sql.substring(iStart,iEnd);
+                    return d;
+                }));
+            } else {
+                return Promise.resolve([]);
+            }
         }
 
         logSensor(vname, evt, value, date=new Date()) {
@@ -129,13 +138,18 @@
                 try {
                     var d1 = this.utcstr(new Date(enddate.getTime() - days*24*3600*1000));
                     var d2 = this.utcstr(enddate);
+                    if (typeof evt === 'string') {
+                        evt = `'${evt}'`;
+                    } else {
+                        evt = `'${evt.join("','")}'`;
+                    }
                     var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        `avg(v) vavg, min(v) vmin, max(v) vmax\n`+
+                        `avg(v) vavg, min(v) vmin, max(v) vmax, evt\n`+
                         `from sensordata\n`+
                         `where utc between ${d1} and ${d2}\n`+
-                        `and evt='${evt}'\n`+
-                        `group by hr\n`+
-                        `order by hr desc\n`+
+                        `and evt in (${evt})\n`+
+                        `group by evt, hr\n`+
+                        `order by evt, hr desc\n`+
                         `limit ${days*24};`;
                     this.sqlAll(sql).then(data=>{
                         resolve( { sql, data, });
