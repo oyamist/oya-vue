@@ -20,6 +20,19 @@
         ecInternal: OyaVessel.SENSE_EC_INTERNAL,
     };
 
+    const SQL_EVENTS = {
+        tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
+        humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+        ecInternal: [ OyaVessel.SENSE_EC_INTERNAL, OyaVessel.SENSE_TEMP_INTERNAL],
+        tempCanopy: OyaVessel.SENSE_TEMP_CANOPY,
+        humidityCanopy: OyaVessel.SENSE_HUMIDITY_CANOPY,
+        ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_INTERNAL],
+        tempAmbient: OyaVessel.SENSE_TEMP_AMBIENT,
+        humidityAmbient: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+        ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_INTERNAL],
+    }
+
+
     class OyaReactor extends rb.RestBundle {
         constructor(name = "test", opts = {}) {
             super(name, Object.assign({
@@ -216,7 +229,7 @@
             return [ OyaConf.MCU_HAT_NONE ];
         }
 
-        normalizeDataByHour(data) {
+        normalizeDataByHour(data, evt) {
             var dateMap = {};
             data.forEach(d=>{
                 var date = d.hr.substr(0,10);
@@ -234,6 +247,7 @@
                             vavg:null,
                             vmin:null,
                             vmax:null,
+                            evt,
                         });
                     }
                 }
@@ -260,8 +274,9 @@
         getSensorDataByHour(req, res, next) {
             return new Promise((resolve, reject) => {
                 try {
+                    var evt = SQL_EVENTS[req.params.field];
                     var resolveNormalize = r => {
-                        this.normalizeDataByHour(r.data);
+                        this.normalizeDataByHour(r.data, evt && evt[0] || evt);
                         resolve(r);
                     };
                     var dbf = this.vessel.dbfacade;
@@ -271,49 +286,9 @@
                     var mo = Number(endDate.substr(5,2))-1;
                     var dd = Number(endDate.substr(8,2));
                     var date = new Date(yyyy,mo,dd,23,59,59,999);
-                    if (req.params.field === 'tempInternal') {
-                        var evt = OyaVessel.SENSE_TEMP_INTERNAL;
+                    if (evt) {
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'humidityInternal') {
-                        var evt = OyaVessel.SENSE_HUMIDITY_INTERNAL;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'ecInternal') {
-                        var evt = OyaVessel.SENSE_EC_INTERNAL;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'tempCanopy') {
-                        var evt = OyaVessel.SENSE_TEMP_CANOPY;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'humidityCanopy') {
-                        var evt = OyaVessel.SENSE_HUMIDITY_CANOPY;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'ecCanopy') {
-                        var evt = OyaVessel.SENSE_EC_CANOPY;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'tempAmbient') {
-                        var evt = OyaVessel.SENSE_TEMP_AMBIENT;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                        .catch(e => reject(e));
-                    } else if (req.params.field === 'humidityAmbient') {
-                        var evt = OyaVessel.SENSE_HUMIDITY_AMBIENT;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
-                    } else if (req.params.field === 'ecAmbient') {
-                        var evt = OyaVessel.SENSE_EC_AMBIENT;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r))
+                        .then(r => resolveNormalize(r, evt && evt[0] || evt))
                         .catch(e => reject(e));
                     } else {
                         reject(new Error(`unknown field:${req.params.field}`));

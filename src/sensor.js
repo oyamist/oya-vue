@@ -1,6 +1,7 @@
 (function(exports) {
     const winston = require("winston");
     const OyaVessel = require('./oya-vessel');
+    const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
 
     var SERIALIZABLE_KEYS;
@@ -77,6 +78,54 @@
 
         get serializableKeys() {
             return SERIALIZABLE_KEYS;
+        }
+
+        static calibratedValue(ann, temp, reading, nominal) {
+            var annValue = ann.activate([temp])[0];
+            return reading * (nominal/annValue);
+        }
+
+        static calibrationANN(seq, valueKey='ecInternal', tempKey='tempInternal') {
+            var mono = Sensor.monotonic(seq,tempKey);
+            var examples = seq.slice(mono.start, mono.end).map(s => {
+                return new OyaAnn.Example([s[tempKey]], [s[valueKey]]);
+            });
+            var v = OyaAnn.Variable.variables(examples);
+            var factory = new OyaAnn.Factory(v, {
+                power: 5,
+                maxMSE: 1,
+                preTrain: true,
+                trainingReps: 50, // max reps to reach maxMSE
+            });
+            var network = factory.createNetwork();
+            network.train(examples);
+            return network;
+        }
+
+        static monotonic(list, key) {
+            var start = 0;
+            var end = 0;
+            var descStart = 0;
+            var ascStart = 0;
+            var iprev = 0;
+            for (var i = 0; i < list.length; i++) {
+                var vi = list[i];
+                if (list[i][key] < list[iprev][key]) { // decreasing
+                    if ((i - ascStart) > (end - start)) {
+                        start = ascStart;
+                        end = i;
+                    }
+                    ascStart = i;
+                } else { //  increasing
+                    if ((i - descStart) > (end - start)) {
+                        start = descStart;
+                        end = i;
+                    }
+                    descStart = i;
+                }
+                iprev = i;
+            }
+            return { start, end };
         }
 
         static update(sensor=new Sensor(), ...args) {

@@ -94,8 +94,13 @@
                 // multiple events
                 var r = await dbl.sensorDataByHour('test',['testevt','tempInternal'], testDate);
                 should(r).properties(["sql","data"]);
-                should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\nand evt .*\ngroup by evt, hr\norder by evt, hr desc\nlimit 24/m);
+                should(r.sql).match(/select.*/m);
+                should(r.sql).match(/from sensordata/m);
+                should(r.sql).match(/where.*/m);
                 should(r.sql).match(/evt in \('testevt','tempInternal'\)/m);
+                should(r.sql).match(/group by evt, hr/m);
+                should(r.sql).match(/order by evt, hr desc/m);
+                should(r.sql).match(/limit 48/m);
                 should(r.data).instanceOf(Array);
                 done();
             } catch (e) {
