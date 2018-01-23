@@ -32,10 +32,10 @@
                 ecInternal: [ OyaVessel.SENSE_EC_INTERNAL, OyaVessel.SENSE_TEMP_INTERNAL],
                 tempCanopy: OyaVessel.SENSE_TEMP_CANOPY,
                 humidityCanopy: OyaVessel.SENSE_HUMIDITY_CANOPY,
-                ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_INTERNAL],
+                ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_CANOPY],
                 tempAmbient: OyaVessel.SENSE_TEMP_AMBIENT,
                 humidityAmbient: OyaVessel.SENSE_HUMIDITY_AMBIENT,
-                ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_INTERNAL],
+                ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_AMBIENT],
             }
         }
 
