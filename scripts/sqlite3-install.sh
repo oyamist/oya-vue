@@ -1,7 +1,6 @@
 #!/bin/bash
 
 echo -e "START\t: $0 `date`"
-#pushd `dirname $0` >& /dev/null
 SCRIPTS=`dirname $0`
 echo -e "INSTALL\t: `pwd`"
 
@@ -26,7 +25,7 @@ if [ -e ${DB} ]; then
 else
     echo -e "INSTALL\t: Creating SQLite database: ${DB}"
     sqlite3 ${DB} < ${SCRIPTS}/create-${VER}.sql
-    scripts/db-update-${VER}.sh
+    ${SCRIPTS}/db-update-${VER}.sh
 fi
 
 echo -e "END\t: $0 `date`"
