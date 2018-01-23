@@ -12,8 +12,8 @@ sqlite3 oyamist.db <<HEREIS1
 select 
     utc,
     evt,
-    v,
-    vessel ctx
+    vessel ctx,
+    v
 from sensordata;
 HEREIS1
 RC=$?; if [ "$RC" != "0" ]; then
