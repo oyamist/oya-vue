@@ -29,69 +29,6 @@
     it("default DbReport is none", function() {
         var dbr = new DbReport();
     });
-    it("monotonic(seq,key) finds longest monotonic contiguous subsequence", function() {
-        var seq = [];
-        var phase = 135;
-        for (var degree=phase; degree<360+phase; degree += 10) {
-            seq.push({
-                value: Math.sin(degree*Math.PI/180)
-            });
-        }
-        should.deepEqual(DbReport.monotonic(seq,'value'), {
-            start: 13, // inclusive
-            end: 33, // exclusive
-        });
-    });
-    it("strings are equal", function() {
-        var a = 'test';
-        var b = 'test';
-        var c = 'te';
-        c += 'st';
-        should(a === 'test').equal(true);
-        should(a === 'TEst').equal(false);
-        should(a !== 'test').equal(false);
-        should(a !== 'TEst').equal(true);
-        should(c !== 'test').equal(false);
-        should(c !== 'TEst').equal(true);
-        should(a === b).equal(true);
-        should(a === c).equal(true);
-        should(b === c).equal(true);
-        should(['a','b']+"").equal("a,b");
-        should([a,b,c]+"").equal("test,test,test");
-    });
-    it("calibrationANN(seq,yKey,xKey) creates calibration ANN for sampled data", function() {
-        // create sample data for diurnal temperature cycle
-        // For testing, we use a linear relationship, but non-linear relationships can
-        // also be handled
-        var seq = [];
-        for (var degree=0; degree<360; degree += 10) {
-            var v = Math.sin(degree*Math.PI/180);
-            var temp = 2*v + 18; // centigrade
-            var ec = 20*v + 400; // microsiemens
-            seq.push({
-                tempInternal: temp,
-                ecInternal: ec,
-            });
-        }
-
-        // create artificial neural network for calibration from sample data
-        // Calibration is based on the longest monotonic subsequence
-        // of sampled temperatures to avoid hysteresis effects which
-        // affect EC probes.
-        var ann = DbReport.calibrationANN(seq, 'ecInternal', 'tempInternal');
-
-        // fractional readings should correspond with fractions of nominal value independent of temperature
-        // over all measured values
-        var e = 0.01;
-        var percent = 100; // arbitrary nominal value conversion
-        seq.forEach(s => {
-            [1,1/2,1/4,1/10,1/100].forEach(fraction => {
-                var fractionalReading = s.ecInternal * fraction;
-                var cv = DbReport.calibratedValue(ann, s.tempInternal, fractionalReading, percent);
-                should(cv).approximately(percent * fraction, e);
-            });
-        });
-    });
     it("TESTTESThourlySummary(data,fields) summarizes data by hour for given fields", function() {
         var sqlDataPath = path.join(__dirname, 'ecInternal.json');
         var sqlData = JSON.parse(fs.readFileSync(sqlDataPath));
@@ -110,5 +47,15 @@
         result.forEach(r => {
             should(r).properties(['hr','ecInternal', 'tempInternal']);
         });
+    });
+    it ("normalizeDataByHour fills in missing data", function() {
+        var data = [
+            {"hr":"1999-12-08 1300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
+            {"hr":"1999-12-08 1200","vavg":18.074496982104563,"vmin":17.99795274789553,"vmax":18.104765901172403},
+        ];
+        var normData = DbReport.normalizeDataByHour(data);
+        normData.length.should.equal(24);
+        should(data[0].hr).equal("1999-12-08 2300");
+        should(data[23].hr).equal("1999-12-08 0000");
     });
 })

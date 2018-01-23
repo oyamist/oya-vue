@@ -330,7 +330,7 @@
         }();
         async.next();
     });
-    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -738,17 +738,6 @@
             }
         }();
         async.next();
-    });
-    it ("normalizeDataByHour fills in missing data", function() {
-        var reactor =  new OyaReactor();
-        var data = [
-            {"hr":"1999-12-08 1300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
-            {"hr":"1999-12-08 1200","vavg":18.074496982104563,"vmin":17.99795274789553,"vmax":18.104765901172403},
-        ];
-        var normData = reactor.normalizeDataByHour(data);
-        normData.length.should.equal(24);
-        should(data[0].hr).equal("1999-12-08 2300");
-        should(data[23].hr).equal("1999-12-08 0000");
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;

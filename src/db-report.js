@@ -1,5 +1,6 @@
 (function(exports) {
     const winston = require("winston");
+    const DbFacade = require("./db-facade");
     const Sensor = require('./sensor');
     const OyaVessel = require('./oya-vessel');
     const OyaAnn = require('oya-ann');
@@ -15,94 +16,28 @@
     };
 
     class DbReport {
-        constructor(opts) {
+        constructor(opts={}) {
+            this.dbfacade = opts.dbfacade || new DbFacade();
+            this.dbfacade.open();
+            this.vessel = opts.vessel;
         }
 
         static fieldOfEvent(event) {
             return EVENT_FIELD_MAP[event];
         }
 
-        static calibratedValue(ann, temp, reading, nominal) {
-            var annValue = ann.activate([temp])[0];
-            return reading * (nominal/annValue);
-        }
-
-        static calibrationANN(seq, valueKey='ecInternal', tempKey='tempInternal') {
-            var mono = Sensor.monotonic(seq,tempKey);
-            var examples = seq.slice(mono.start, mono.end).map(s => {
-                return new OyaAnn.Example([s[tempKey]], [s[valueKey]]);
-            });
-            var v = OyaAnn.Variable.variables(examples);
-            var factory = new OyaAnn.Factory(v, {
-                power: 5,
-                maxMSE: 1,
-                preTrain: true,
-                trainingReps: 50, // max reps to reach maxMSE
-            });
-            var network = factory.createNetwork();
-            network.train(examples);
-            return network;
-        }
-
-        static monotonic(list, key) {
-            var start = 0;
-            var end = 0;
-            var descStart = 0;
-            var ascStart = 0;
-            var iprev = 0;
-            for (var i = 0; i < list.length; i++) {
-                var vi = list[i];
-                if (list[i][key] < list[iprev][key]) { // decreasing
-                    if ((i - ascStart) > (end - start)) {
-                        start = ascStart;
-                        end = i;
-                    }
-                    ascStart = i;
-                } else { //  increasing
-                    if ((i - descStart) > (end - start)) {
-                        start = descStart;
-                        end = i;
-                    }
-                    descStart = i;
-                }
-                iprev = i;
+        static get SQL_EVENTS() { 
+            return {
+                tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
+                humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+                ecInternal: [ OyaVessel.SENSE_EC_INTERNAL, OyaVessel.SENSE_TEMP_INTERNAL],
+                tempCanopy: OyaVessel.SENSE_TEMP_CANOPY,
+                humidityCanopy: OyaVessel.SENSE_HUMIDITY_CANOPY,
+                ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_INTERNAL],
+                tempAmbient: OyaVessel.SENSE_TEMP_AMBIENT,
+                humidityAmbient: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+                ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_INTERNAL],
             }
-            return { start, end };
-        }
-
-        static update(DbReport=new DbReport(), ...args) {
-            var opts = args.reduce((a,arg) => {
-                Object.assign(a, arg);
-                return a;
-            }, {});
-
-            if (opts.hasOwnProperty('type')) {
-                if (typeof opts.type === 'object') {
-                    opts.type = opts.type.type;
-                }
-                if (typeof opts.type !== 'string') {
-                    throw new Error("expected type to be string");
-                }
-                var types = DbReport.TYPE_LIST.filter(t => t.type === opts.type);
-                var newType = types && types[0] || DbReport.TYPE_NONE;
-                Object.keys(newType).sort().forEach(k=> {
-                    var newValue = newType[k];
-                    var oldValue = DbReport[k];
-                    if (oldValue+"" !== newValue+"") {
-                        winston.info(`DbReport.update(${DbReport.name}) ${k}:${DbReport[k]}=>${newType[k]}.`);
-                        DbReport[k] = newType[k];
-                    }
-                });
-            }
-
-            // serializable toJSON() properties
-            DbReport.serializableKeys.forEach(propName => {
-                if (opts.hasOwnProperty(propName)) {
-                    DbReport[propName] = opts[propName];
-                }
-            });
-
-            return DbReport;
         }
 
         static get EVENT_EC_MAP() {
@@ -156,6 +91,63 @@
             });
         }
 
+        static normalizeDataByHour(data, evt) {
+            var dateMap = {};
+            data.forEach(d=>{
+                var date = d.hr.substr(0,10);
+                var hr = d.hr.substr(-4);
+                dateMap[date] || (dateMap[date] = {});
+                dateMap[date][hr] = true;
+            });
+            Object.keys(dateMap).forEach(date=>{
+                var d = dateMap[date];
+                for (var i = 0; i<24; i+=1) {
+                    var hr = ('0' + i + '00').substr(-4);
+                    if (!d.hasOwnProperty(hr)) {
+                        data.push({
+                            hr:`${date} ${hr}`,
+                            vavg:null,
+                            vmin:null,
+                            vmax:null,
+                            evt,
+                        });
+                    }
+                }
+            });
+
+            return data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
+        }
+
+        sensorDataByHour(opts={}) {
+            return new Promise((resolve, reject) => {
+                try {
+                    var field = opts.field || 'ecInternal';
+                    var evt = DbReport.SQL_EVENTS[field];
+                    var primaryEvt = evt && evt[0] || evt;
+                    var resolveNormalize = r => {
+                        DbReport.normalizeDataByHour(r.data, primaryEvt);
+                        resolve(r);
+                    };
+                    var dbf = this.dbfacade;
+                    var days = Number(opts.days) || 7;
+                    var endDate = opts.endDate || new Date().toISOString().substr(0,10);
+                    var yyyy = Number(endDate.substr(0,4));
+                    var mo = Number(endDate.substr(5,2))-1;
+                    var dd = Number(endDate.substr(8,2));
+                    var date = new Date(yyyy,mo,dd,23,59,59,999);
+                    if (evt) {
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolveNormalize(r, primaryEvt))
+                        .catch(e => reject(e));
+                    } else {
+                        throw new Error(`unknown field:${field}`);
+                    }
+                } catch(e) {
+                    winston.error(e.stack);
+                    reject(e);
+                }
+            });
+        }
 
     } //// class DbReport
 

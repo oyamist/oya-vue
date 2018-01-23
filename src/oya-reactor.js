@@ -21,19 +21,6 @@
         ecInternal: OyaVessel.SENSE_EC_INTERNAL,
     };
 
-    const SQL_EVENTS = {
-        tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
-        humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-        ecInternal: [ OyaVessel.SENSE_EC_INTERNAL, OyaVessel.SENSE_TEMP_INTERNAL],
-        tempCanopy: OyaVessel.SENSE_TEMP_CANOPY,
-        humidityCanopy: OyaVessel.SENSE_HUMIDITY_CANOPY,
-        ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_INTERNAL],
-        tempAmbient: OyaVessel.SENSE_TEMP_AMBIENT,
-        humidityAmbient: OyaVessel.SENSE_HUMIDITY_AMBIENT,
-        ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_INTERNAL],
-    }
-
-
     class OyaReactor extends rb.RestBundle {
         constructor(name = "test", opts = {}) {
             super(name, Object.assign({
@@ -112,6 +99,10 @@
                 return vessel;
             });
             this.vessel = this.vessels[0];
+            this.dbReport = new DbReport({
+                vessel: this.vessel,
+                dbfacade: this.vessel.dbfacade,
+            });
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             this.loadApiModel(this.apiFile).then(apiModelCopy => {
                 var oyaConf = this.oyaConf;
@@ -140,6 +131,7 @@
                 this.emitter.emit(OyaReactor.EVENT_RELAY, value, light.pin);
             };
         }
+
         onActuator(event, value, vesselIndex) {
             var vessel = this.vessels[vesselIndex];
             this.oyaConf.actuators.map((a,ia) => {
@@ -231,33 +223,6 @@
             return [ OyaConf.MCU_HAT_NONE ];
         }
 
-        normalizeDataByHour(data, evt) {
-            var dateMap = {};
-            data.forEach(d=>{
-                var date = d.hr.substr(0,10);
-                var hr = d.hr.substr(-4);
-                dateMap[date] || (dateMap[date] = {});
-                dateMap[date][hr] = true;
-            });
-            Object.keys(dateMap).forEach(date=>{
-                var d = dateMap[date];
-                for (var i = 0; i<24; i+=1) {
-                    var hr = ('0' + i + '00').substr(-4);
-                    if (!d.hasOwnProperty(hr)) {
-                        data.push({
-                            hr:`${date} ${hr}`,
-                            vavg:null,
-                            vmin:null,
-                            vmax:null,
-                            evt,
-                        });
-                    }
-                }
-            });
-
-            return data.sort((a,b) => a.hr > b.hr ? -1 : (a.hr === b.hr ? 0 : 1));
-        }
-
         health() {
             // true: nominal
             // false: error
@@ -274,32 +239,7 @@
         }
 
         getSensorDataByHour(req, res, next) {
-            return new Promise((resolve, reject) => {
-                try {
-                    var evt = SQL_EVENTS[req.params.field];
-                    var resolveNormalize = r => {
-                        this.normalizeDataByHour(r.data, evt && evt[0] || evt);
-                        resolve(r);
-                    };
-                    var dbf = this.vessel.dbfacade;
-                    var days = Number(req.params.days) || 7;
-                    var endDate = req.params.endDate || new Date().toISOString().substr(0,10);
-                    var yyyy = Number(endDate.substr(0,4));
-                    var mo = Number(endDate.substr(5,2))-1;
-                    var dd = Number(endDate.substr(8,2));
-                    var date = new Date(yyyy,mo,dd,23,59,59,999);
-                    if (evt) {
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
-                        .then(r => resolveNormalize(r, evt && evt[0] || evt))
-                        .catch(e => reject(e));
-                    } else {
-                        reject(new Error(`unknown field:${req.params.field}`));
-                    }
-                } catch(e) {
-                    winston.error(e.stack);
-                    reject(e);
-                }
-            });
+            return this.dbReport.sensorDataByHour(req.params);
         }
 
         getSensorTypes(req, res, next) {
@@ -370,7 +310,7 @@
                     var startDate = Date.parse(opts.startDate);
                     var endDate = Date.parse(opts.endDate);
                     if (field === 'ecInternal') {
-                        var evt = SQL_EVENTS[field];
+                        var evt = DbReport.SQL_EVENTS[field];
                         var dbf = this.vessel.dbfacade;
                         dbf.sensorDataByHour(this.vessel.name, evt, date, days)
                         .then(r => resolveNormalize(r, evt && evt[0] || evt))
@@ -408,6 +348,7 @@
             }
             return value;
         }
+
         postAppRestart(req, res, next) {
             return new Promise((resolve,reject) => {
                 winston.info('OyaReactor.postAppRestart() restart server');
@@ -430,6 +371,7 @@
                 }
             });
         }
+
         postAppUpdate(req, res, next) {
             return new Promise((resolve,reject) => {
                 winston.info('OyaReactor.postAppUpdate() update application');
@@ -453,6 +395,7 @@
                 }
             });
         }
+
         postReactor(req, res, next) {
             var result = {};
             if (req.body.hasOwnProperty('activate')) {
