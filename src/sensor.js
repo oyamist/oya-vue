@@ -4,6 +4,15 @@
     const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
 
+    const EVENT_FIELD_MAP = {
+        [OyaVessel.SENSE_EC_INTERNAL]:'ecInternal',
+        [OyaVessel.SENSE_EC_CANOPY]:'ecCanopy',
+        [OyaVessel.SENSE_EC_AMBIENT]:'ecAmbient',
+        [OyaVessel.SENSE_TEMP_INTERNAL]:'tempInternal',
+        [OyaVessel.SENSE_TEMP_CANOPY]:'tempCanopy',
+        [OyaVessel.SENSE_TEMP_AMBIENT]:'tempAmbient',
+    };
+
     var SERIALIZABLE_KEYS;
 
     class Sensor {
@@ -78,6 +87,10 @@
 
         get serializableKeys() {
             return SERIALIZABLE_KEYS;
+        }
+
+        static fieldOfEvent(event) {
+            return EVENT_FIELD_MAP[event];
         }
 
         static calibratedValue(ann, temp, reading, nominal) {

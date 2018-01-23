@@ -6,6 +6,8 @@
     const OyaVessel = require('../index').OyaVessel;
     const EventEmitter = require("events");
     const OyaAnn = require('oya-ann');
+    const path = require('path');
+    const fs = require('fs');
 
     class MockSystem extends SystemFacade {
         constructor(opts={}) {
@@ -499,7 +501,7 @@
         should(['a','b']+"").equal("a,b");
         should([a,b,c]+"").equal("test,test,test");
     });
-    it("TESTTESTcalibrationANN(seq,yKey,xKey) creates calibration ANN for sampled data", function() {
+    it("calibrationANN(seq,yKey,xKey) creates calibration ANN for sampled data", function() {
         // create sample data for diurnal temperature cycle
         // For testing, we use a linear relationship, but non-linear relationships can
         // also be handled
@@ -530,6 +532,50 @@
                 var cv = Sensor.calibratedValue(ann, s.tempInternal, fractionalReading, percent);
                 should(cv).approximately(percent * fraction, e);
             });
+        });
+    });
+    it("TESTTESThourlySummary(data,fields) summarizes data by hour for given fields", function() {
+        var sqldataPath = path.join(__dirname, 'ecInternal.json');
+        var sqldata = JSON.parse(fs.readFileSync(sqldataPath));
+        var data = sqldata.data;
+        function hourlySummary(data, fields=[]) {
+            var hrSummaryMap = {};
+            var result = [];
+            data.forEach(d => {
+                var field = Sensor.fieldOfEvent(d.evt);
+                if (d.vavg) {
+                    var summary = hrSummaryMap[d.hr];
+                    if (summary == null) {
+                        hrSummaryMap[d.hr] = summary = {
+                            hr: d.hr,
+                        };
+                        result.push(summary);
+                    }
+                    summary[field] = d.vavg;
+                }
+            });
+
+            return result.filter(r => {
+                if (fields.length == 0) {
+                    return true;
+                }
+                return fields.reduce((a,f) => {
+                    return a && (r[f] != null);
+                }, true);
+            });
+        }
+
+        var result = hourlySummary(data);
+        should(result.length).equal(71);
+        result.forEach(r => {
+            should(r).properties(['hr','tempInternal']);
+        });
+        should(result[result.length-1].ecInternal).equal(undefined);
+
+        var result = hourlySummary(data, ['ecInternal', 'tempInternal']);
+        should(result.length).equal(64);
+        result.forEach(r => {
+            should(r).properties(['hr','ecInternal', 'tempInternal']);
         });
     });
 })
