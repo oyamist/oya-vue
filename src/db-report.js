@@ -4,9 +4,18 @@
     const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
 
+    const EVENT_FIELD_MAP = {
+        [OyaVessel.SENSE_EC_INTERNAL]:'ecInternal',
+        [OyaVessel.SENSE_EC_CANOPY]:'ecCanopy',
+        [OyaVessel.SENSE_EC_AMBIENT]:'ecAmbient',
+        [OyaVessel.SENSE_TEMP_INTERNAL]:'tempInternal',
+        [OyaVessel.SENSE_TEMP_CANOPY]:'tempCanopy',
+        [OyaVessel.SENSE_TEMP_AMBIENT]:'tempAmbient',
+    };
+
     var SERIALIZABLE_KEYS;
 
-    class Sensor {
+    class DbReport {
         constructor(...optArgs) {
             var opts = optArgs.reduce((acc,a) => {
                 Object.assign(acc, a);
@@ -17,22 +26,22 @@
                 type = type.type;
             }
             if (type) {
-                if (0>Sensor.TYPE_LIST.findIndex(ud => (ud.type === type))) {
+                if (0>DbReport.TYPE_LIST.findIndex(ud => (ud.type === type))) {
                     throw new Error(`Unknown type:${type}`);
                 }
             } else {
-                var type = Sensor.TYPE_NONE.type;
+                var type = DbReport.TYPE_NONE.type;
             }
-            var typeProps = Sensor.TYPE_LIST.filter(
-                ud => (ud.type===type))[0] || Sensor.TYPE_NONE;
+            var typeProps = DbReport.TYPE_LIST.filter(
+                ud => (ud.type===type))[0] || DbReport.TYPE_NONE;
 
             // BEGIN serializable toJSON() properties
             this.address = opts.address || typeProps.address;
             this.addresses = typeProps.addresses; // read-only and serializable
             this.comm = opts.comm || typeProps.comm;
-            this.desc = opts.desc || typeProps.desc || 'generic sensor';
+            this.desc = opts.desc || typeProps.desc || 'generic DbReport';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
-            this.loc = opts.loc || Sensor.LOC_NONE;
+            this.loc = opts.loc || DbReport.LOC_NONE;
             this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.name = opts.name || typeProps.name;
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
@@ -43,7 +52,7 @@
             // END serializable toJSON() properties
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
 
-            // sensor type properties
+            // DbReport type properties
             this.tempRegExp = typeProps.tempRegExp;
             this.cmdWakeup = typeProps.cmdWakeup;
             this.cmdRead = typeProps.cmdRead;
@@ -80,13 +89,17 @@
             return SERIALIZABLE_KEYS;
         }
 
+        static fieldOfEvent(event) {
+            return EVENT_FIELD_MAP[event];
+        }
+
         static calibratedValue(ann, temp, reading, nominal) {
             var annValue = ann.activate([temp])[0];
             return reading * (nominal/annValue);
         }
 
         static calibrationANN(seq, valueKey='ecInternal', tempKey='tempInternal') {
-            var mono = Sensor.monotonic(seq,tempKey);
+            var mono = DbReport.monotonic(seq,tempKey);
             var examples = seq.slice(mono.start, mono.end).map(s => {
                 return new OyaAnn.Example([s[tempKey]], [s[valueKey]]);
             });
@@ -128,7 +141,7 @@
             return { start, end };
         }
 
-        static update(sensor=new Sensor(), ...args) {
+        static update(DbReport=new DbReport(), ...args) {
             var opts = args.reduce((a,arg) => {
                 Object.assign(a, arg);
                 return a;
@@ -141,69 +154,69 @@
                 if (typeof opts.type !== 'string') {
                     throw new Error("expected type to be string");
                 }
-                var types = Sensor.TYPE_LIST.filter(t => t.type === opts.type);
-                var newType = types && types[0] || Sensor.TYPE_NONE;
+                var types = DbReport.TYPE_LIST.filter(t => t.type === opts.type);
+                var newType = types && types[0] || DbReport.TYPE_NONE;
                 Object.keys(newType).sort().forEach(k=> {
                     var newValue = newType[k];
-                    var oldValue = sensor[k];
+                    var oldValue = DbReport[k];
                     if (oldValue+"" !== newValue+"") {
-                        winston.info(`Sensor.update(${sensor.name}) ${k}:${sensor[k]}=>${newType[k]}.`);
-                        sensor[k] = newType[k];
+                        winston.info(`DbReport.update(${DbReport.name}) ${k}:${DbReport[k]}=>${newType[k]}.`);
+                        DbReport[k] = newType[k];
                     }
                 });
             }
 
             // serializable toJSON() properties
-            sensor.serializableKeys.forEach(propName => {
+            DbReport.serializableKeys.forEach(propName => {
                 if (opts.hasOwnProperty(propName)) {
-                    sensor[propName] = opts[propName];
+                    DbReport[propName] = opts[propName];
                 }
             });
 
-            return sensor;
+            return DbReport;
         }
 
         static get EVENT_EC_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_EC_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_EC_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_EC_AMBIENT,
+                [DbReport.LOC_INTERNAL]: OyaVessel.SENSE_EC_INTERNAL,
+                [DbReport.LOC_CANOPY]: OyaVessel.SENSE_EC_CANOPY,
+                [DbReport.LOC_AMBIENT]: OyaVessel.SENSE_EC_AMBIENT,
             };
         }
 
         static get EVENT_HUMIDITY_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_HUMIDITY_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+                [DbReport.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
+                [DbReport.LOC_CANOPY]: OyaVessel.SENSE_HUMIDITY_CANOPY,
+                [DbReport.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
             };
         }
 
         static get EVENT_TEMP_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_TEMP_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
+                [DbReport.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
+                [DbReport.LOC_CANOPY]: OyaVessel.SENSE_TEMP_CANOPY,
+                [DbReport.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
             };
         }
 
         static get TYPE_SHT31_DIS() {
-            return Object.assign(Sensor.TYPE_NONE, {
+            return Object.assign(DbReport.TYPE_NONE, {
                 type: "SHT31-DIS",
                 name: "SHT31-DIS",
-                desc: "SHT31-DIS Temperature/Humidity I2C sensor",
-                comm: Sensor.COMM_I2C,
+                desc: "SHT31-DIS Temperature/Humidity I2C DbReport",
+                comm: DbReport.COMM_I2C,
                 cmdRead: [0x24, 0x00],
-                crc: Sensor.CRC_8_FF_31,
+                crc: DbReport.CRC_8_FF_31,
                 crcInit: 0xff,
                 crcPoly: 0x31,
                 dataRead: [
-                    Sensor.BYTE_TEMP_HIGH,
-                    Sensor.BYTE_TEMP_LOW,
-                    Sensor.BYTE_CRC2,
-                    Sensor.BYTE_RH_HIGH,
-                    Sensor.BYTE_RH_LOW,
-                    Sensor.BYTE_CRC2,
+                    DbReport.BYTE_TEMP_HIGH,
+                    DbReport.BYTE_TEMP_LOW,
+                    DbReport.BYTE_CRC2,
+                    DbReport.BYTE_RH_HIGH,
+                    DbReport.BYTE_RH_LOW,
+                    DbReport.BYTE_CRC2,
                 ],
                 readDelay: 15, // 15ms high precision sensing delay
                 tempScale: 175.0/65535,
@@ -222,24 +235,24 @@
             });
         }
         static get TYPE_AM2315() {
-            return Object.assign(Sensor.TYPE_NONE, {
+            return Object.assign(DbReport.TYPE_NONE, {
                 address: 0x5C,
                 addresses: [0x5C],
                 cmdRead: [0x03, 0x00, 0x04],
                 cmdWakeup: [0x03, 0x00, 0x04], 
-                comm: Sensor.COMM_I2C,
-                crc: Sensor.CRC_MODBUS,
+                comm: DbReport.COMM_I2C,
+                crc: DbReport.CRC_MODBUS,
                 dataRead: [ 
-                    Sensor.BYTE_IGNORE,
-                    Sensor.BYTE_IGNORE,
-                    Sensor.BYTE_RH_HIGH,
-                    Sensor.BYTE_RH_LOW,
-                    Sensor.BYTE_TEMP_HIGH,
-                    Sensor.BYTE_TEMP_LOW,
-                    Sensor.BYTE_CRC_LOW,
-                    Sensor.BYTE_CRC_HIGH,
+                    DbReport.BYTE_IGNORE,
+                    DbReport.BYTE_IGNORE,
+                    DbReport.BYTE_RH_HIGH,
+                    DbReport.BYTE_RH_LOW,
+                    DbReport.BYTE_TEMP_HIGH,
+                    DbReport.BYTE_TEMP_LOW,
+                    DbReport.BYTE_CRC_LOW,
+                    DbReport.BYTE_CRC_HIGH,
                 ],
-                desc: "AM2315 Temperature/Humidity I2C sensor",
+                desc: "AM2315 Temperature/Humidity I2C DbReport",
                 humidityOffset: 0,
                 humidityScale: 0.001,
                 name: "AM2315",
@@ -252,20 +265,20 @@
             });
         }
         static get TYPE_EZO_EC_K1() {
-            return Object.assign(Sensor.TYPE_NONE, {
+            return Object.assign(DbReport.TYPE_NONE, {
                 address: 0x64,
                 addresses: [0x64],
                 baud: 100000,
                 cmdRead: [0x52],
                 cmdInfo: [0x49],
-                comm: Sensor.COMM_I2C,
+                comm: DbReport.COMM_I2C,
                 dataRead: [ 
-                    Sensor.BYTE_RES_1,
-                    Sensor.BYTE_EC_0,
-                    Sensor.BYTE_EC_1,
-                    Sensor.BYTE_EC_2,
-                    Sensor.BYTE_EC_3,
-                    Sensor.BYTE_EC_4,
+                    DbReport.BYTE_RES_1,
+                    DbReport.BYTE_EC_0,
+                    DbReport.BYTE_EC_1,
+                    DbReport.BYTE_EC_2,
+                    DbReport.BYTE_EC_3,
+                    DbReport.BYTE_EC_4,
                 ],
                 desc: "Atlas Scientific EZO\u2122 EC with K1 conductivity probe",
                 name: "EZO-EC-K1",
@@ -275,10 +288,10 @@
             });
         }
         static get TYPE_DS18B20() {
-            return Object.assign(Sensor.TYPE_NONE, {
+            return Object.assign(DbReport.TYPE_NONE, {
                 addresses: SystemFacade.oneWireAddresses(),
-                comm: Sensor.COMM_W1,
-                desc: "DS18B20 Temperature 1-Wire sensor",
+                comm: DbReport.COMM_W1,
+                desc: "DS18B20 Temperature 1-Wire DbReport",
                 name: "DS18B20",
                 readTemp: true,
                 tempOffset: 0,
@@ -298,11 +311,11 @@
                 crcInit: null,
                 crcPoly: null,
                 dataRead: null,
-                desc: "No sensor",
+                desc: "No DbReport",
                 heater: null,
                 humidityOffset: null,
                 humidityScale: null,
-                name: "No sensor",
+                name: "No DbReport",
                 readDelay: null,
                 readEC: null,
                 readHumidity: null,
@@ -338,26 +351,26 @@
         static get CRC_8_FF_31() { return "CRC bits:8 initial:0xFF polynomial:0x31"; }
         static get TYPE_LIST() { 
             return [
-                Sensor.TYPE_AM2315, 
-                Sensor.TYPE_SHT31_DIS, 
-                Sensor.TYPE_DS18B20, 
-                Sensor.TYPE_EZO_EC_K1, 
-                Sensor.TYPE_NONE, 
+                DbReport.TYPE_AM2315, 
+                DbReport.TYPE_SHT31_DIS, 
+                DbReport.TYPE_DS18B20, 
+                DbReport.TYPE_EZO_EC_K1, 
+                DbReport.TYPE_NONE, 
             ];
         }
         static get LOCATION_LIST() {
             return [{
-                id: Sensor.LOC_INTERNAL,
+                id: DbReport.LOC_INTERNAL,
                 desc: "Vessel internal (at plant roots)",
             }, {
-                id: Sensor.LOC_CANOPY,
+                id: DbReport.LOC_CANOPY,
                 desc: "Plant canopy",
             }, {
-                id: Sensor.LOC_AMBIENT,
+                id: DbReport.LOC_AMBIENT,
                 desc: "Ambient (shaded, 5' above earth)",
             }, {
-                id: Sensor.LOC_NONE,
-                desc: "No sensor",
+                id: DbReport.LOC_NONE,
+                desc: "No DbReport",
             }];
         }
         static crcModbus(buf, length=buf.length) {
@@ -381,7 +394,7 @@
             var hrSummaryMap = {};
             var result = [];
             data.forEach(d => {
-                var field = Sensor.fieldOfEvent(d.evt);
+                var field = DbReport.fieldOfEvent(d.evt);
                 if (d.vavg) {
                     var summary = hrSummaryMap[d.hr];
                     if (summary == null) {
@@ -428,7 +441,7 @@
 
         heat(enable) {
             if (this.heater == null) {
-                return Promise.reject(new Error("Sensor ${this.key}has no heater"));
+                return Promise.reject(new Error("DbReport ${this.key}has no heater"));
             }
             return new Promise((resolve, reject) => {
                 try {
@@ -445,13 +458,13 @@
         }
 
         write(cmd) {
-            if (this.comm === Sensor.COMM_I2C) {
+            if (this.comm === DbReport.COMM_I2C) {
                 if (this.cmdWakeup) {
                     this.i2cWrite(this.address, Buffer.from(this.cmdWakeup));
                 }
                 this.i2cWrite(this.address, Buffer.from(cmd));
             } else {
-                throw new Error("Could not write sensor. Unknown communication protocol ${this.comm}");
+                throw new Error("Could not write DbReport. Unknown communication protocol ${this.comm}");
             }
         }
 
@@ -461,7 +474,7 @@
             }
             return new Promise((resolve, reject) => {
                 try {
-                    if (this.comm === Sensor.COMM_I2C) {
+                    if (this.comm === DbReport.COMM_I2C) {
                         this.write(this.cmdRead);
                         var buf = Buffer.alloc(this.dataRead.length);
                         setTimeout(() => {
@@ -473,32 +486,32 @@
                                 resolve(data);
                             } catch(e) {
                                 if (++this.readErrors >= this.maxReadErrors) {
-                                    this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E1]`);
+                                    this.fault = new Error(`DbReport ${this.key} disabled (too many errors) [E1]`);
                                 }
                                 reject(e);
                             }
                         }, this.readDelay || 0);
-                    } else if (this.comm === Sensor.COMM_W1) {
+                    } else if (this.comm === DbReport.COMM_W1) {
                         SystemFacade.oneWireRead(this.address, this.type).then(r => {
                             if (r.temp && this.readTemp) {
                                 r.temp = r.temp * this.tempScale + this.tempOffset;
                                 this.data.temp = r.temp;
-                                this.emit(r.temp, Sensor.EVENT_TEMP_MAP);
+                                this.emit(r.temp, DbReport.EVENT_TEMP_MAP);
                             }
                             if (r.humidity && this.readHumidity) {
                                 r.humidity = r.humidity * this.humidityScale + this.humidityOffset;
                                 this.data.humidity = r.humidity;
-                                this.emit(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
+                                this.emit(r.humidity, DbReport.EVENT_HUMIDITY_MAP);
                             }
                             this.lastRead = new Date();
                             resolve(r);
                         }).catch(e=>reject(e));
                     } else {
-                        reject(new Error(`read() not supported for sensor:${this.name} comm:${this.comm}`));
+                        reject(new Error(`read() not supported for DbReport:${this.name} comm:${this.comm}`));
                     }
                 } catch (e) {
                     if (++this.readErrors >= this.maxReadErrors) {
-                        this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E2]`);
+                        this.fault = new Error(`DbReport ${this.key} disabled (too many errors) [E2]`);
                     }
                     reject(e);
                 }
@@ -507,16 +520,16 @@
 
         health() {
             var key = `${this.type}@${this.loc}`;
-            if (this.loc === Sensor.LOC_NONE) {
+            if (this.loc === DbReport.LOC_NONE) {
                 var value = null;
             } else if (this.fault instanceof Error) {
                 var value = this.fault.message;
             } else if (this.fault) {
                 var value = this.fault;
             } else if (this.lastRead == null) {
-                var value = `Sensor is completely unresponsive`;
+                var value = `DbReport is completely unresponsive`;
             } else if ((Date.now() - this.lastRead.getTime()) > this.healthTimeout * 1000) {
-                var value = `Sensor is failing. Last read:${new Date(this.lastRead).toISOString()}`;
+                var value = `DbReport is failing. Last read:${new Date(this.lastRead).toISOString()}`;
             } else {
                 var value = true;
             }
@@ -544,69 +557,69 @@
             for (var i=0; i<buf.length; i++) {
                 hexData = hexData + buf[i].toString(16) + ' ';
                 var action = this.dataRead[i];
-                if (action === Sensor.BYTE_TEMP_HIGH) {
+                if (action === DbReport.BYTE_TEMP_HIGH) {
                     temp = temp == null ? 0 : temp;
                     temp |= (buf[i] << 8);
-                } else if (action === Sensor.BYTE_TEMP_LOW) {
+                } else if (action === DbReport.BYTE_TEMP_LOW) {
                     temp = temp == null ? 0 : temp;
                     temp |= buf[i];
-                } else if (action === Sensor.BYTE_RH_HIGH) {
+                } else if (action === DbReport.BYTE_RH_HIGH) {
                     humidity = humidity == null ? 0 : humidity;
                     humidity |= (buf[i] << 8);
-                } else if (action === Sensor.BYTE_RH_LOW) {
+                } else if (action === DbReport.BYTE_RH_LOW) {
                     humidity = humidity == null ? 0 : humidity;
                     humidity |= buf[i];
-                } else if (action === Sensor.BYTE_EC_0) {
+                } else if (action === DbReport.BYTE_EC_0) {
                     ec = `${buf.toString("utf8",i-0,i+1)}`;
-                } else if (action === Sensor.BYTE_EC_1) {
+                } else if (action === DbReport.BYTE_EC_1) {
                     ec = `${buf.toString("utf8",i-1,i+1)}`;
-                } else if (action === Sensor.BYTE_EC_2) {
+                } else if (action === DbReport.BYTE_EC_2) {
                     ec = `${buf.toString("utf8",i-2,i+1)}`;
-                } else if (action === Sensor.BYTE_EC_3) {
+                } else if (action === DbReport.BYTE_EC_3) {
                     ec = `${buf.toString("utf8",i-3,i+1)}`;
-                } else if (action === Sensor.BYTE_EC_4) {
+                } else if (action === DbReport.BYTE_EC_4) {
                     ec = `${buf.toString("utf8",i-4,i+1)}`;
-                } else if (action === Sensor.BYTE_RES_1) {
+                } else if (action === DbReport.BYTE_RES_1) {
                     if (buf[i] !== 1) {
-                        var err = new Error(`Sensor ${this.name} invalid response. `+
+                        var err = new Error(`DbReport ${this.name} invalid response. `+
                             `expected:0x01 actual:0x${buf[i].toString(16)}`);
                         throw err;
                     }
-                } else if (action === Sensor.BYTE_CRC_HIGH) {
+                } else if (action === DbReport.BYTE_CRC_HIGH) {
                     crc = crc == null ? 0 : crc;
                     crc |= (buf[i] << 8);
-                } else if (action === Sensor.BYTE_CRC_LOW) {
+                } else if (action === DbReport.BYTE_CRC_LOW) {
                     crc = crc == null ? 0 : crc;
                     crc |= buf[i];
-                } else if (action === Sensor.BYTE_CRC2) {
+                } else if (action === DbReport.BYTE_CRC2) {
                     if (crc == null) {
                         crc = buf[i];
-                        crc1 = Sensor.crc8(this.crcInit, this.crcPoly, buf, i-2, 2);
+                        crc1 = DbReport.crc8(this.crcInit, this.crcPoly, buf, i-2, 2);
                     } else {
                         crc = (crc << 8) | buf[i];
-                        crc2 = Sensor.crc8(this.crcInit, this.crcPoly, buf, i-2, 2);
+                        crc2 = DbReport.crc8(this.crcInit, this.crcPoly, buf, i-2, 2);
                     }
-                } else if (action === Sensor.BYTE_IGNORE) {
+                } else if (action === DbReport.BYTE_IGNORE) {
                     // do nothing
                 } else {
                     throw new Error(`Invalid dataRead[${i}] specification`);
                 }
             }
             if (crc != null) {
-                if (this.crc === Sensor.CRC_MODBUS) {
-                    if (Sensor.crcModbus(buf) !== 0) {
-                        var err = new Error(`Sensor ${this.name} bad CRC ${hexData}`);
+                if (this.crc === DbReport.CRC_MODBUS) {
+                    if (DbReport.crcModbus(buf) !== 0) {
+                        var err = new Error(`DbReport ${this.name} bad CRC ${hexData}`);
                         throw err;
                     }
-                } else if (this.crc === Sensor.CRC_8_FF_31) {
+                } else if (this.crc === DbReport.CRC_8_FF_31) {
                     if (crc2 != null) {
                         if (crc !== ((crc1 << 8) | crc2)) {
-                            var err = new Error(`Sensor ${this.name} bad CRC ${hexData}`);
+                            var err = new Error(`DbReport ${this.name} bad CRC ${hexData}`);
                             throw err;
                         }
                     } else if (crc1 != null) {
                         if (crc !== crc1) {
-                            var err = new Error(`Sensor ${this.name} bad CRC ${hexData}`);
+                            var err = new Error(`DbReport ${this.name} bad CRC ${hexData}`);
                             throw err;
                         }
                     }
@@ -615,7 +628,7 @@
             if (temp != null) {
                 if (this.readTemp) {
                     temp = temp * this.tempScale + this.tempOffset;
-                    this.emit(temp, Sensor.EVENT_TEMP_MAP);
+                    this.emit(temp, DbReport.EVENT_TEMP_MAP);
                 } else {
                     temp = null;
                 }
@@ -623,7 +636,7 @@
             if (humidity != null) {
                 if (this.readHumidity) {
                     humidity = humidity * this.humidityScale + this.humidityOffset;
-                    this.emit(humidity, Sensor.EVENT_HUMIDITY_MAP);
+                    this.emit(humidity, DbReport.EVENT_HUMIDITY_MAP);
                 } else {
                     humidity = null;
                 }
@@ -631,7 +644,7 @@
             if (ec != null) {
                 if (this.readEC) {
                     ec = Number(ec);
-                    this.emit(ec, Sensor.EVENT_EC_MAP);
+                    this.emit(ec, DbReport.EVENT_EC_MAP);
                 } else {
                     ec = null;
                 }
@@ -647,16 +660,16 @@
         emit(value, eventMap) {
             var event = eventMap[this.loc];
             if (event == null) {
-                winston.warn(`no event for sensor ${this.name} location ${this.loc}`);
+                winston.warn(`no event for DbReport ${this.name} location ${this.loc}`);
             } else if (this.emitter == null) {
-                winston.info(`no event emitter for sensor ${this.name}`);
+                winston.info(`no event emitter for DbReport ${this.name}`);
             } else {
                 winston.debug(`emit ${event} ${value}`);
                 this.emitter.emit(event, value);
             }
         }
 
-    } //// class Sensor
+    } //// class DbReport
 
-    module.exports = exports.Sensor = Sensor;
+    module.exports = exports.DbReport = DbReport;
 })(typeof exports === "object" ? exports : (exports = {}));

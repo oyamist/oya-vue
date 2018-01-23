@@ -162,6 +162,35 @@
             });
         }
 
+        sensorAvgByHour(vname, evt, startdate, enddate) {
+            return new Promise((resolve,reject) => {
+                try {
+                    var d1 = this.utcstr(startdate);
+                    var d2 = this.utcstr(enddate);
+                    if (typeof evt === 'string') {
+                        var rowLimit = days * 24;
+                        evt = `'${evt}'`;
+                    } else {
+                        var rowLimit = evt.length * days * 24;
+                        evt = `'${evt.join("','")}'`;
+                    }
+                    var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
+                        `avg(v) vavg, evt\n`+
+                        `from sensordata\n`+
+                        `where utc between ${d1} and ${d2}\n`+
+                        `and evt in (${evt})\n`+
+                        `group by evt, hr\n`+
+                        `order by evt, hr desc\n`+
+                        `limit ${rowLimit};`;
+                    this.sqlAll(sql).then(data=>{
+                        resolve( { sql, data, });
+                    }).catch(e=>reject(e));
+                } catch (e) {
+                    return Promise.reject(e);
+                }
+            });
+        }
+
     } //// class DbFacade
 
     module.exports = exports.DbFacade = DbFacade;

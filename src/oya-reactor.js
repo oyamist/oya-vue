@@ -6,6 +6,7 @@
     const Actuator = require("./actuator");
     const Light = require("./light");
     const Sensor = require("./sensor");
+    const DbReport = require("./db-report");
     const Switch = require("./switch");
     const fs = require('fs');
     const OyaVessel = require("./oya-vessel");
@@ -54,6 +55,7 @@
                     this.resourceMethod("post", "app/update", this.postAppUpdate),
                     this.resourceMethod("post", "reactor", this.postReactor),
                     this.resourceMethod("post", "sensor", this.postSensor),
+                    this.resourceMethod("post", "sensor/calibrate", this.postSensorCalibrate),
                     this.resourceMethod("put", "oya-conf", this.putOyaConf),
 
                 ]),
@@ -358,6 +360,29 @@
                 }
             });
             return req.body;
+        }
+
+        postSensorCalibrate(req, res, next) {
+            return new Promise((resolve, reject) => {
+                try {
+                    var opts = req.body;
+                    var field = opts.field;
+                    var startDate = Date.parse(opts.startDate);
+                    var endDate = Date.parse(opts.endDate);
+                    if (field === 'ecInternal') {
+                        var evt = SQL_EVENTS[field];
+                        var dbf = this.vessel.dbfacade;
+                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        .then(r => resolveNormalize(r, evt && evt[0] || evt))
+                        .catch(e => reject(e));
+                    } else {
+                        reject(new Error(`unknown field:${req.params.field}`));
+                    }
+                } catch(e) {
+                    winston.error(e.stack);
+                    reject(e);
+                }
+            });
         }
 
         syncLights(value, date=new Date()) {

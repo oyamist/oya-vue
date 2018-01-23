@@ -17,6 +17,7 @@
     const winston = require('winston');
     const Actuator = require("../index").Actuator;
     const Sensor = require("../index").Sensor;
+    const DbReport = require("../index").DbReport;
     const OyaReactor = require("../index").OyaReactor;
     const OyaConf = require("../index").OyaConf;
     const Light = require("../index").Light;
