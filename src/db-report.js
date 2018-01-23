@@ -19,7 +19,6 @@
         constructor(opts={}) {
             this.dbfacade = opts.dbfacade || new DbFacade();
             this.dbfacade.open();
-            this.vessel = opts.vessel;
         }
 
         static fieldOfEvent(event) {
@@ -136,7 +135,7 @@
                     var dd = Number(endDate.substr(8,2));
                     var date = new Date(yyyy,mo,dd,23,59,59,999);
                     if (evt) {
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        dbf.sensorDataByHour(evt, date, days)
                         .then(r => resolveNormalize(r, primaryEvt))
                         .catch(e => reject(e));
                     } else {

@@ -312,7 +312,7 @@
                     if (field === 'ecInternal') {
                         var evt = DbReport.SQL_EVENTS[field];
                         var dbf = this.vessel.dbfacade;
-                        dbf.sensorDataByHour(this.vessel.name, evt, date, days)
+                        dbf.sensorDataByHour(evt, date, days)
                         .then(r => resolveNormalize(r, evt && evt[0] || evt))
                         .catch(e => reject(e));
                     } else {

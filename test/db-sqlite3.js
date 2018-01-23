@@ -95,7 +95,7 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(vname,evt,date) summarizes sensor data by hour", function(done) {
+    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = await new DbSqlite3().open();
@@ -108,7 +108,7 @@
                 await dbl.logSensor("test", "testevt", 14, testDate);
 
                 // single event
-                var r = await dbl.sensorDataByHour('test','testevt', testDate2);
+                var r = await dbl.sensorDataByHour('testevt', testDate2);
                 should(r).properties(["sql","data"]);
                 should.deepEqual(r.data, [{
                     evt: 'testevt',
@@ -125,7 +125,7 @@
                 }]);
 
                 // multiple events
-                var r = await dbl.sensorDataByHour('test',['testevt','otherevt'], testDate2);
+                var r = await dbl.sensorDataByHour(['testevt','otherevt'], testDate2);
                 should(r).properties(["sql","data"]);
                 should.deepEqual(r.data, [{
                     evt: 'otherevt',

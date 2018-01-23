@@ -133,7 +133,7 @@
             }
         }
 
-        sensorDataByHour(vname, evt, enddate=new Date(), days=1) {
+        sensorDataByHour(evt, enddate=new Date(), days=1) {
             return new Promise((resolve,reject) => {
                 try {
                     var d1 = this.utcstr(new Date(enddate.getTime() - days*24*3600*1000));
@@ -162,7 +162,7 @@
             });
         }
 
-        sensorAvgByHour(vname, evt, startdate, enddate) {
+        sensorAvgByHour(evt, startdate, enddate) {
             return new Promise((resolve,reject) => {
                 try {
                     var d1 = this.utcstr(startdate);

@@ -78,21 +78,21 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(vname,evt,date) summarizes sensor data by hour", function(done) {
+    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = new TestLogger();
                 var r = await dbl.open();
 
                 // single events
-                var r = await dbl.sensorDataByHour('test','testevt', testDate);
+                var r = await dbl.sensorDataByHour('testevt', testDate);
                 should(r).properties(["sql","data"]);
                 should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\nand evt .*\ngroup by evt, hr\norder by evt, hr desc\nlimit 24/m);
                 should(r.sql).match(/evt in \('testevt'\)/m);
                 should(r.data).instanceOf(Array);
 
                 // multiple events
-                var r = await dbl.sensorDataByHour('test',['testevt','tempInternal'], testDate);
+                var r = await dbl.sensorDataByHour(['testevt','tempInternal'], testDate);
                 should(r).properties(["sql","data"]);
                 should(r.sql).match(/select.*/m);
                 should(r.sql).match(/from sensordata/m);
