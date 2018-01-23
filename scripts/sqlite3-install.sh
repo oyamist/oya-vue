@@ -7,6 +7,8 @@ echo -e "INSTALL\t: `pwd`"
 
 SQLVER=`sqlite3 -version`
 RC=$?
+VER=v1.0
+DB=oyamist-${VER}.db
 if [ "$RC" == "0" ]; then
     echo -e "INSTALL\t: SQlite ($SQLVER) is already installed => OK"
 else
@@ -19,11 +21,12 @@ else
     echo -e "INSTALL\t: SQLite (`sqlite3 --version`) installed => OK"
 fi
 
-if [ -e oyamist.db ]; then
-    echo -e "INSTALL\t: SQLite database exists:oyamist.db"
+if [ -e ${DB} ]; then
+    echo -e "INSTALL\t: SQLite database exists:${DB}"
 else
-    echo -e "INSTALL\t: Creating SQLite database: oyamist.db"
-    sqlite3 oyamist.db < ${SCRIPTS}/create.sql
+    echo -e "INSTALL\t: Creating SQLite database: ${DB}"
+    sqlite3 ${DB} < ${SCRIPTS}/create-${VER}.sql
+    scripts/db-update-${VER}.sh
 fi
 
 echo -e "END\t: $0 `date`"

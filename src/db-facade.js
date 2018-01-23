@@ -107,7 +107,7 @@
             }
         }
 
-        logSensor(vname, evt, value, date=new Date()) {
+        logSensor(ctx, evt, value, date=new Date()) {
             try {
                 this.logCount[evt] = this.logCount[evt] || 0;
                 this.logSum[evt] = this.logSum[evt] || 0;
@@ -117,10 +117,10 @@
                 } 
                 this.logCount[evt]++;
                 this.logSum[evt] += value;
-                var stmt = `insert into sensordata(vessel,evt,utc,v) values(` +
-                    `'${vname}',` +
-                    `'${evt}',` +
+                var stmt = `insert into sensordata(utc,evt,ctx,v) values(` +
                     `${this.utcstr(date)},` +
+                    `'${evt}',` +
+                    `'${ctx}',` +
                     `${this.logSum[evt] / this.logCount[evt]}` +
                     ');';
                 if (!this.isOpen) {

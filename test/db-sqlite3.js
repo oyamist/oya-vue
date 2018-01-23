@@ -7,7 +7,7 @@
     const DbFacade = require('../index').DbFacade;
     const DbSqlite3 = exports.DbSqlite3 || require('../index').DbSqlite3;
     const TESTDATESTR = "'2017-03-08'";
-    const stmtDel = `delete from sensordata where sensordata.vessel='test'`;
+    const stmtDel = `delete from sensordata where sensordata.ctx='test'`;
 
     it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
@@ -42,6 +42,7 @@
 
                 done();
             } catch (e) {
+                winston.error(e.stack);
                 done(e);
             }
         }();
@@ -51,7 +52,7 @@
         (async function () {
             try {
                 var dbl = await new DbSqlite3().open();
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.vessel='test'");
+                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
                 done();
             } catch (e) {
@@ -64,12 +65,12 @@
             try {
                 var dbl = await new DbSqlite3().open();
                 var r = await dbl.sqlExec(stmtDel);
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.vessel='test'");
+                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
                 await dbl.logSensor("test", "testevt", 12, testDate3);
                 await dbl.logSensor("test", "testevt", 13, testDate2);
 
-                var r = await dbl.sqlAll("select utc,v from sensordata as sd where sd.vessel='test'");
+                var r = await dbl.sqlAll("select utc,v from sensordata as sd where sd.ctx='test'");
                 should(r).instanceof(Array);
                 should(r.length).equal(2);
                 should(r[0]).properties(["utc","v"]);
@@ -100,7 +101,7 @@
             try {
                 var dbl = await new DbSqlite3().open();
                 var r = await dbl.sqlExec(stmtDel); // cleanup
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.vessel='test'");
+                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
                 await dbl.logSensor("test", "testevt", 12, testDate3);
                 await dbl.logSensor("test", "testevt", 13, testDate2);

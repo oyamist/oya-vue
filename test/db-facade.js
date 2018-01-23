@@ -35,8 +35,8 @@
 
                 var r = yield dbl.logSensor("test", "testevt", 11, testDate)
                     .then(r=>async.next(r)).catch(e=>async.throw(e));
-                var stmt = "insert into sensordata(vessel,evt,utc,v) values" +
-                    "('test','testevt','2017-03-10 01:02:03.456',10.5);"
+                var stmt = "insert into sensordata(utc,evt,ctx,v) values" +
+                    "('2017-03-10 01:02:03.456','testevt','test',10.5);"
                 should.deepEqual(r, stmt);
                 dbl.stmts.length.should.equal(1);
                 dbl.stmts[0].should.equal(stmt);
@@ -50,8 +50,8 @@
                 // even event is logged
                 var r = yield dbl.logSensor("test", "testevt", 13, testDate)
                     .then(r=>async.next(r)).catch(e=>async.throw(e));
-                var stmt = "insert into sensordata(vessel,evt,utc,v) values" +
-                    "('test','testevt','2017-03-10 01:02:03.456',12.5);"
+                var stmt = "insert into sensordata(utc,evt,ctx,v) values" +
+                    "('2017-03-10 01:02:03.456','testevt','test',12.5);"
                 should.deepEqual(r, stmt);
                 dbl.stmts.length.should.equal(2);
 
