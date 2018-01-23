@@ -38,7 +38,8 @@ let async = function*() {
             var serviceName = services[iService];
 
             // for unit tests, do not disturb real database
-            var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
+            //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
+            var dbfacade = new DbSqlite3();
 
             var oya = new OyaReactor(serviceName, {
                 dbfacade,

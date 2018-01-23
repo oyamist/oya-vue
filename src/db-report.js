@@ -122,7 +122,7 @@
                 try {
                     var field = opts.field || 'ecInternal';
                     var evt = DbReport.SQL_EVENTS[field];
-                    var primaryEvt = evt && evt[0] || evt;
+                    var primaryEvt = evt instanceof Array && evt[0] || evt;
                     var resolveNormalize = r => {
                         DbReport.normalizeDataByHour(r.data, primaryEvt);
                         resolve(r);
@@ -135,7 +135,7 @@
                     var dd = Number(endDate.substr(8,2));
                     var date = new Date(yyyy,mo,dd,23,59,59,999);
                     if (evt) {
-                        dbf.sensorDataByHour(evt, date, days)
+                        dbf.sensorDataByHour(primaryEvt, date, days)
                         .then(r => resolveNormalize(r, primaryEvt))
                         .catch(e => reject(e));
                     } else {
