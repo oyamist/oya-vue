@@ -1,4 +1,5 @@
 (function(exports) {
+    const winston = require('winston');
 
     const mockData = [
         {"hr":"1999-12-08 2300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
@@ -56,7 +57,7 @@
         static get ERROR_NOT_OPEN() { return new Error("open() database before use"); }
         static get ERROR_ABSTRACT() { return new Error("abstract method must be implemented by subclass"); }
 
-        utcstr(date) {
+        static utcstr(date) {
             var yyyy = date.getUTCFullYear();
             var mo = ('0'+(date.getUTCMonth()+1)).slice(-2);
             var dd = ('0'+date.getUTCDate()).slice(-2);
@@ -118,7 +119,7 @@
                 this.logCount[evt]++;
                 this.logSum[evt] += value;
                 var stmt = `insert into sensordata(utc,evt,ctx,v) values(` +
-                    `${this.utcstr(date)},` +
+                    `${DbFacade.utcstr(date)},` +
                     `'${evt}',` +
                     `'${ctx}',` +
                     `${this.logSum[evt] / this.logCount[evt]}` +
@@ -136,8 +137,8 @@
         sensorDataByHour(evt, enddate=new Date(), days=1) {
             return new Promise((resolve,reject) => {
                 try {
-                    var d1 = this.utcstr(new Date(enddate.getTime() - days*24*3600*1000));
-                    var d2 = this.utcstr(enddate);
+                    var d1 = DbFacade.utcstr(new Date(enddate.getTime() - days*24*3600*1000));
+                    var d2 = DbFacade.utcstr(enddate);
                     if (typeof evt === 'string') {
                         var rowLimit = days * 24;
                         evt = `'${evt}'`;
@@ -147,35 +148,6 @@
                     }
                     var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         `avg(v) vavg, min(v) vmin, max(v) vmax, evt\n`+
-                        `from sensordata\n`+
-                        `where utc between ${d1} and ${d2}\n`+
-                        `and evt in (${evt})\n`+
-                        `group by evt, hr\n`+
-                        `order by evt, hr desc\n`+
-                        `limit ${rowLimit};`;
-                    this.sqlAll(sql).then(data=>{
-                        resolve( { sql, data, });
-                    }).catch(e=>reject(e));
-                } catch (e) {
-                    return Promise.reject(e);
-                }
-            });
-        }
-
-        sensorAvgByHour(evt, startdate, enddate) {
-            return new Promise((resolve,reject) => {
-                try {
-                    var d1 = this.utcstr(startdate);
-                    var d2 = this.utcstr(enddate);
-                    if (typeof evt === 'string') {
-                        var rowLimit = days * 24;
-                        evt = `'${evt}'`;
-                    } else {
-                        var rowLimit = evt.length * days * 24;
-                        evt = `'${evt.join("','")}'`;
-                    }
-                    var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        `avg(v) vavg, evt\n`+
                         `from sensordata\n`+
                         `where utc between ${d1} and ${d2}\n`+
                         `and evt in (${evt})\n`+

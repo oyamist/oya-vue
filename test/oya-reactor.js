@@ -739,6 +739,44 @@
         }();
         async.next();
     });
+    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+
+                var vessel = testReactor().vessels[0];
+                vessel.activate(false);
+                should(vessel.state.active).equal(false);
+
+                // activate vessel
+                var command = {
+                    startDate: new Date(2018,0,22),
+                    endDate: new Date(2018,0,23),
+                    field: 'ecInternal',
+                }
+                var res = yield supertest(app).post("/test/sensor/calibrate").send(command)
+                    .end((e,r) => e ? async.throw(e) : async.next(r));
+                should(res.statusCode).equal(200);
+                var sql = res.body.sql;
+                should(sql).match(/select strftime.*evt/m);
+                should(sql).match(/from sensordata/m);
+                should(sql).match(/where utc between .* and .*/m);
+                should(sql).match(/and evt in (.*)/m);
+                should(sql).match(/group by evt, hr/m);
+                should(sql).match(/order by evt, hr desc/m);
+                should(sql).match(/limit 50;/m);
+                var summary = res.body.summary;
+                should(summary).instanceOf(Array);
+                //should(summary.length).equal(24);
+
+                done();
+            } catch(err) {
+                winston.error(err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
         testReactor().vessels[0].activate(false);

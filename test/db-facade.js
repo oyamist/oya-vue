@@ -18,8 +18,7 @@
     }
 
     it("utcstr(date) returns SQL utc date string", function() {
-        var dbl = new DbFacade();
-        dbl.utcstr(testDate).should.equal("'2017-03-10 01:02:03.456'");
+        DbFacade.utcstr(testDate).should.equal("'2017-03-10 01:02:03.456'");
     });
     it("logSensor(vname,evt,value,date) logs sensor data via sqlExec(sql) method", function(done) {
         var async = function*() {

@@ -147,6 +147,69 @@
                 }
             });
         }
+            
+        static hourlySummary(data, fields=[]) {
+            var hrSummaryMap = {};
+            var result = [];
+            data.forEach(d => {
+                var field = DbReport.fieldOfEvent(d.evt);
+                if (d.vavg) {
+                    var summary = hrSummaryMap[d.hr];
+                    if (summary == null) {
+                        hrSummaryMap[d.hr] = summary = {
+                            hr: d.hr,
+                        };
+                        result.push(summary);
+                    }
+                    summary[field] = d.vavg;
+                }
+            });
+
+            return result.filter(r => {
+                if (fields.length == 0) {
+                    return true;
+                }
+                return fields.reduce((a,f) => {
+                    return a && (r[f] != null);
+                }, true);
+            });
+        }
+
+        sensorAvgByHour(fields, startdate, enddate) {
+            return new Promise((resolve,reject) => {
+                try {
+                    var field = fields instanceof Array && fields[0] || fields;
+                    var evt = DbReport.SQL_EVENTS[field];
+                    var d1 = DbFacade.utcstr(startdate);
+                    var d2 = DbFacade.utcstr(enddate);
+                    var hours = Math.round((enddate-startdate)/(1000*3600)+.5);
+                    if (typeof evt === 'string') {
+                        var rowLimit = hours;
+                        var evtStr = `'${evt}'`;
+                    } else if (evt instanceof Array) {
+                        var rowLimit = fields.length * hours;
+                        var evtStr = `'${evt.join("','")}'`;
+                    } else {
+                        throw new Error(`unknown fields:${fields}`);
+                    }
+                    var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
+                        `avg(v) vavg, evt\n`+
+                        `from sensordata\n`+
+                        `where utc between ${d1} and ${d2}\n`+
+                        `and evt in (${evtStr})\n`+
+                        `group by evt, hr\n`+
+                        `order by evt, hr desc\n`+
+                        `limit ${rowLimit};`;
+                    this.dbfacade.sqlAll(sql).then(data=>{
+                        var summary = DbReport.hourlySummary(data, fields);
+                        resolve( { sql, summary, });
+                    }).catch(e=>reject(e));
+                } catch (e) {
+                    winston.error(e.stack);
+                    return Promise.reject(e);
+                }
+            });
+        }
 
     } //// class DbReport
 

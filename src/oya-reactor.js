@@ -307,16 +307,21 @@
                 try {
                     var opts = req.body;
                     var field = opts.field;
-                    var startDate = Date.parse(opts.startDate);
-                    var endDate = Date.parse(opts.endDate);
+                    var startDate = new Date(opts.startDate);
+                    var endDate = new Date(opts.endDate);
+                    console.log('opts',opts, startDate, endDate);
                     if (field === 'ecInternal') {
-                        var evt = DbReport.SQL_EVENTS[field];
-                        var dbf = this.vessel.dbfacade;
-                        dbf.sensorDataByHour(evt, date, days)
-                        .then(r => resolveNormalize(r, evt && evt[0] || evt))
-                        .catch(e => reject(e));
+                        this.dbReport.sensorAvgByHour([field,'tempInternal'], startDate, endDate).then(r => {
+                            console.log(r);
+                            resolve(r);
+                        }).catch(e => {
+                            winston.error(e.stack);
+                            reject(e);
+                        });
                     } else {
-                        reject(new Error(`unknown field:${req.params.field}`));
+                        var e = new Error(`unknown field:${req.params.field}`);
+                        winston.error(e.stack);
+                        reject(e);
                     }
                 } catch(e) {
                     winston.error(e.stack);
