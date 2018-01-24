@@ -3,6 +3,8 @@
     const should = require("should");
     const testDate = new Date(Date.UTC(2017,2,10,1,2,3,456));
     const DbFacade = exports.DbFacade || require('../index').DbFacade;
+    const path = require('path');
+    const fs = require('fs');
     class TestLogger extends DbFacade {
         constructor(opts={}) {
             super(opts);
@@ -89,22 +91,39 @@
                 should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\nand evt .*\ngroup by evt, hr\norder by evt, hr desc\nlimit 24/m);
                 should(r.sql).match(/evt in \('testevt'\)/m);
                 should(r.data).instanceOf(Array);
-
-                // multiple events
-                var r = await dbl.sensorDataByHour(['testevt','tempInternal'], testDate);
-                should(r).properties(["sql","data"]);
-                should(r.sql).match(/select.*/m);
-                should(r.sql).match(/from sensordata/m);
-                should(r.sql).match(/where.*/m);
-                should(r.sql).match(/evt in \('testevt','tempInternal'\)/m);
-                should(r.sql).match(/group by evt, hr/m);
-                should(r.sql).match(/order by evt, hr desc/m);
-                should(r.sql).match(/limit 48/m);
-                should(r.data).instanceOf(Array);
                 done();
             } catch (e) {
                 done(e);
             }
         })();
+    });
+    it("TESTTESThourlySummary(data,fields) summarizes data by hour for given fields", function() {
+        var sqlDataPath = path.join(__dirname, 'ecInternal.json');
+        var sqlData = JSON.parse(fs.readFileSync(sqlDataPath));
+
+        // default allows null values 
+        var result = DbFacade.hourlySummary(sqlData.data);
+        should(result.length).equal(71);
+        result.forEach(r => {
+            should(r).properties(['hr','tempInternal']);
+        });
+        should(result[result.length-1].hasOwnProperty('ecInternal')).equal(false); // no value
+
+        // only return data having all specified fields
+        var result = DbFacade.hourlySummary(sqlData.data, ['ecInternal', 'tempInternal']);
+        should(result.length).equal(64);
+        result.forEach(r => {
+            should(r).properties(['hr','ecInternal', 'tempInternal']);
+        });
+    });
+    it ("normalizeDataByHour fills in missing data", function() {
+        var data = [
+            {"hr":"1999-12-08 1300","vavg":17.57570134387154,"vmin":17.430819409475856,"vmax":17.951177487856373},
+            {"hr":"1999-12-08 1200","vavg":18.074496982104563,"vmin":17.99795274789553,"vmax":18.104765901172403},
+        ];
+        var normData = DbFacade.normalizeDataByHour(data);
+        normData.length.should.equal(24);
+        should(data[0].hr).equal("1999-12-08 2300");
+        should(data[23].hr).equal("1999-12-08 0000");
     });
 })

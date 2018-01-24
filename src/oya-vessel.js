@@ -1,6 +1,7 @@
 (function(exports) {
     const EventEmitter = require("events");
     const winston = require("winston");
+    const OyaMist = require("./oyamist");
     const DbFacade = require("./db-facade");
     const uuidv4 = require('uuid/v4');
 
@@ -13,8 +14,8 @@
             // serializable toJSON() properties
             this.name = `vessel${id++}`;
             this.enabled = true; // can be activated
-            this.startCycle = OyaVessel.CYCLE_STANDARD;
-            this.hotCycle = OyaVessel.CYCLE_COOL;
+            this.startCycle = OyaMist.CYCLE_STANDARD;
+            this.hotCycle = OyaMist.CYCLE_COOL;
             this.coolThreshold = COOLTHRESHOLD;
             this.sensorExpRate = opts.sensorExpRate || 0.01; // exponential average rate
             this.maxCycles = 0;
@@ -92,99 +93,79 @@
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
-            this.emitter.on(OyaVessel.EVENT_MIST, (value) => {
+            this.emitter.on(OyaMist.EVENT_MIST, (value) => {
                 this._state.Mist = value;
             });
-            this.emitter.on(OyaVessel.EVENT_COOL, (value) => {
+            this.emitter.on(OyaMist.EVENT_COOL, (value) => {
                 this._state.Cool = value;
             });
-            this.emitter.on(OyaVessel.EVENT_PRIME, (value) => {
+            this.emitter.on(OyaMist.EVENT_PRIME, (value) => {
                 this._state.Prime = value;
             });
-            this.emitter.on(OyaVessel.EVENT_ACTIVATE, (self, event) => {
+            this.emitter.on(OyaMist.EVENT_ACTIVATE, (self, event) => {
                 winston.debug(this.summary, event);
             });
-            this.emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (v) => 
-                this.onTemp(v,'tempInternal',OyaVessel.SENSE_TEMP_INTERNAL));
-            this.emitter.on(OyaVessel.SENSE_TEMP_CANOPY, (v) => 
-                this.onTemp(v,'tempCanopy',OyaVessel.SENSE_TEMP_CANOPY));
-            this.emitter.on(OyaVessel.SENSE_TEMP_AMBIENT, (v) => 
-                this.onTemp(v,'tempAmbient',OyaVessel.SENSE_TEMP_AMBIENT));
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (v) => 
-                this.onHumidity(v,'humidityInternal', OyaVessel.SENSE_HUMIDITY_INTERNAL));
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_AMBIENT, (v) => 
-                this.onHumidity(v,'humidityAmbient', OyaVessel.SENSE_HUMIDITY_AMBIENT));
-            this.emitter.on(OyaVessel.SENSE_HUMIDITY_CANOPY, (v) => 
-                this.onHumidity(v,'humidityCanopy', OyaVessel.SENSE_HUMIDITY_CANOPY));
-            this.emitter.on(OyaVessel.SENSE_EC_INTERNAL, (v) => 
-                this.onEC(v,'ecInternal', OyaVessel.SENSE_EC_INTERNAL));
-            this.emitter.on(OyaVessel.SENSE_EC_CANOPY, (v) => 
-                this.onEC(v,'ecCanopy', OyaVessel.SENSE_EC_CANOPY));
-            this.emitter.on(OyaVessel.SENSE_EC_AMBIENT, (v) => 
-                this.onEC(v,'ecAmbient', OyaVessel.SENSE_EC_AMBIENT));
+            this.emitter.on(OyaMist.SENSE_TEMP_INTERNAL, (v) => 
+                this.onTemp(v,'tempInternal',OyaMist.SENSE_TEMP_INTERNAL));
+            this.emitter.on(OyaMist.SENSE_TEMP_CANOPY, (v) => 
+                this.onTemp(v,'tempCanopy',OyaMist.SENSE_TEMP_CANOPY));
+            this.emitter.on(OyaMist.SENSE_TEMP_AMBIENT, (v) => 
+                this.onTemp(v,'tempAmbient',OyaMist.SENSE_TEMP_AMBIENT));
+            this.emitter.on(OyaMist.SENSE_HUMIDITY_INTERNAL, (v) => 
+                this.onHumidity(v,'humidityInternal', OyaMist.SENSE_HUMIDITY_INTERNAL));
+            this.emitter.on(OyaMist.SENSE_HUMIDITY_AMBIENT, (v) => 
+                this.onHumidity(v,'humidityAmbient', OyaMist.SENSE_HUMIDITY_AMBIENT));
+            this.emitter.on(OyaMist.SENSE_HUMIDITY_CANOPY, (v) => 
+                this.onHumidity(v,'humidityCanopy', OyaMist.SENSE_HUMIDITY_CANOPY));
+            this.emitter.on(OyaMist.SENSE_EC_INTERNAL, (v) => 
+                this.onEC(v,'ecInternal', OyaMist.SENSE_EC_INTERNAL));
+            this.emitter.on(OyaMist.SENSE_EC_CANOPY, (v) => 
+                this.onEC(v,'ecCanopy', OyaMist.SENSE_EC_CANOPY));
+            this.emitter.on(OyaMist.SENSE_EC_AMBIENT, (v) => 
+                this.onEC(v,'ecAmbient', OyaMist.SENSE_EC_AMBIENT));
             this._countdownId = setInterval(() => {
                 this._state.countdown = this._state.countdown <= 0 ? 0 : (this._state.countdown-1);
             }, 1000);
         }
 
         static get DEFAULT_CYCLES() { return {
-            [OyaVessel.CYCLE_STANDARD]: {
+            [OyaMist.CYCLE_STANDARD]: {
                 name: "Standard",
-                key: OyaVessel.CYCLE_STANDARD,
+                key: OyaMist.CYCLE_STANDARD,
                 desc: "Standard cycle for all phases of plant growth",
-                emits: OyaVessel.EVENT_MIST,
+                emits: OyaMist.EVENT_MIST,
                 on: 10,
                 off: 60,
-                nextCycle: OyaVessel.CYCLE_STANDARD,
+                nextCycle: OyaMist.CYCLE_STANDARD,
             },
-            [OyaVessel.CYCLE_PRIME]: {
+            [OyaMist.CYCLE_PRIME]: {
                 name: "Prime",
-                key: OyaVessel.CYCLE_PRIME,
+                key: OyaMist.CYCLE_PRIME,
                 desc: "Circulate water to prime misting system",
-                emits: OyaVessel.EVENT_MIST,
+                emits: OyaMist.EVENT_MIST,
                 on: 60,
                 off: 0,
-                nextCycle: OyaVessel.CYCLE_STANDARD,
+                nextCycle: OyaMist.CYCLE_STANDARD,
             },
-            [OyaVessel.CYCLE_COOL]: {
+            [OyaMist.CYCLE_COOL]: {
                 name: "Cool",
-                key: OyaVessel.CYCLE_COOL,
+                key: OyaMist.CYCLE_COOL,
                 desc: "Hot day evaporative cooling cycle with fan",
-                emits: OyaVessel.EVENT_MIST,
+                emits: OyaMist.EVENT_MIST,
                 on: 10,
                 off: 20,
-                nextCycle: OyaVessel.CYCLE_COOL,
+                nextCycle: OyaMist.CYCLE_COOL,
             },
-            [OyaVessel.CYCLE_CONSERVE]: {
+            [OyaMist.CYCLE_CONSERVE]: {
                 name: "Conserve",
-                key: OyaVessel.CYCLE_CONSERVE,
+                key: OyaMist.CYCLE_CONSERVE,
                 desc: "Conservative misting cycle for mild conditions",
-                emits: OyaVessel.EVENT_MIST,
+                emits: OyaMist.EVENT_MIST,
                 on: 10,
                 off: 120,
-                nextCycle: OyaVessel.CYCLE_CONSERVE,
+                nextCycle: OyaMist.CYCLE_CONSERVE,
             },
         }}
-
-        static get CYCLE_STANDARD() { return "Cycle #1"; }
-        static get CYCLE_PRIME() { return "Cycle #2"; }
-        static get CYCLE_COOL() { return "Cycle #3"; }
-        static get CYCLE_CONSERVE() { return "Cycle #4"; }
-        static get EVENT_MIST() { return "event:mist"; }
-        static get EVENT_COOL() { return "event:Cool"; }
-        static get EVENT_PRIME() { return "event:Prime"; }
-        static get EVENT_ACTIVATE() { return "event:activate"; }
-        static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
-        static get SENSE_TEMP_CANOPY() { return "sense: temp-canopy"; }
-        static get SENSE_TEMP_AMBIENT() { return "sense: temp-ambient"; }
-        static get SENSE_HUMIDITY_INTERNAL() { return "sense: humidity-internal"; }
-        static get SENSE_HUMIDITY_CANOPY() { return "sense: humidity-canopy"; }
-        static get SENSE_HUMIDITY_AMBIENT() { return "sense: humidity-ambient"; }
-        static get SENSE_PH() { return "sense: pH"; }
-        static get SENSE_PPM() { return "sense: ppm"; }
-        static get SENSE_EC_INTERNAL() { return "sense: ec-internal"; }
-        static get SENSE_EC_CANOPY() { return "sense: ec-canopy"; }
-        static get SENSE_EC_AMBIENT() { return "sense: ec-ambient"; }
 
         toJSON() {
             return {
@@ -296,7 +277,7 @@
                 winston.debug(`OyaVessel.activate(true) vessel:${this.name} `);
                 this._state.active = value;
                 this._state.cycleNumber = 0;
-                this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
+                this.emitter.emit(OyaMist.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
             } else if (value === false) {
                 winston.debug(`OyaVessel.activate(false) vessel:${this.name} `);
@@ -305,10 +286,10 @@
                 this._state.countstart = 0;
                 this._phaseTimeout != null && clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
-                this.emitter.emit(OyaVessel.EVENT_ACTIVATE, value);
-                this.emitter.emit(OyaVessel.EVENT_MIST, false);
-                this.emitter.emit(OyaVessel.EVENT_COOL, false);
-                this.emitter.emit(OyaVessel.EVENT_PRIME, false);
+                this.emitter.emit(OyaMist.EVENT_ACTIVATE, value);
+                this.emitter.emit(OyaMist.EVENT_MIST, false);
+                this.emitter.emit(OyaMist.EVENT_COOL, false);
+                this.emitter.emit(OyaMist.EVENT_PRIME, false);
             } else {
                 var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);
                 winston.warn(err.stack);
@@ -373,7 +354,7 @@
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
                 self._state.countstart = self._state.countdown;
-                self.emitter.emit(OyaVessel.EVENT_MIST, value);
+                self.emitter.emit(OyaMist.EVENT_MIST, value);
                 var msOn = Number(cycle.on) * 1000;
                 if (msOn > 0) {
                     self._phaseTimeout = setTimeout(() => {
@@ -385,7 +366,7 @@
         } else {
             self._state.countdown = Math.trunc(cycle.off);
             self._state.countstart = self._state.countdown;
-            self.emitter.emit(OyaVessel.EVENT_MIST, value);
+            self.emitter.emit(OyaMist.EVENT_MIST, value);
             if (OyaVessel.DEFAULT_CYCLES[cycle.off]) {
                 self.setCycle(cycle.off);
             } else {

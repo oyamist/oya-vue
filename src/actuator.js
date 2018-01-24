@@ -1,5 +1,6 @@
 (function(exports) {
     const OyaVessel = require('./oya-vessel');
+    const OyaMist = require('./oyamist');
 
     class Actuator {
         constructor(opts = {}) {
@@ -32,17 +33,17 @@
         static get USAGE_DEFAULTS() { 
             return [{
                 usage: Actuator.USAGE_MIST,
-                activate: OyaVessel.EVENT_MIST,
+                activate: OyaMist.EVENT_MIST,
                 desc: 'Mist roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: Actuator.USAGE_COOL,
-                activate: OyaVessel.EVENT_COOL,
+                activate: OyaMist.EVENT_COOL,
                 desc: 'Cool roots',
                 type: Actuator.ACTUATOR_SPST_NO,
             },{
                 usage: Actuator.USAGE_PRIME,
-                activate: OyaVessel.EVENT_PRIME,
+                activate: OyaMist.EVENT_PRIME,
                 desc: 'Prime mist system ',
                 type: Actuator.ACTUATOR_SPST_NO,
             }];

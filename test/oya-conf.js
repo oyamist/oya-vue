@@ -1,12 +1,15 @@
 (typeof describe === 'function') && describe("OyaConf", function() {
     const should = require("should");
     const winston = require('winston');
-    const OyaConf = require("../index").OyaConf;
-    const Actuator = require("../index").Actuator;
-    const Light = require("../index").Light;
-    const Sensor = require("../index").Sensor;
-    const Switch = require("../index").Switch;
-    const OyaVessel = require("../index").OyaVessel;
+    const {
+        OyaConf,
+        OyaMist,
+        Actuator,
+        Light,
+        Sensor,
+        Switch,
+        OyaVessel,
+    } = require('../index');
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
         name: 'test',
@@ -123,17 +126,17 @@
                     name: 'test1',
                     guid: 'test1guid',
                     type: 'new-type',
-                    startCycle: OyaVessel.CYCLE_COOL,
-                    hotCycle: OyaVessel.CYCLE_COOL,
+                    startCycle: OyaMist.CYCLE_COOL,
+                    hotCycle: OyaMist.CYCLE_COOL,
                     enabled: false,
                     coolThreshold: 72,
                     cycles: {
-                        [OyaVessel.CYCLE_COOL]: {
+                        [OyaMist.CYCLE_COOL]: {
                             desc: 'fans are cool',
-                            emits: OyaVessel.EVENT_COOL,
+                            emits: OyaMist.EVENT_COOL,
                             on: 10,
                             off: 23,
-                            nextCycle: OyaVessel.CYCLE_COOL,
+                            nextCycle: OyaMist.CYCLE_COOL,
                         }
                     },
             })],
@@ -143,17 +146,17 @@
         updatedVessel.name = 'test1';
         updatedVessel.guid= 'test1guid';
         updatedVessel.enabled = false;
-        updatedVessel.startCycle = OyaVessel.CYCLE_COOL;
+        updatedVessel.startCycle = OyaMist.CYCLE_COOL;
         updatedVessel.coolThreshold = 72;
         updatedVessel.cycles = {
-            [OyaVessel.CYCLE_COOL]: {
+            [OyaMist.CYCLE_COOL]: {
                 name: "Cool",
-                key: OyaVessel.CYCLE_COOL,
+                key: OyaMist.CYCLE_COOL,
                 desc: 'fans are cool',
-                emits: OyaVessel.EVENT_COOL,
+                emits: OyaMist.EVENT_COOL,
                 on: 10,
                 off: 23,
-                nextCycle: OyaVessel.CYCLE_COOL,
+                nextCycle: OyaMist.CYCLE_COOL,
             }
         };
         should.deepEqual(new OyaConf(opts).toJSON(), {
@@ -186,8 +189,8 @@
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
-            startCycle: OyaVessel.CYCLE_STANDARD,
-            hotCycle: OyaVessel.CYCLE_COOL,
+            startCycle: OyaMist.CYCLE_STANDARD,
+            hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
@@ -198,8 +201,8 @@
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
-            startCycle: OyaVessel.CYCLE_STANDARD,
-            hotCycle: OyaVessel.CYCLE_COOL,
+            startCycle: OyaMist.CYCLE_STANDARD,
+            hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
@@ -209,8 +212,8 @@
             guid: 'dubbaguid',
             type: "testtype",
             enabled: true,
-            startCycle: OyaVessel.CYCLE_COOL,
-            hotCycle: OyaVessel.CYCLE_COOL,
+            startCycle: OyaMist.CYCLE_COOL,
+            hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: 81,
             maxCycles: 2,
             cycles: defaultCycles,
@@ -221,8 +224,8 @@
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
-            startCycle: OyaVessel.CYCLE_COOL,
-            hotCycle: OyaVessel.CYCLE_COOL,
+            startCycle: OyaMist.CYCLE_COOL,
+            hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: 81,
             maxCycles: 2,
             cycles: defaultCycles,
@@ -237,8 +240,8 @@
             sensorExpRate: 0.01,
             type: "OyaVessel",
             enabled: true,
-            startCycle: OyaVessel.CYCLE_STANDARD,
-            hotCycle: OyaVessel.CYCLE_COOL,
+            startCycle: OyaMist.CYCLE_STANDARD,
+            hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
             maxCycles: 0,
             cycles: defaultCycles,
@@ -261,20 +264,20 @@
         oc.update({
             name: 'foo',
             type: 'bad-type', // ignored
-            startCycle: OyaVessel.CYCLE_COOL,
-            hotCycle: OyaVessel.CYCLE_STANDARD,
+            startCycle: OyaMist.CYCLE_COOL,
+            hotCycle: OyaMist.CYCLE_STANDARD,
             tempUnit: 'C',
             vessels: [{
             },{
                 name: 'test2',
                 guid: 'test2guid',
                 type: 'new-type',
-                startCycle: OyaVessel.CYCLE_COOL,
-                hotCycle: OyaVessel.CYCLE_STANDARD,
+                startCycle: OyaMist.CYCLE_COOL,
+                hotCycle: OyaMist.CYCLE_STANDARD,
                 enabled: false,
                 coolThreshold: 72,
                 cycles: {
-                    [OyaVessel.CYCLE_COOL]: {
+                    [OyaMist.CYCLE_COOL]: {
                         on: 10,
                         off: 23,
                     }
@@ -291,18 +294,18 @@
         updatedVessel.name = 'test2';
         updatedVessel.guid = 'test2guid';
         updatedVessel.enabled = false;
-        updatedVessel.startCycle = OyaVessel.CYCLE_COOL;
-        updatedVessel.hotCycle = OyaVessel.CYCLE_STANDARD;
+        updatedVessel.startCycle = OyaMist.CYCLE_COOL;
+        updatedVessel.hotCycle = OyaMist.CYCLE_STANDARD;
         updatedVessel.coolThreshold = 72;
         updatedVessel.cycles = {
-            [OyaVessel.CYCLE_COOL]: {
+            [OyaMist.CYCLE_COOL]: {
                 name: "Cool",
-                key: OyaVessel.CYCLE_COOL,
-                desc: defaultCycles[OyaVessel.CYCLE_COOL].desc,
-                emits: OyaVessel.EVENT_MIST,
+                key: OyaMist.CYCLE_COOL,
+                desc: defaultCycles[OyaMist.CYCLE_COOL].desc,
+                emits: OyaMist.EVENT_MIST,
                 on: 10,
                 off: 23,
-                nextCycle: OyaVessel.CYCLE_COOL,
+                nextCycle: OyaMist.CYCLE_COOL,
             }
         };
 

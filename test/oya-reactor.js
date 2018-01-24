@@ -15,13 +15,17 @@
     const app = require("../scripts/server.js");
     const EventEmitter = require("events");
     const winston = require('winston');
-    const Actuator = require("../index").Actuator;
-    const Sensor = require("../index").Sensor;
-    const DbReport = require("../index").DbReport;
-    const OyaReactor = require("../index").OyaReactor;
-    const OyaConf = require("../index").OyaConf;
-    const Light = require("../index").Light;
-    const OyaVessel = require("../index").OyaVessel;
+    const {
+        OyaConf,
+        DbReport,
+        OyaMist,
+        OyaReactor,
+        Actuator,
+        Light,
+        Sensor,
+        Switch,
+        OyaVessel,
+    } = require('../index');
     const STANDARD_ON = 0.005;
     const STANDARD_OFF = 0.01;
     const FAN_ON = 2*STANDARD_ON;
@@ -30,10 +34,10 @@
     const DEFAULT_APIMODEL = Object.assign({}, DEFAULT_CONF );
 
     var testTimer = OyaConf.createVesselConfig();
-    testTimer.cycles[OyaVessel.CYCLE_STANDARD].on = STANDARD_ON;
-    testTimer.cycles[OyaVessel.CYCLE_STANDARD].off = STANDARD_OFF;
-    testTimer.cycles[OyaVessel.CYCLE_COOL].on = FAN_ON;
-    testTimer.cycles[OyaVessel.CYCLE_COOL].off = FAN_OFF;
+    testTimer.cycles[OyaMist.CYCLE_STANDARD].on = STANDARD_ON;
+    testTimer.cycles[OyaMist.CYCLE_STANDARD].off = STANDARD_OFF;
+    testTimer.cycles[OyaMist.CYCLE_COOL].on = FAN_ON;
+    testTimer.cycles[OyaMist.CYCLE_COOL].off = FAN_OFF;
     var level = winston.level;
     winston.level = 'warn';
 
@@ -89,7 +93,7 @@
         relayValue = null;
         relayPin = null;
         should(reactor.vessels[0].state.Mist).equal(false);
-        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_MIST, true);
+        reactor.vessels[0].emitter.emit(OyaMist.EVENT_MIST, true);
         should(reactor.vessels[0].state.Mist).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(2);
@@ -98,7 +102,7 @@
         relayValue = null;
         relayPin = null;
         should(reactor.vessels[0].state.Cool).equal(false);
-        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_COOL, true);
+        reactor.vessels[0].emitter.emit(OyaMist.EVENT_COOL, true);
         should(reactor.vessels[0].state.Cool).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(3);
@@ -107,7 +111,7 @@
         relayValue = null;
         relayPin = null;
         should(reactor.vessels[0].state.Prime).equal(false);
-        reactor.vessels[0].emitter.emit(OyaVessel.EVENT_PRIME, true);
+        reactor.vessels[0].emitter.emit(OyaMist.EVENT_PRIME, true);
         should(reactor.vessels[0].state.Prime).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(4);
@@ -116,44 +120,44 @@
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
-        reactor.vessel.setCycle(OyaVessel.CYCLE_COOL);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+        reactor.vessel.setCycle(OyaMist.CYCLE_COOL);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
 
         // do nothing on false
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, false);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
 
         // set cycle on true
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, true);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
     });
     it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
         // do nothing on false
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, false);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
         // set cycle on true
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, true);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
     });
     it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
         // do nothing on false
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, false);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
         // set cycle on true
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
-        should(reactor.vessel.cycle).equal(OyaVessel.CYCLE_PRIME);
+        should(reactor.vessel.cycle).equal(OyaMist.CYCLE_PRIME);
     });
     it("GET /state returns push state", function(done) {
         var async = function* () {
@@ -230,13 +234,13 @@
             autoActivate: false,
             sensors: [{
                 type: Sensor.TYPE_AM2315,
-                loc: Sensor.LOC_INTERNAL,
+                loc: OyaMist.LOC_INTERNAL,
             }],
         });
         reactor.oyaConf.sensors.length.should.equal(1);
         var sensor0 = reactor.oyaConf.sensors[0];
         sensor0.type.should.equal(Sensor.TYPE_AM2315.type);
-        sensor0.loc.should.equal(Sensor.LOC_INTERNAL);
+        sensor0.loc.should.equal(OyaMist.LOC_INTERNAL);
         should(sensor0.lastRead == null).equal(true);
         should.deepEqual(sensor0.health(), {
             "AM2315@internal": 'Sensor is completely unresponsive',
@@ -330,18 +334,19 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
 
                 // one day 
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/1/2017-03-09").expect((res) => {
+                var url = "/test/sensor/data-by-hour/tempInternal/1/2017-03-10T08:10:20Z";
+                var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
                         'from sensordata\n'+
-                        "where utc between '2017-03-09 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
+                        "where utc between '2017-03-09 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
                         "and evt in ('sense: temp-internal')\n"+
                         "group by evt, hr\n"+
                         "order by evt, hr desc\n"+
@@ -350,12 +355,13 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
                 // seven days
-                var response = yield supertest(app).get("/test/sensor/data-by-hour/tempInternal/7/2017-03-09").expect((res) => {
+                var url = "/test/sensor/data-by-hour/tempInternal/7/2017-03-10T08:10:20Z";
+                var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
                         'from sensordata\n'+
-                        "where utc between '2017-03-03 07:59:59.999' and '2017-03-10 07:59:59.999'\n"+
+                        "where utc between '2017-03-03 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
                         "and evt in ('sense: temp-internal')\n"+
                         "group by evt, hr\n"+
                         "order by evt, hr desc\n"+
@@ -435,9 +441,9 @@
                         tempUnit: 'F',
                     });
                     should(apiModel.vessels[0].cycles).properties([
-                        OyaVessel.CYCLE_COOL,
-                        OyaVessel.CYCLE_STANDARD,
-                        OyaVessel.CYCLE_PRIME,
+                        OyaMist.CYCLE_COOL,
+                        OyaMist.CYCLE_STANDARD,
+                        OyaMist.CYCLE_PRIME,
                     ]);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -477,7 +483,7 @@
                 };
                 newConf.name = 'OyaMist01';
                 newConf.vessels[0].coolThreshold = 81;
-                newConf.vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on = 3;
+                newConf.vessels[0].cycles[OyaMist.CYCLE_STANDARD].on = 3;
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;
@@ -489,7 +495,7 @@
                         rbHash: rbh.hash(newConf),
                     }));
                     should(testReactor().vessels[0].name).equal('vessel1');
-                    should(testReactor().vessels[0].cycles[OyaVessel.CYCLE_STANDARD].on).equal(3);
+                    should(testReactor().vessels[0].cycles[OyaMist.CYCLE_STANDARD].on).equal(3);
                     should(testReactor().vessels[0].coolThreshold).equal(81);
                     should.ok(apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
@@ -719,16 +725,16 @@
 
                 // change cycle
                 var command = {
-                    cycle: OyaVessel.CYCLE_COOL,
+                    cycle: OyaMist.CYCLE_COOL,
                 }
                 winston.level="warn";
-                should(vessel.cycle).equal(OyaVessel.CYCLE_STANDARD);
+                should(vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
                 var res = yield supertest(app).post("/test/reactor").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 should(res.statusCode).equal(200);
-                should(vessel.cycle).equal(OyaVessel.CYCLE_COOL);
+                should(vessel.cycle).equal(OyaMist.CYCLE_COOL);
                 should.deepEqual(res.body, {
-                    cycle: OyaVessel.CYCLE_COOL,
+                    cycle: OyaMist.CYCLE_COOL,
                 });
 
                 done();

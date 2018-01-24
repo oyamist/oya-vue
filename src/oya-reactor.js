@@ -1,12 +1,12 @@
 (function(exports) {
     const winston = require('winston');
+    const OyaMist = require("./oyamist");
     const EventEmitter = require("events");
     const srcPkg = require("../package.json");
     const OyaConf = require("./oya-conf");
     const Actuator = require("./actuator");
     const Light = require("./light");
     const Sensor = require("./sensor");
-    const DbReport = require("./db-report");
     const Switch = require("./switch");
     const fs = require('fs');
     const OyaVessel = require("./oya-vessel");
@@ -20,9 +20,9 @@
         winston.warn('memwatch() => leak', JSON.stringify(info));
     });
     const SENSOR_EVENTS = {
-        tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
-        humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-        ecInternal: OyaVessel.SENSE_EC_INTERNAL,
+        tempInternal: OyaMist.SENSE_TEMP_INTERNAL,
+        humidityInternal: OyaMist.SENSE_HUMIDITY_INTERNAL,
+        ecInternal: OyaMist.SENSE_EC_INTERNAL,
     };
 
     class OyaReactor extends rb.RestBundle {
@@ -79,34 +79,30 @@
                 this.onLight(Light.SPECTRUM_RED, value, 'red');
             });
             this.emitter.on(OyaConf.EVENT_CYCLE_MIST, value => {
-                value && this.vessel.setCycle(OyaVessel.CYCLE_STANDARD);
+                value && this.vessel.setCycle(OyaMist.CYCLE_STANDARD);
             });
             this.emitter.on(OyaConf.EVENT_CYCLE_COOL, value => {
-                value && this.vessel.setCycle(OyaVessel.CYCLE_COOL);
+                value && this.vessel.setCycle(OyaMist.CYCLE_COOL);
             });
             this.emitter.on(OyaConf.EVENT_CYCLE_PRIME, value => {
-                value && this.vessel.setCycle(OyaVessel.CYCLE_PRIME);
+                value && this.vessel.setCycle(OyaMist.CYCLE_PRIME);
             });
             this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
                 var vessel = new OyaVessel(Object.assign({
                     name: `${name}-vessel${iv}`,
                 }, vconf, opts));
-                vessel.emitter.on(OyaVessel.EVENT_MIST, (value) => {
-                    this.onActuator(OyaVessel.EVENT_MIST, value, iv);
+                vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
+                    this.onActuator(OyaMist.EVENT_MIST, value, iv);
                 });
-                vessel.emitter.on(OyaVessel.EVENT_COOL, (value) => {
-                    this.onActuator(OyaVessel.EVENT_COOL, value, iv);
+                vessel.emitter.on(OyaMist.EVENT_COOL, (value) => {
+                    this.onActuator(OyaMist.EVENT_COOL, value, iv);
                 });
-                vessel.emitter.on(OyaVessel.EVENT_PRIME, (value) => {
-                    this.onActuator(OyaVessel.EVENT_PRIME, value, iv);
+                vessel.emitter.on(OyaMist.EVENT_PRIME, (value) => {
+                    this.onActuator(OyaMist.EVENT_PRIME, value, iv);
                 });
                 return vessel;
             });
             this.vessel = this.vessels[0];
-            this.dbReport = new DbReport({
-                vessel: this.vessel,
-                dbfacade: this.vessel.dbfacade,
-            });
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             this.loadApiModel(this.apiFile).then(apiModelCopy => {
                 var oyaConf = this.oyaConf;
@@ -236,14 +232,33 @@
                 active: this.vessel.isActive,
             }
             this.oyaConf.sensors.forEach(sensor => {
-                sensor.loc !== Sensor.LOC_NONE && Object.assign(result, sensor.health());
+                sensor.loc !== OyaMist.LOC_NONE && Object.assign(result, sensor.health());
             });
 
             return result;
         }
 
         getSensorDataByHour(req, res, next) {
-            return this.dbReport.sensorDataByHour(req.params);
+            var field = req.params.field || 'ecInternal';
+            var days = Number(req.params.days) || 7;
+            var endDate = req.params.endDate && new Date(req.params.endDate) || new Date();
+            var eDate = req.params.endDate || new Date().toString();
+            console.log('enddate', endDate, new Date(endDate));
+            return new Promise((resolve, reject) => {
+                try {
+                    var evt = OyaMist.eventOfField(field);
+                    var dbf = this.vessel.dbfacade;
+                    if (evt) {
+                        dbf.sensorDataByHour(evt, endDate, days).then(r => resolve(r))
+                        .catch(e => reject(e));
+                    } else {
+                        throw new Error(`unknown field:${field}`);
+                    }
+                } catch(e) {
+                    winston.error(e.stack);
+                    reject(e);
+                }
+            });
         }
 
         getSensorTypes(req, res, next) {
@@ -313,10 +328,11 @@
                     var field = opts.field;
                     var startDate = new Date(opts.startDate);
                     var endDate = new Date(opts.endDate);
+                    var dbf = this.vessel.dbfacade;
                     console.log('opts',opts, startDate, endDate);
                     if (field === 'ecInternal') {
-                        this.dbReport.sensorAvgByHour([field,'tempInternal'], startDate, endDate).then(r => {
-                            console.log(r);
+                        dbf.sensorAvgByHour([field,'tempInternal'], startDate, endDate).then(r => {
+                            //console.log(r);
                             resolve(r);
                         }).catch(e => {
                             winston.error(e.stack);

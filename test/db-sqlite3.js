@@ -96,7 +96,7 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
+    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
         (async function () {
             try {
                 var dbl = await new DbSqlite3().open();
@@ -111,42 +111,26 @@
                 // single event
                 var r = await dbl.sensorDataByHour('testevt', testDate2);
                 should(r).properties(["sql","data"]);
-                should.deepEqual(r.data, [{
+                should.deepEqual(r.data[22], {
                     evt: 'testevt',
                     hr: '2017-03-08 0100',
                     vavg: 13.5,
                     vmax: 14,
                     vmin: 13,
-                },{
+                });
+                should.deepEqual(r.data[36], {
                     evt: 'testevt',
                     hr: '2017-03-07 1100',
                     vavg: 12,
                     vmax: 12,
                     vmin: 12,
-                }]);
+                });
+                should(r.data.length).equal(48);
+                should(r.data.filter(d=>d.evt==='testevt').length).equal(48);
 
-                // multiple events
-                var r = await dbl.sensorDataByHour(['testevt','otherevt'], testDate2);
-                should(r).properties(["sql","data"]);
-                should.deepEqual(r.data, [{
-                    evt: 'otherevt',
-                    hr: '2017-03-08 0100',
-                    vavg: 100,
-                    vmax: 100,
-                    vmin: 100,
-                },{
-                    evt: 'testevt',
-                    hr: '2017-03-08 0100',
-                    vavg: 13.5,
-                    vmax: 14,
-                    vmin: 13,
-                },{
-                    evt: 'testevt',
-                    hr: '2017-03-07 1100',
-                    vavg: 12,
-                    vmax: 12,
-                    vmin: 12,
-                }]);
+                // null is returned for hours with no data
+                should(r.data.filter(d=>d.vavg==null).length).equal(46);
+
                 done();
             } catch (e) {
                 done(e);

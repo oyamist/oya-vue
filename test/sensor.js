@@ -1,13 +1,16 @@
 (typeof describe === 'function') && describe("Sensor", function() {
     const winston = require('winston');
     const should = require("should");
-    const Sensor = exports.Sensor || require("../index").Sensor;
-    const SystemFacade = exports.SystemFacade || require("../index").SystemFacade;
-    const OyaVessel = require('../index').OyaVessel;
     const EventEmitter = require("events");
-    const OyaAnn = require('oya-ann');
     const path = require('path');
     const fs = require('fs');
+    const {
+        OyaAnn,
+        OyaMist,
+        OyaVessel,
+        Sensor,
+        SystemFacade,
+    } = require("../index");
 
     class MockSystem extends SystemFacade {
         constructor(opts={}) {
@@ -40,7 +43,7 @@
                 });
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_DS18B20, {
                     address: "28-MOCK2",
-                    loc: Sensor.LOC_INTERNAL,
+                    loc: OyaMist.LOC_INTERNAL,
                 }));
                 should(sensor).properties({
                     address: "28-MOCK2",
@@ -75,7 +78,7 @@
 
                 // sensor with no data ever is dead
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    loc: Sensor.LOC_CANOPY,
+                    loc: OyaMist.LOC_CANOPY,
                     healthTimeout,
                 }));
                 should.deepEqual(sensor.health(), {
@@ -84,7 +87,7 @@
 
                 // healthy sensor has recently read data
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    loc: Sensor.LOC_CANOPY,
+                    loc: OyaMist.LOC_CANOPY,
                     healthTimeout,
                     lastRead: new Date(Date.now() - healthTimeout/2 * 1000),
                 }));
@@ -95,7 +98,7 @@
                 // unhealthy sensor has stale data
                 var lastRead = new Date(Date.now() - (healthTimeout * 1000 + 1));
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    loc: Sensor.LOC_CANOPY,
+                    loc: OyaMist.LOC_CANOPY,
                     healthTimeout,
                     lastRead,
                 }));
@@ -105,7 +108,7 @@
 
                 // a read fault is fatal
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-                    loc: Sensor.LOC_CANOPY,
+                    loc: OyaMist.LOC_CANOPY,
                     healthTimeout,
                     maxReadErrors: 2,
                 }));
@@ -126,7 +129,7 @@
     });
     it("ctor defaults can be overridden", function() {
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
-            loc: Sensor.LOC_CANOPY,
+            loc: OyaMist.LOC_CANOPY,
         }));
         should(sensor.name).equal("AM2315");
         should(sensor.type).equal(Sensor.TYPE_AM2315.type);
@@ -147,7 +150,7 @@
         should(sensor.tempOffset).equal(0);
         should(sensor.humidityScale).equal(0.001);
         should(sensor.humidityOffset).equal(0);
-        should(sensor.loc).equal(Sensor.LOC_CANOPY);
+        should(sensor.loc).equal(OyaMist.LOC_CANOPY);
         should(sensor.comm).equal(Sensor.COMM_I2C);
         should(sensor.crc).equal(Sensor.CRC_MODBUS);
         should(sensor.vesselIndex).equal(0);
@@ -180,7 +183,7 @@
     });
     it("parseData() parses SHT31-DIS", function() {
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS, {
-            loc: Sensor.LOC_INTERNAL,
+            loc: OyaMist.LOC_INTERNAL,
         });
 
         var buf = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
@@ -201,20 +204,20 @@
         var emitter = new EventEmitter();
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
             emitter,
-            loc: Sensor.LOC_INTERNAL,
+            loc: OyaMist.LOC_INTERNAL,
         }));
         should(sensor.emitter).equal(emitter);
         var temp_event = null;
         var temp_eventValue = null;
-        emitter.on(OyaVessel.SENSE_TEMP_INTERNAL, (value) => {
-            temp_event = OyaVessel.SENSE_TEMP_INTERNAL;
+        emitter.on(OyaMist.SENSE_TEMP_INTERNAL, (value) => {
+            temp_event = OyaMist.SENSE_TEMP_INTERNAL;
             temp_eventValue = value;
         });
 
         var humidity_event = null;
         var humidity_eventValue = null;
-        emitter.on(OyaVessel.SENSE_HUMIDITY_INTERNAL, (value) => {
-            humidity_event = OyaVessel.SENSE_HUMIDITY_INTERNAL;
+        emitter.on(OyaMist.SENSE_HUMIDITY_INTERNAL, (value) => {
+            humidity_event = OyaMist.SENSE_HUMIDITY_INTERNAL;
             humidity_eventValue = value;
         });
 
@@ -229,15 +232,15 @@
         data.humidity.should.approximately(.323, 0.0001); // %relative humidity
         should(data.timestamp - new Date()).approximately(0, 2);
         should.deepEqual(sensor.data, data);
-        should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
+        should(temp_event).equal(OyaMist.SENSE_TEMP_INTERNAL);
         should(temp_eventValue).equal(data.temp);
-        should(humidity_event).equal(OyaVessel.SENSE_HUMIDITY_INTERNAL);
+        should(humidity_event).equal(OyaMist.SENSE_HUMIDITY_INTERNAL);
         should(humidity_eventValue).equal(data.humidity);
 
         // temp events are suppressed if readTemp is false
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
             emitter,
-            loc: Sensor.LOC_INTERNAL,
+            loc: OyaMist.LOC_INTERNAL,
             readTemp: false,
         }));
         temp_event = null;
@@ -251,13 +254,13 @@
         should.deepEqual(sensor.data, data);
         should(temp_event).equal(null); // no event
         should(temp_eventValue).equal(null); // no event
-        should(humidity_event).equal(OyaVessel.SENSE_HUMIDITY_INTERNAL);
+        should(humidity_event).equal(OyaMist.SENSE_HUMIDITY_INTERNAL);
         should(humidity_eventValue).equal(data.humidity);
 
         // humidity events are suppressed if readHumidity is false
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
             emitter,
-            loc: Sensor.LOC_INTERNAL,
+            loc: OyaMist.LOC_INTERNAL,
             readHumidity: false,
         }));
         temp_event = null;
@@ -269,14 +272,14 @@
         should(data.humidity).equal(null);
         should(data.timestamp - new Date()).approximately(0, 3);
         should.deepEqual(sensor.data, data);
-        should(temp_event).equal(OyaVessel.SENSE_TEMP_INTERNAL);
+        should(temp_event).equal(OyaMist.SENSE_TEMP_INTERNAL);
         should(temp_eventValue).equal(data.temp);
         should(humidity_event).equal(null);
         should(humidity_eventValue).equal(null);
 
         // events are suppressed if emitter is not provided
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315,{
-            loc: Sensor.LOC_INTERNAL,
+            loc: OyaMist.LOC_INTERNAL,
         }));
         var data = sensor.parseData(buf); 
         data.temp.should.approximately(19.5, 0.01); // Centigrade
@@ -301,7 +304,7 @@
                 var readDelay = 15;
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
-                    loc: Sensor.LOC_INTERNAL,
+                    loc: OyaMist.LOC_INTERNAL,
                     maxReadErrors: 1,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
@@ -364,7 +367,7 @@
                 var msRead = null;
                 var testData = Buffer.from([0x65, 0x44, 0x5a, 0x84, 0x3e, 0xfb]);
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_SHT31_DIS, {
-                    loc: Sensor.LOC_AMBIENT,
+                    loc: OyaMist.LOC_AMBIENT,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
                         testData.copy(buf);
@@ -417,11 +420,11 @@
         // changing sensor type does not affect critical properties
         var date = new Date();
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS, {
-            loc: Sensor.LOC_CANOPY,
+            loc: OyaMist.LOC_CANOPY,
             lastRead: date,
         });
         var sensorExpected = new Sensor(Sensor.TYPE_DS18B20, {
-            loc: Sensor.LOC_CANOPY,
+            loc: OyaMist.LOC_CANOPY,
             lastRead: date,
         });
         should(Sensor.update(sensor, {

@@ -1,6 +1,6 @@
 (function(exports) {
     const winston = require("winston");
-    const OyaVessel = require('./oya-vessel');
+    const OyaMist = require("./oyamist");
     const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
 
@@ -32,7 +32,7 @@
             this.comm = opts.comm || typeProps.comm;
             this.desc = opts.desc || typeProps.desc || 'generic sensor';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
-            this.loc = opts.loc || Sensor.LOC_NONE;
+            this.loc = opts.loc || OyaMist.LOC_NONE;
             this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.name = opts.name || typeProps.name;
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
@@ -165,25 +165,25 @@
 
         static get EVENT_EC_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_EC_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_EC_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_EC_AMBIENT,
+                [OyaMist.LOC_INTERNAL]: OyaMist.SENSE_EC_INTERNAL,
+                [OyaMist.LOC_CANOPY]: OyaMist.SENSE_EC_CANOPY,
+                [OyaMist.LOC_AMBIENT]: OyaMist.SENSE_EC_AMBIENT,
             };
         }
 
         static get EVENT_HUMIDITY_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_HUMIDITY_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_HUMIDITY_AMBIENT,
+                [OyaMist.LOC_INTERNAL]: OyaMist.SENSE_HUMIDITY_INTERNAL,
+                [OyaMist.LOC_CANOPY]: OyaMist.SENSE_HUMIDITY_CANOPY,
+                [OyaMist.LOC_AMBIENT]: OyaMist.SENSE_HUMIDITY_AMBIENT,
             };
         }
 
         static get EVENT_TEMP_MAP() {
             return {
-                [Sensor.LOC_INTERNAL]: OyaVessel.SENSE_TEMP_INTERNAL,
-                [Sensor.LOC_CANOPY]: OyaVessel.SENSE_TEMP_CANOPY,
-                [Sensor.LOC_AMBIENT]: OyaVessel.SENSE_TEMP_AMBIENT,
+                [OyaMist.LOC_INTERNAL]: OyaMist.SENSE_TEMP_INTERNAL,
+                [OyaMist.LOC_CANOPY]: OyaMist.SENSE_TEMP_CANOPY,
+                [OyaMist.LOC_AMBIENT]: OyaMist.SENSE_TEMP_AMBIENT,
             };
         }
 
@@ -314,10 +314,6 @@
 
             }
         }
-        static get LOC_INTERNAL() { return "internal"; }
-        static get LOC_CANOPY() { return "canopy"; }
-        static get LOC_AMBIENT() { return "ambient"; }
-        static get LOC_NONE() { return "none"; }
         static get COMM_I2C() { return "I\u00B2C"; }
         static get COMM_W1() { return "1-wire"; }
         static get BYTE_EC_0() { return "EC string[0]"; }
@@ -347,16 +343,16 @@
         }
         static get LOCATION_LIST() {
             return [{
-                id: Sensor.LOC_INTERNAL,
+                id: OyaMist.LOC_INTERNAL,
                 desc: "Vessel internal (at plant roots)",
             }, {
-                id: Sensor.LOC_CANOPY,
+                id: OyaMist.LOC_CANOPY,
                 desc: "Plant canopy",
             }, {
-                id: Sensor.LOC_AMBIENT,
+                id: OyaMist.LOC_AMBIENT,
                 desc: "Ambient (shaded, 5' above earth)",
             }, {
-                id: Sensor.LOC_NONE,
+                id: OyaMist.LOC_NONE,
                 desc: "No sensor",
             }];
         }
@@ -507,7 +503,7 @@
 
         health() {
             var key = `${this.type}@${this.loc}`;
-            if (this.loc === Sensor.LOC_NONE) {
+            if (this.loc === OyaMist.LOC_NONE) {
                 var value = null;
             } else if (this.fault instanceof Error) {
                 var value = this.fault.message;

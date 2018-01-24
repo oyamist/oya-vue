@@ -1,10 +1,10 @@
 module.exports = {
     Actuator: require("./src/actuator"),
     DbFacade: require("./src/db-facade"),
-    DbReport: require("./src/db-report"),
     DbSqlite3: require('./src/db-sqlite3'),
     Light: require("./src/light"),
     OyaConf: require("./src/oya-conf"),
+    OyaMist: require('./src/oyamist'),
     OyaNet: require('./src/oya-net'),
     OyaReactor: require("./src/oya-reactor"),
     OyaVessel: require("./src/oya-vessel"),
