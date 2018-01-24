@@ -15,6 +15,10 @@
     const rb = require("rest-bundle");
     const DiffUpsert = require('diff-upsert').DiffUpsert;
     const exec = require('child_process').exec;
+    const memwatch = require('memwatch-next');
+    memwatch.on('leak', (info) => {
+        winston.warn('memwatch() => leak', JSON.stringify(info));
+    });
     const SENSOR_EVENTS = {
         tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
         humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,

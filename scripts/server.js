@@ -9,6 +9,10 @@ const rb = require("rest-bundle");
 const OyaReactor = require("../index").OyaReactor;
 const DbSqlite3 = require('../index').DbSqlite3;
 const DbFacade = require('../index').DbFacade;
+const memwatch = require('memwatch-next');
+memwatch.on('leak', (info) => {
+    winston.warn(`memwatch leak:${info}`);
+});
 
 global.__appdir = path.dirname(__dirname);
 
@@ -58,6 +62,7 @@ let async = function*() {
 
         winston.debug("firing asyncOnReady event");
         app.locals.asyncOnReady.forEach(async => async.next(app)); // notify waiting async blocks
+        winston.info('memoryUsage()', process.memoryUsage());
     } catch (err) {
         winston.error("server.js:", err.stack);
         async.throw(err);
