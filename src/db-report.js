@@ -29,13 +29,13 @@
             return {
                 tempInternal: OyaVessel.SENSE_TEMP_INTERNAL,
                 humidityInternal: OyaVessel.SENSE_HUMIDITY_INTERNAL,
-                ecInternal: [ OyaVessel.SENSE_EC_INTERNAL, OyaVessel.SENSE_TEMP_INTERNAL],
+                ecInternal: OyaVessel.SENSE_EC_INTERNAL, 
                 tempCanopy: OyaVessel.SENSE_TEMP_CANOPY,
                 humidityCanopy: OyaVessel.SENSE_HUMIDITY_CANOPY,
-                ecCanopy: [OyaVessel.SENSE_EC_CANOPY, OyaVessel.SENSE_TEMP_CANOPY],
+                ecCanopy: OyaVessel.SENSE_EC_CANOPY,
                 tempAmbient: OyaVessel.SENSE_TEMP_AMBIENT,
                 humidityAmbient: OyaVessel.SENSE_HUMIDITY_AMBIENT,
-                ecAmbient: [OyaVessel.SENSE_EC_AMBIENT, OyaVessel.SENSE_TEMP_AMBIENT],
+                ecAmbient: OyaVessel.SENSE_EC_AMBIENT, 
             }
         }
 
@@ -178,20 +178,12 @@
         sensorAvgByHour(fields, startdate, enddate) {
             return new Promise((resolve,reject) => {
                 try {
-                    var field = fields instanceof Array && fields[0] || fields;
-                    var evt = DbReport.SQL_EVENTS[field];
                     var d1 = DbFacade.utcstr(startdate);
                     var d2 = DbFacade.utcstr(enddate);
                     var hours = Math.round((enddate-startdate)/(1000*3600)+.5);
-                    if (typeof evt === 'string') {
-                        var rowLimit = hours;
-                        var evtStr = `'${evt}'`;
-                    } else if (evt instanceof Array) {
-                        var rowLimit = fields.length * hours;
-                        var evtStr = `'${evt.join("','")}'`;
-                    } else {
-                        throw new Error(`unknown fields:${fields}`);
-                    }
+                    var rowLimit = fields.length * hours;
+                    var evt = fields.map(f => DbReport.SQL_EVENTS[f]);
+                    var evtStr = `'${evt.join("','")}'`;
                     var sql = 'select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
                         `avg(v) vavg, evt\n`+
                         `from sensordata\n`+
