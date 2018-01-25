@@ -43,7 +43,13 @@ let async = function*() {
 
             // for unit tests, do not disturb real database
             //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
-            var dbfacade = new DbSqlite3();
+            if (serviceName === 'test') {
+                var dbfacade = new DbSqlite3({
+                    dbname: './test/test-v1.0.db',
+                });
+            } else {
+                var dbfacade = new DbSqlite3();
+            }
 
             var oya = new OyaReactor(serviceName, {
                 dbfacade,

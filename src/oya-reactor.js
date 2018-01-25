@@ -325,15 +325,19 @@
             return new Promise((resolve, reject) => {
                 try {
                     var opts = req.body;
-                    var field = opts.field;
-                    var startDate = new Date(opts.startDate);
-                    var endDate = new Date(opts.endDate);
+                    var field = opts.field || 'ecInternal';
+                    var startDate = opts.startDate && new Date(opts.startDate) || new Date();
+                    var hours = opts.hours || 24;
                     var dbf = this.vessel.dbfacade;
-                    console.log('opts',opts, startDate, endDate);
                     if (field === 'ecInternal') {
-                        dbf.sensorAvgByHour([field,'tempInternal'], startDate, endDate).then(r => {
-                            //console.log(r);
-                            resolve(r);
+                        dbf.sensorAvgByHour([field,'tempInternal'], startDate, hours).then(r => {
+                            resolve({
+                                sql: r.sql,
+                                startDate: startDate.toISOString(),
+                                hours,
+                                data: r.data,
+                                field,
+                            });
                         }).catch(e => {
                             winston.error(e.stack);
                             reject(e);

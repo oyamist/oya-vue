@@ -333,7 +333,7 @@
         });
 
     });
-    it("TESTTESTupdate(opts) retains sensor instances", function() {
+    it("update(opts) retains sensor instances", function() {
         var oc = new OyaConf();
         var sensor0 = oc.sensors[0];
         var sensor1 = oc.sensors[1];

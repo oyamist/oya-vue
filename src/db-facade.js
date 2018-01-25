@@ -78,12 +78,12 @@
             });
         }
 
-        sensorAvgByHour(fields, startdate, enddate) {
+        sensorAvgByHour(fields, startDate, hours) {
             return new Promise((resolve,reject) => {
                 try {
-                    var d1 = DbFacade.utcstr(startdate);
-                    var d2 = DbFacade.utcstr(enddate);
-                    var hours = Math.round((enddate-startdate)/(1000*3600)+.5);
+                    var d1 = DbFacade.utcstr(startDate);
+                    var endDate = new Date(startDate.getTime()+hours*3600*1000);
+                    var d2 = DbFacade.utcstr(endDate);
                     var rowLimit = fields.length * hours;
                     var evt = fields.map(f => OyaMist.eventOfField(f));
                     var evtStr = `'${evt.join("','")}'`;
@@ -96,8 +96,8 @@
                         `order by evt, hr desc\n`+
                         `limit ${rowLimit};`;
                     this.sqlAll(sql).then(data=>{
-                        var summary = DbFacade.hourlySummary(data, fields);
-                        resolve( { sql, summary, });
+                        var data = DbFacade.hourlySummary(data, fields);
+                        resolve( { sql, data, });
                     }).catch(e=>reject(e));
                 } catch (e) {
                     winston.error(e.stack);

@@ -7,7 +7,7 @@
         constructor(opts = {}) {
             super(opts);
             var self = this;
-            this.dbname = opts.dbname || './oyamist-v1.0.db';
+            this.dbname = opts.dbname || './test-v1.0.db';
             Object.defineProperty(this, 'isOpen', {
                 get: () => this.db ? true : false,
             });

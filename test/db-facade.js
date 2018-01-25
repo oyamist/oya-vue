@@ -79,7 +79,7 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
+    it("sensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = new TestLogger();
@@ -97,7 +97,7 @@
             }
         })();
     });
-    it("TESTTESThourlySummary(data,fields) summarizes data by hour for given fields", function() {
+    it("hourlySummary(data,fields) summarizes data by hour for given fields", function() {
         var sqlDataPath = path.join(__dirname, 'ecInternal.json');
         var sqlData = JSON.parse(fs.readFileSync(sqlDataPath));
 

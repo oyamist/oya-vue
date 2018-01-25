@@ -8,11 +8,14 @@
     const DbSqlite3 = exports.DbSqlite3 || require('../index').DbSqlite3;
     const TESTDATESTR = "'2017-03-08'";
     const stmtDel = `delete from sensordata where sensordata.ctx='test'`;
+    var dbopts = {
+        dbname: 'test/test-v1.0.db',
+    };
 
     it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
             try {
-                var dbl = new DbSqlite3();
+                var dbl = new DbSqlite3(dbopts);
                 const stmtCount = `select count(*) c from sensordata as sd where sd.evt='testevt'`;
 
                 // open() must be called before use
@@ -51,7 +54,7 @@
     it("sqlGet(sql) returns JSON object for single tuple query", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3().open();
+                var dbl = await new DbSqlite3(dbopts).open();
                 var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
                 done();
@@ -63,7 +66,7 @@
     it("sqlAll(sql) returns result array of tuples ", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3().open();
+                var dbl = await new DbSqlite3(dbopts).open();
                 var r = await dbl.sqlExec(stmtDel);
                 var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
@@ -96,10 +99,10 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
+    it("sensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3().open();
+                var dbl = await new DbSqlite3(dbopts).open();
                 var r = await dbl.sqlExec(stmtDel); // cleanup
                 var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
@@ -140,7 +143,7 @@
     it("TESTTESTfinalize test suite", function(done) {
         (async function() {
             try {
-                var dbl = await new DbSqlite3().open();
+                var dbl = await new DbSqlite3(dbopts).open();
                 var r = await dbl.sqlExec(stmtDel); // cleanup
                 done();
             } catch (e) {

@@ -756,24 +756,35 @@
 
                 // activate vessel
                 var command = {
-                    startDate: new Date(2018,0,22),
-                    endDate: new Date(2018,0,23),
+                    startDate: new Date('2018-01-21T10:20:30Z'),
+                    hours: 24,
                     field: 'ecInternal',
                 }
                 var res = yield supertest(app).post("/test/sensor/calibrate").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
-                should(res.statusCode).equal(200);
                 var sql = res.body.sql;
                 should(sql).match(/select strftime.*evt/m);
                 should(sql).match(/from sensordata/m);
-                should(sql).match(/where utc between .* and .*/m);
-                should(sql).match(/and evt in (.*)/m);
+                should(sql).match(/where utc between '2018-01-21 10:20:30.000' and '2018-01-22 10:20:30.000'/m);
+                should(sql).match(/and evt in \('sense: ec-internal','sense: temp-internal'\)/m);
                 should(sql).match(/group by evt, hr/m);
                 should(sql).match(/order by evt, hr desc/m);
-                should(sql).match(/limit 50;/m);
-                var summary = res.body.summary;
-                should(summary).instanceOf(Array);
-                //should(summary.length).equal(24);
+                should(sql).match(/limit 48;/m);
+                var data = res.body.data;
+                should(data).instanceOf(Array);
+                should(data.length).equal(23);
+                var e = 0.1;
+                should(data[0].hr).equal('2018-01-22 0200');
+                should(data[0].ecInternal).approximately(479.4,e);
+                should(data[0].tempInternal).approximately(17.1,e);
+                should(data[22].hr).equal('2018-01-21 0400');
+                should(data[22].ecInternal).approximately(461,e);
+                should(data[22].tempInternal).approximately(15.4,e);
+                should(res.body).properties({
+                    hours: 24,
+                    startDate: '2018-01-21T10:20:30.000Z',
+                    field: 'ecInternal',
+                });
 
                 done();
             } catch(err) {
