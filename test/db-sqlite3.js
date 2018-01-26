@@ -16,7 +16,7 @@
         dbname: 'unit-test-v1.0.db',
     };
 
-    it("TESTTESTinitialize unit test database", function(done) {
+    it("initialize unit test database", function(done) {
         (async function(){
             var r = await new Promise((resolve, reject) => {
                 var script = exec(`scripts/unit-test.sh`, (error, stdout, stderr) => {
@@ -115,7 +115,7 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
+    it("sensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
         (async function () {
             try {
                 var dbl = await new DbSqlite3(dbopts).open();
