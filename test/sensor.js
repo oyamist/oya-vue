@@ -354,7 +354,7 @@
 
                 done();
             } catch(err) {
-                console.log(err.stack);
+                winston.error(err.stack);
                 done(err);
             }
         }();
@@ -453,6 +453,9 @@
             'readEC',
             'readHumidity',
             'readTemp',
+            'tempAnn',
+            'tempData',
+            'tempNominal',
             'type',
             'vesselIndex',
         ];
@@ -469,6 +472,9 @@
             'readEC',
             'readHumidity',
             'readTemp',
+            'tempAnn',
+            'tempData',
+            'tempNominal',
             'type',
             'vesselIndex',
 
@@ -485,6 +491,33 @@
         should.deepEqual(Sensor.monotonic(seq,'value'), {
             start: 13, // inclusive
             end: 33, // exclusive
+        });
+
+        //
+        seq = [];
+        for (var t=17; t < 25; t++) {
+            seq.push({
+                upvalue: t,
+                downvalue: -t,
+                updown: t < 20 ? t : -t,
+                downup: t < 20 ? -t : t,
+            });
+        }
+        should.deepEqual(Sensor.monotonic(seq,'upvalue'), {
+            start: 0, // inclusive
+            end: seq.length, // exclusive
+        });
+        should.deepEqual(Sensor.monotonic(seq,'downvalue'), {
+            start: 0, // inclusive
+            end: seq.length, // exclusive
+        });
+        should.deepEqual(Sensor.monotonic(seq,'updown'), {
+            start: 2, // inclusive
+            end: seq.length, // exclusive
+        });
+        should.deepEqual(Sensor.monotonic(seq,'downup'), {
+            start: 2, // inclusive
+            end: seq.length, // exclusive
         });
     });
     it("strings are equal", function() {
@@ -536,5 +569,150 @@
                 should(cv).approximately(percent * fraction, e);
             });
         });
+    });
+    it("calibrate(...) cannot calibrate some sensors", function() {
+        var seq = [];
+        var s = new Sensor(Sensor.TYPE_DS18B20);
+        should.throws(() => s.calibrate(seq));
+        var s = new Sensor(Sensor.TYPE_SHT31_DIS);
+        should.throws(() => s.calibrate(seq));
+        var s = new Sensor(Sensor.TYPE_AM2315);
+        should.throws(() => s.calibrate(seq));
+    });
+    it("tempQuality(temps) returns quality of calibration temperature range", function() {
+        // no data => no quality
+        should(Sensor.tempQuality()).equal(0);
+        should(Sensor.tempQuality([])).equal(0);
+
+        should(Sensor.tempQuality([13])).equal(13); // A single data point is abysmal quality
+        should(Sensor.tempQuality([13,12,13])).equal(50); // 1C is horrible quality
+        should(Sensor.tempQuality([1.5,3.5,2])).equal(74); // 2C is poor quality
+        should(Sensor.tempQuality([-1.5,2.5,2])).equal(91); // 3C is good quality
+        should(Sensor.tempQuality([28,24])).equal(91); // 4C is good quality
+        should(Sensor.tempQuality([24,29])).equal(95); // 5C is very good quality
+        should(Sensor.tempQuality([24,30])).equal(98); // 6C is excellent quality
+        should(Sensor.tempQuality([31,24])).equal(100); // 7C is top quality
+    });
+    it("valueForTemp(value,temp) returns temperature compensated value", function() {
+        var seq = [];
+        var s = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1,{
+            loc: OyaMist.LOC_INTERNAL,
+        }));
+
+        // uncalibrated sensor 
+        should(s.valueForTemp(123, 17)).equal(123);
+        should(s.valueForTemp(400, 35)).equal(400);
+
+        // empty data sequence -- no temp comp
+        var opts = {
+            nominal: 1000,
+            date: new Date('2018-01-02T10:20:30Z'),
+            hours: 22.5,
+            tempMin: null,
+            tempMax: null,
+        };
+        var r = s.calibrateTemp(seq, Object.assign({
+            quality: 0,
+        },opts));
+        should(r).properties(opts);
+        var e = 0.1;
+        should(s.valueForTemp(400, 35)).approximately(400,e);
+
+        // no data sequence -- no temp comp
+        var r = s.calibrateTemp();
+        should(r).properties({
+            quality: 0,
+            nominal: 100,
+            hours: 24,
+            tempMin: null,
+            tempMax: null,
+        });
+        should(s.valueForTemp(400, 35)).approximately(400,e);
+
+        // single temperature calibration scales sensor value independent of temperature
+        seq = [];
+        seq.push({
+            tempInternal: 17,
+            ecInternal: 400,
+        })
+        var r = s.calibrateTemp(seq);
+        should(r).properties({
+            quality: 13,
+            nominal: 100,
+            hours: 24,
+            tempMax: 17,
+            tempMin: 17,
+        });
+        var e = 0.1;
+        should(s.valueForTemp(400, 17)).approximately(100,e);
+        should(s.valueForTemp(400, 18)).approximately(100,e);
+        should(s.valueForTemp(400, 23)).approximately(100,e);
+        should(s.valueForTemp(200, 23)).approximately(50,e);
+
+        // two temperature values provide a linear temperature dependency
+        seq = [];
+        seq.push({
+            tempInternal: 17,
+            ecInternal: 400,
+        });
+        seq.push({
+            tempInternal: 18,
+            ecInternal: 410,
+        });
+        var r = s.calibrateTemp(seq);
+        should(r).properties({
+            quality: 50,
+            nominal: 100,
+            hours: 24,
+            tempMax: 18,
+            tempMin: 17,
+        });
+        var e = 0.1;
+        should(s.valueForTemp(400, 17)).approximately(100,e);
+        should(s.valueForTemp(410, 18)).approximately(100,e);
+        should(s.valueForTemp(420, 19)).approximately(100,e);
+    });
+    it("TESTTESTcalibrations are serializable", function() {
+        var seq = [];
+        var s = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1,{
+            loc: OyaMist.LOC_INTERNAL,
+        }));
+
+        // two temperature values provide a linear temperature dependency
+        seq = [];
+        seq.push({
+            tempInternal: 17,
+            ecInternal: 400,
+        });
+        seq.push({
+            tempInternal: 18,
+            ecInternal: 410,
+        });
+        var r = s.calibrateTemp(seq);
+        should(r).properties({
+            quality: 50,
+            nominal: 100,
+            hours: 24,
+            tempMax: 18,
+            tempMin: 17,
+        });
+        var json = JSON.stringify(s);
+        var s2 = new Sensor(JSON.parse(json));
+        var e = 0.1;
+        should(s2.valueForTemp(400, 17)).approximately(100,e);
+        should(s2.valueForTemp(410, 18)).approximately(100,e);
+        should(s2.valueForTemp(420, 19)).approximately(100,e);
+    });
+    it("TESTTESTcalibrateTemp(seq,date,hrs) performs temperature calibration", function() {
+        var vals = [{
+            tempInternal: 17,
+            ecInternal: 400,
+        },{
+            tempInternal: 18,
+            ecInternal: 410,
+        },{
+            tempInternal: 19,
+            ecInternal: 419,
+        }]
     });
 })

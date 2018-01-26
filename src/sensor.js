@@ -38,6 +38,12 @@
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
             this.readEC = opts.readEC == null ? typeProps.readEC : opts.readEC;
+            this.tempData = opts.tempData;
+            this.tempNominal = opts.tempNominal;
+            this.tempAnn = opts.tempAnn;
+            if (this.tempAnn && !(this.tempAnn instanceof OyaAnn)) {
+                this.tempAnn = OyaAnn.Factory.fromJSON(this.tempAnn);
+            }
             this.type = type;
             this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
@@ -80,23 +86,113 @@
             return SERIALIZABLE_KEYS;
         }
 
+        calibrateTemp(seq=[], opts={}) {
+            if (this.readEC) {
+                var dataField = OyaMist.locationField(this.loc, 'ec');
+            } else {
+                throw new Error(`Sensor.calibrate(${this.name}) cannot be calibrated`);
+            }
+
+            var tempField = opts.tempField || OyaMist.locationField(this.loc,'temp');
+            var seqAvail = seq.reduce((a,s) => {
+                s.hasOwnProperty(tempField) && s.hasOwnProperty(dataField) && a.push(s);
+                return a;
+            },[]);
+            var temps = seqAvail.map(s=>s[tempField]);
+            var quality = Sensor.tempQuality(temps);
+            var tempMin = temps.length ? Math.min.apply(null, temps) : null;
+            var tempMax = temps.length ? Math.max.apply(null, temps) : null;
+            var nominal = opts.nominal || 100;
+            var result = {
+                quality,
+                tempMin,
+                tempMax,
+                nominal,
+                date: opts.date || new Date(),
+                hours: opts.hours || 24,
+            }
+
+            if (seqAvail.length === 0 ) { 
+                // no calibration data => generate temperature independent data
+                seqAvail.push({
+                    [tempField]: 18,
+                    [dataField]: nominal,
+                });
+                seqAvail.push({
+                    [tempField]: 28,
+                    [dataField]: nominal,
+                });
+            } else if (seqAvail.length === 1 ) { 
+                // single data point: generate temperature indepedent data
+                seqAvail.push({
+                    [tempField]: seqAvail[0][tempField] + 10,
+                    [dataField]: seqAvail[0][dataField],
+                });
+            } else { 
+                // calibrate to provided sequence
+            }
+            this.tempData = seqAvail;
+            this.tempNominal = nominal;
+            this.tempAnn = Sensor.calibrationANN(seqAvail, dataField, tempField);
+
+            return result;
+        }
+
+        valueForTemp(value, temp) {
+            return this.tempAnn 
+                ? Sensor.calibratedValue(this.tempAnn, temp, value, this.tempNominal)
+                : value;
+        }
+
+        static tempQuality(temps) {
+            var bottom = 0.13;
+            if (!(temps instanceof Array) || temps.length === 0) {
+                return 0;
+            }
+            if (temps.length === 0) {
+                return bottom * 100;
+            }
+
+            var diff = Math.max.apply(null,temps) - Math.min.apply(null,temps)
+            var q = Math.pow(Math.E,-1/diff); // raw quality
+            return Math.min(100, Math.round((100)*(bottom+q))); // pretty quality
+        }
+
         static calibratedValue(ann, temp, reading, nominal) {
             var annValue = ann.activate([temp])[0];
             return reading * (nominal/annValue);
         }
 
-        static calibrationANN(seq, valueKey='ecInternal', tempKey='tempInternal') {
+        static calibrationANN(seq, dataKey='ecInternal', tempKey='tempInternal') {
             var mono = Sensor.monotonic(seq,tempKey);
             var examples = seq.slice(mono.start, mono.end).map(s => {
-                return new OyaAnn.Example([s[tempKey]], [s[valueKey]]);
+                return new OyaAnn.Example([s[tempKey]], [s[dataKey]]);
             });
             var v = OyaAnn.Variable.variables(examples);
-            var factory = new OyaAnn.Factory(v, {
-                power: 5,
+            var opts = {
                 maxMSE: 1,
                 preTrain: true,
                 trainingReps: 50, // max reps to reach maxMSE
-            });
+            };
+            switch (examples.length) {
+                case 0:
+                case 1:
+                case 2:
+                    break;
+                case 3:
+                    opts.power = 2;
+                    break;
+                case 4:
+                    opts.power = 3;
+                    break;
+                case 5:
+                    opts.power = 4;
+                    break;
+                default:
+                    opts.power = 5;
+                    break;
+            }
+            var factory = new OyaAnn.Factory(v, opts);
             var network = factory.createNetwork();
             network.train(examples);
             return network;
@@ -109,19 +205,30 @@
             var ascStart = 0;
             var iprev = 0;
             for (var i = 0; i < list.length; i++) {
-                var vi = list[i];
                 if (list[i][key] < list[iprev][key]) { // decreasing
                     if ((i - ascStart) > (end - start)) {
                         start = ascStart;
                         end = i;
                     }
                     ascStart = i;
+                    if ((i - descStart) >= (end -start)) {
+                        start = descStart;
+                    }
+                    if (descStart === start) {
+                        end = i+1;
+                    }
                 } else { //  increasing
                     if ((i - descStart) > (end - start)) {
                         start = descStart;
                         end = i;
                     }
                     descStart = i;
+                    if ((i - ascStart) >= (end - start)) {
+                        start = ascStart;
+                    }
+                    if (ascStart === start) {
+                        end = i+1;
+                    }
                 }
                 iprev = i;
             }

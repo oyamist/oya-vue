@@ -38,6 +38,15 @@
             }[event];
         }
 
+        static locationField(loc, fieldPrefix) {
+            return {
+                [OyaMist.LOC_INTERNAL]: `${fieldPrefix}Internal`,
+                [OyaMist.LOC_AMBIENT]: `${fieldPrefix}Ambient`,
+                [OyaMist.LOC_CANOPY]: `${fieldPrefix}Canopy`,
+                [OyaMist.LOC_NONE]: `${fieldPrefix}None`,
+            }[loc];
+        }
+
         static eventOfField(field) {
             return {
                 tempInternal: OyaMist.SENSE_TEMP_INTERNAL,
