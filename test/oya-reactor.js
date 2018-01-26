@@ -12,6 +12,7 @@
     if (fs.existsSync(APIMODEL_PATH)) {
         fs.unlinkSync(APIMODEL_PATH);
     }
+    global.__unitdb = true;
     const app = require("../scripts/server.js");
     const EventEmitter = require("events");
     const winston = require('winston');

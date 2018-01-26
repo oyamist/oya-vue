@@ -45,7 +45,7 @@ let async = function*() {
             //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
             if (serviceName === 'test') {
                 var dbfacade = new DbSqlite3({
-                    dbname: './test/test-v1.0.db',
+                    dbname: global.__unitdb ? 'unit-test-v1.0.db' : './test/test-v1.0.db',
                 });
             } else {
                 var dbfacade = new DbSqlite3();
