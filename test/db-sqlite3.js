@@ -16,7 +16,7 @@
         dbname: 'unit-test-v1.0.db',
     };
 
-    it("initialize unit test database", function(done) {
+    it("TESTTESTinitialize unit test database", function(done) {
         (async function(){
             var r = await new Promise((resolve, reject) => {
                 var script = exec(`scripts/unit-test.sh`, (error, stdout, stderr) => {

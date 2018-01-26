@@ -48,7 +48,7 @@
         return app.locals.restBundles.filter(rb => rb.name==='test')[0];
     }
 
-    it("Initialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
+    it("TESTTESTInitialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
         var async = function*() {
             if (null == testReactor()) {
                 yield app.locals.asyncOnReady.push(async);
@@ -58,7 +58,7 @@
         }();
         async.next();
     });
-    it("EVENT_RELAY notifies client to change a relay actuator", function() {
+    it("TESTTESTEVENT_RELAY notifies client to change a relay actuator", function() {
         var reactor = new OyaReactor('test', {
             actuators: [
                 new Actuator({
@@ -116,7 +116,7 @@
         should(relayValue).equal(true);
         should(relayPin).equal(4);
     });
-    it("EVENT_CYCLE_MIST sets next cycle to standard", function() {
+    it("TESTTESTEVENT_CYCLE_MIST sets next cycle to standard", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -131,7 +131,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
     });
-    it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
+    it("TESTTESTEVENT_CYCLE_COOL sets next cycle to cool", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -159,7 +159,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_PRIME);
     });
-    it("GET /state returns push state", function(done) {
+    it("TESTTESTGET /state returns push state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -198,7 +198,7 @@
         }();
         async.next();
     });
-    it("GET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
+    it("TESTTESTGET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -216,7 +216,7 @@
         }();
         async.next();
     });
-    it("health() returns reactor health", function(done) {
+    it("TESTTESThealth() returns reactor health", function(done) {
         // an inactive reactor is not healthy
         var reactor = new OyaReactor('test', {
             autoActivate: false
@@ -252,7 +252,7 @@
         });
         done();
     });
-    it("GET /identity returns reactor identity", function(done) {
+    it("TESTTESTGET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -276,7 +276,7 @@
         }();
         async.next();
     });
-    it("GET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
+    it("TESTTESTGET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -334,7 +334,7 @@
         }();
         async.next();
     });
-    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -343,14 +343,14 @@
                 var url = "/test/sensor/data-by-hour/tempInternal/1/2017-03-10T08:10:20Z";
                 var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
-                    should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, evt\n'+
-                        'from sensordata\n'+
-                        "where utc between '2017-03-09 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
-                        "and evt in ('sense: temp-internal')\n"+
-                        "group by evt, hr\n"+
-                        "order by evt, hr desc\n"+
-                        "limit 24;");
+                    var sql = res.body.sql;
+                    should(sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                    should(sql).match(/from sensordata/m);
+                    should(sql).match(/where utc between '2017-03-09 08:10:20.000' and '2017-03-10 08:10:20.000'/m);
+                    should(sql).match(/and evt in \('sense: temp-internal'\)/m);
+                    should(sql).match(/group by evt, hr/m);
+                    should(sql).match(/order by evt, hr desc/m);
+                    should(sql).match(/limit 24;/m);
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
@@ -358,14 +358,14 @@
                 var url = "/test/sensor/data-by-hour/tempInternal/7/2017-03-10T08:10:20Z";
                 var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
-                    should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, evt\n'+
-                        'from sensordata\n'+
-                        "where utc between '2017-03-03 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
-                        "and evt in ('sense: temp-internal')\n"+
-                        "group by evt, hr\n"+
-                        "order by evt, hr desc\n"+
-                        "limit 168;");
+                    var sql = res.body.sql;
+                    should(sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                    should(sql).match(/from sensordata/m);
+                    should(sql).match(/where utc between '2017-03-03 08:10:20.000' and '2017-03-10 08:10:20.000'/m);
+                    should(sql).match(/and evt in \('sense: temp-internal'\)/m);
+                    should(sql).match(/group by evt, hr/m);
+                    should(sql).match(/order by evt, hr desc/m);
+                    should(sql).match(/limit 168;/m);
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
@@ -384,7 +384,7 @@
         }();
         async.next();
     });
-    it("GET /sensor/types returns sensor types", function(done) {
+    it("TESTTESTGET /sensor/types returns sensor types", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -406,7 +406,7 @@
         }();
         async.next();
     });
-    it("GET /sensor/locations returns sensor locations", function(done) {
+    it("TESTTESTGET /sensor/locations returns sensor locations", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -426,7 +426,7 @@
         }();
         async.next();
     });
-    it("GET /oya-conf returns OyaMist apiModel", function(done) {
+    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -454,7 +454,7 @@
         }();
         async.next();
     });
-    it("PUT /oya-conf updates OyaConf apiModel", function(done) {
+    it("TESTTESTPUT /oya-conf updates OyaConf apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -507,7 +507,7 @@
         }();
         async.next();
     });
-    it("POST /actuator changes actuator state", function(done) {
+    it("TESTTESTPOST /actuator changes actuator state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -560,6 +560,8 @@
         }();
         async.next();
     });
+
+    // TODO
     it("POST /sensor changes sensor state", function(done) {
         var async = function* () {
             try {
@@ -645,7 +647,7 @@
         }();
         async.next();
     });
-    it("Deactivating reactor turns off everything", function(done) {
+    it("TESTTESTDeactivating reactor turns off everything", function(done) {
         (async function() {
             try {
                 var emitter = new EventEmitter();
@@ -699,7 +701,7 @@
             }
         })();
     });
-    it("POST /reactor changes vessel state", function(done) {
+    it("TESTTESTPOST /reactor changes vessel state", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
