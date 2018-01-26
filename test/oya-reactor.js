@@ -146,7 +146,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
     });
-    it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
+    it("TESTTESTEVENT_CYCLE_PRIME sets next cycle to prime", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -563,7 +563,7 @@
     });
 
     // TODO
-    it("POST /sensor changes sensor state", function(done) {
+    it("TESTTESTPOST /sensor changes sensor state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
