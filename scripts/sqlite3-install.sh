@@ -7,7 +7,11 @@ echo -e "INSTALL\t: `pwd`"
 SQLVER=`sqlite3 -version`
 RC=$?
 VER=v1.0
-DB=oyamist-${VER}.db
+DBNAME=$1
+if [ "$DBNAME" == "" ]; then
+    DBNAME=oyamist
+fi
+DB=$DBNAME-${VER}.db
 if [ "$RC" == "0" ]; then
     echo -e "INSTALL\t: SQlite ($SQLVER) is already installed => OK"
 else

@@ -8,10 +8,26 @@
     const DbSqlite3 = exports.DbSqlite3 || require('../index').DbSqlite3;
     const TESTDATESTR = "'2017-03-08'";
     const stmtDel = `delete from sensordata where sensordata.ctx='test'`;
+    const fs = require('fs');
+    const path = require('path');
+    const exec = require('child_process').exec;
+
     var dbopts = {
-        dbname: 'test/test-v1.0.db',
+        dbname: 'unit-test-v1.0.db',
     };
 
+    it("TESTTESTinitialize unit test database", function(done) {
+        (async function(){
+            var r = await new Promise((resolve, reject) => {
+                var script = exec(`scripts/unit-test.sh`, (error, stdout, stderr) => {
+                    resolve({ error, stdout, stderr });
+                });
+            });
+            should(r.error).equal(null);
+            should(r.stderr).equal('');
+            done();
+        })();
+    });
     it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
             try {
