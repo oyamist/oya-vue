@@ -65,7 +65,7 @@
         }();
         async.next();
     });
-    it("TESTTESTEVENT_RELAY notifies client to change a relay actuator", function() {
+    it("EVENT_RELAY notifies client to change a relay actuator", function() {
         var reactor = new OyaReactor('test', {
             actuators: [
                 new Actuator({
@@ -123,7 +123,7 @@
         should(relayValue).equal(true);
         should(relayPin).equal(4);
     });
-    it("TESTTESTEVENT_CYCLE_MIST sets next cycle to standard", function() {
+    it("EVENT_CYCLE_MIST sets next cycle to standard", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -138,7 +138,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_MIST, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
     });
-    it("TESTTESTEVENT_CYCLE_COOL sets next cycle to cool", function() {
+    it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -152,7 +152,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_COOL, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
     });
-    it("TESTTESTEVENT_CYCLE_PRIME sets next cycle to prime", function() {
+    it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
         var reactor = new OyaReactor();
         reactor.activate(true);
         should(reactor.vessel.isActive).equal(true);
@@ -166,7 +166,7 @@
         reactor.emitter.emit(OyaConf.EVENT_CYCLE_PRIME, true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_PRIME);
     });
-    it("TESTTESTGET /state returns push state", function(done) {
+    it("GET /state returns push state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -205,7 +205,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
+    it("GET /mcu/hats returns supported MCU extension boards (hats)", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -223,7 +223,7 @@
         }();
         async.next();
     });
-    it("TESTTESThealth() returns reactor health", function(done) {
+    it("health() returns reactor health", function(done) {
         // an inactive reactor is not healthy
         var reactor = new OyaReactor('test', {
             autoActivate: false
@@ -259,7 +259,7 @@
         });
         done();
     });
-    it("TESTTESTGET /identity returns reactor identity", function(done) {
+    it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -283,7 +283,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
+    it("GET /net/hosts/:service returns local network OyaMist hosts with given service", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -341,7 +341,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -391,7 +391,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/types returns sensor types", function(done) {
+    it("GET /sensor/types returns sensor types", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -413,7 +413,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/locations returns sensor locations", function(done) {
+    it("GET /sensor/locations returns sensor locations", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -433,7 +433,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
+    it("GET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -461,7 +461,7 @@
         }();
         async.next();
     });
-    it("TESTTESTPUT /oya-conf updates OyaConf apiModel", function(done) {
+    it("PUT /oya-conf updates OyaConf apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -514,7 +514,7 @@
         }();
         async.next();
     });
-    it("TESTTESTPOST /actuator changes actuator state", function(done) {
+    it("POST /actuator changes actuator state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -568,8 +568,7 @@
         async.next();
     });
 
-    // TODO
-    it("TESTTESTPOST /sensor changes sensor state", function(done) {
+    it("POST /sensor changes sensor state", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -654,7 +653,7 @@
         }();
         async.next();
     });
-    it("TESTTESTDeactivating reactor turns off everything", function(done) {
+    it("Deactivating reactor turns off everything", function(done) {
         (async function() {
             try {
                 var emitter = new EventEmitter();
@@ -708,7 +707,7 @@
             }
         })();
     });
-    it("TESTTESTPOST /reactor changes vessel state", function(done) {
+    it("POST /reactor changes vessel state", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -754,7 +753,7 @@
         }();
         async.next();
     });
-    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
+    it("POST /sensor/calibrate calibrates sensor", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
