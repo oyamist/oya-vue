@@ -12,4 +12,9 @@ fi
 DIR=`dirname $0`
 $DIR/sqlite3-install.sh $PREFIX
 
+sqlite3 $DB <<HEREIS
+.mode csv
+.import $DIR/../test/unit-test.csv sensordata
+HEREIS
+
 echo -e "END\t: $0 `date`"
