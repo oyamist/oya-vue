@@ -44,8 +44,7 @@ let async = function*() {
             // for unit tests, do not disturb real database
             //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
             if (serviceName === 'test') {
-                var dbname = global.__unitdb ? 'unit-test-v1.0.db' : './test/test-v1.0.db';
-                winston.error('dbname', dbname);
+                var dbname = './test/test-v1.0.db';
                 var dbfacade = new DbSqlite3({ dbname });
             } else {
                 var dbfacade = new DbSqlite3();

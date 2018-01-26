@@ -1,4 +1,3 @@
-
 (typeof describe === 'function') && describe("OyaReactor", function() {
     const should = require("should");
     const srcPkg = require("../package.json");
@@ -12,13 +11,14 @@
     if (fs.existsSync(APIMODEL_PATH)) {
         fs.unlinkSync(APIMODEL_PATH);
     }
-    global.__unitdb = true;
-    const app = require("../scripts/server.js");
+    const app = require("../scripts/server.js"); // access cached instance 
     const EventEmitter = require("events");
     const winston = require('winston');
+    const path = require('path');
     const {
         OyaConf,
         DbReport,
+        DbSqlite3,
         OyaMist,
         OyaReactor,
         Actuator,
@@ -42,6 +42,10 @@
     var level = winston.level;
     winston.level = 'warn';
 
+    var testdb = new DbSqlite3({
+        dbname: path.join(__dirname, '../unit-test-v1.0.db'),
+    });
+
     function testInit() { 
         return app;
     }
@@ -55,7 +59,9 @@
                 yield app.locals.asyncOnReady.push(async);
             }
             winston.info("test suite initialized");
-            done();
+            testReactor().vessels[0].dbfacade = testdb;
+            var result = yield testdb.open().then(r=>async.next(null)).catch(e=>async.next(e));
+            done(result);
         }();
         async.next();
     });
