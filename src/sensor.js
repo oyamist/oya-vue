@@ -86,6 +86,15 @@
             return SERIALIZABLE_KEYS;
         }
 
+        isFieldSource(field) {
+            var fields = {};
+            var match = false;
+            match = match || !!this.readEC && field === OyaMist.locationField(this.loc, 'ec');
+            match = match || !!this.readTemp && field === OyaMist.locationField(this.loc, 'temp');
+            match = match || !!this.readHumidity && field === OyaMist.locationField(this.loc, 'humidity');
+            return match;
+        }
+
         calibrateTemp(seq=[], opts={}) {
             if (this.readEC) {
                 var dataField = OyaMist.locationField(this.loc, 'ec');

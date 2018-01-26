@@ -243,7 +243,6 @@
             var days = Number(req.params.days) || 7;
             var endDate = req.params.endDate && new Date(req.params.endDate) || new Date();
             var eDate = req.params.endDate || new Date().toString();
-            console.log('enddate', endDate, new Date(endDate));
             return new Promise((resolve, reject) => {
                 try {
                     var evt = OyaMist.eventOfField(field);

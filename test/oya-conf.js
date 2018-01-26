@@ -349,5 +349,20 @@
         //should(oc.sensors[0]).equal(sensor0);
         //should(oc.sensors[1]).equal(sensor1);
     });
+    it("TESTTESTsensorOfField(field) returns source sensor for field", function() {
+        var oc = new OyaConf({
+            sensors: [{
+                type: Sensor.TYPE_AM2315.type,
+                loc: OyaMist.LOC_AMBIENT,
+            },{
+                type: Sensor.TYPE_EZO_EC_K1.type,
+                loc: OyaMist.LOC_AMBIENT,
+            }],
+        });
+        var tempSensor = oc.sensorOfField('tempAmbient');
+        should(tempSensor).equal(oc.sensors[0]);
+        var ecSensor = oc.sensorOfField('ecAmbient');
+        should(ecSensor).equal(oc.sensors[1]);
+    });
 
 });

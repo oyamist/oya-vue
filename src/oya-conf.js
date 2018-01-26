@@ -136,6 +136,10 @@
             return this;
         }
 
+        sensorOfField(field) {
+            return this.sensors.filter(s => s.isFieldSource(field))[0];
+        }
+
         toJSON() {
             return {
                 name: this.name,

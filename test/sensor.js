@@ -65,6 +65,34 @@
             }
         })();
     });
+    it("TESTTESTisFieldSource(field) returns true if sensor provides data for field", function() {
+        var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
+            loc: OyaMist.LOC_CANOPY,
+        }));
+        should(sensor.isFieldSource('tempInternal')).equal(false);
+        should(sensor.isFieldSource('tempAmbient')).equal(false);
+        should(sensor.isFieldSource('tempCanopy')).equal(true);
+        should(sensor.isFieldSource('humidityInternal')).equal(false);
+        should(sensor.isFieldSource('humidityAmbient')).equal(false);
+        should(sensor.isFieldSource('humidityCanopy')).equal(true);
+        should(sensor.isFieldSource('ecInternal')).equal(false);
+        should(sensor.isFieldSource('ecAmbient')).equal(false);
+        should(sensor.isFieldSource('ecCanopy')).equal(false);
+
+        var sensor = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1, {
+            loc: OyaMist.LOC_AMBIENT,
+        }));
+        should(sensor.isFieldSource('tempInternal')).equal(false);
+        should(sensor.isFieldSource('tempAmbient')).equal(false);
+        should(sensor.isFieldSource('tempCanopy')).equal(false);
+        should(sensor.isFieldSource('humidityInternal')).equal(false);
+        should(sensor.isFieldSource('humidityAmbient')).equal(false);
+        should(sensor.isFieldSource('humidityCanopy')).equal(false);
+        should(sensor.isFieldSource('ecInternal')).equal(false);
+        should(sensor.isFieldSource('ecAmbient')).equal(true);
+        should(sensor.isFieldSource('ecCanopy')).equal(false);
+
+    });
     it("health() returns health object", function(done) {
         (async function() {
             try {
