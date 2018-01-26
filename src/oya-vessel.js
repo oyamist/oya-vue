@@ -89,7 +89,12 @@
             this.nextCycle = this._state.cycle,
             this._state.active = false,
             this.dbfacade = opts.dbfacade || new DbFacade();
-            this.dbfacade.open();
+            this.dbfacade.open().then(r => {
+            }).catch(e=>{
+                winston.error(e.stack);
+                winston.error("Unrecoverable error. Exiting with error code: 5=EIO");
+                process.exit(-5); // EIO
+            });
             this.emitter = new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;

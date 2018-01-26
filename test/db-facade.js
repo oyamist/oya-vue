@@ -79,17 +79,49 @@
             }
         })();
     });
-    it("sensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
+    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = new TestLogger();
                 var r = await dbl.open();
 
                 // single events
-                var r = await dbl.sensorDataByHour('testevt', testDate);
+                var enddate = new Date('2017-03-10T01:02:03.456Z'); 
+                var r = await dbl.sensorDataByHour('testevt', enddate);
                 should(r).properties(["sql","data"]);
-                should(r.sql).match(/select.*\nfrom sensordata\nwhere.*\nand evt .*\ngroup by evt, hr\norder by evt, hr desc\nlimit 24/m);
-                should(r.sql).match(/evt in \('testevt'\)/m);
+                should(r.sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                should(r.sql).match(/from sensordata/m);
+                var pat = new RegExp(`where utc between '2017-03-09 01:02:03.456' and '2017-03-10 01:02:03.456'`,'m');
+                should(r.sql).match(pat);
+                should(r.sql).match(/and evt in \('testevt'\)/m);
+                should(r.sql).match(/group by evt, hr/m);
+                should(r.sql).match(/order by evt, hr desc/m);
+                should(r.sql).match(/limit 24/m);
+                should(r.data).instanceOf(Array);
+                done();
+            } catch (e) {
+                done(e);
+            }
+        })();
+    });
+    it("TESTTESTsensorAvgByHour(fields,startdate,hours) summarizes sensor data by hour", function(done) {
+        (async function () {
+            try {
+                var dbl = new TestLogger();
+                var r = await dbl.open();
+
+                // single events
+                var startdate = new Date('2017-03-09T01:02:03.456Z'); 
+                var r = await dbl.sensorAvgByHour(['ecInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                should(r.sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                should(r.sql).match(/from sensordata/m);
+                var pat = new RegExp(`where utc between '2017-03-09 01:02:03.456' and '2017-03-10 01:02:03.456'`,'m');
+                should(r.sql).match(pat);
+                should(r.sql).match(/and evt in \('sense: ec-internal'\)/m);
+                should(r.sql).match(/group by evt, hr/m);
+                should(r.sql).match(/order by evt, hr desc/m);
+                should(r.sql).match(/limit 24/m);
                 should(r.data).instanceOf(Array);
                 done();
             } catch (e) {

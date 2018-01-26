@@ -344,7 +344,7 @@
                 var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
+                        'avg(v) vavg, evt\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-09 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
                         "and evt in ('sense: temp-internal')\n"+
@@ -359,7 +359,7 @@
                 var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
                     should(res.body.sql).equal('select strftime("%Y-%m-%d %H00",utc,"localtime") hr, '+
-                        'avg(v) vavg, min(v) vmin, max(v) vmax, evt\n'+
+                        'avg(v) vavg, evt\n'+
                         'from sensordata\n'+
                         "where utc between '2017-03-03 08:10:20.000' and '2017-03-10 08:10:20.000'\n"+
                         "and evt in ('sense: temp-internal')\n"+

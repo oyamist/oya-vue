@@ -99,7 +99,7 @@
             }
         })();
     });
-    it("sensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
+    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
         (async function () {
             try {
                 var dbl = await new DbSqlite3(dbopts).open();
@@ -133,6 +133,8 @@
 
                 // null is returned for hours with no data
                 should(r.data.filter(d=>d.vavg==null).length).equal(46);
+
+                var r = await dbl.sqlExec(stmtDel); // cleanup
 
                 done();
             } catch (e) {
