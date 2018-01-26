@@ -248,16 +248,21 @@
                     var evt = OyaMist.eventOfField(field);
                     var dbf = this.vessel.dbfacade;
                     if (evt) {
-                        var sensor = this.oyaConf.sensorOfField(field);
-                        var hours = days * 24;
-                        var startDate = new Date(endDate.getTime() - hours*3600*1000);
-                        dbf.sensorAvgByHour([field], startDate, hours).then(r => {
-                            r.data.map(d => {
-                                d.vavg = d[field];
-                                d.evt = evt;
-                            });
-                            resolve(r);
-                        }).catch(e => reject(e));
+                        if (0) {
+                            var sensor = this.oyaConf.sensorOfField(field);
+                            var hours = days * 24;
+                            var startDate = new Date(endDate.getTime() - hours*3600*1000);
+                            dbf.sensorAvgByHour([field], startDate, hours).then(r => {
+                                r.data.map(d => {
+                                    d.vavg = d[field];
+                                    d.evt = evt;
+                                });
+                                resolve(r);
+                            }).catch(e => reject(e));
+                        } else {
+                            dbf.sensorDataByHour(evt, endDate, days).then(r => resolve(r))
+                            .catch(e => reject(e));
+                        }
                     } else {
                         throw new Error(`unknown field:${field}`);
                     }
