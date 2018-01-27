@@ -189,7 +189,7 @@
                                 throw new Error("unknown api model:" + filePath);
                             }
                         } catch (err) { // implementation error
-                            winston.error(err.message, err.stack);
+                            winston.warn(err.stack);
                             reject(err);
                         }
                     })
@@ -199,19 +199,23 @@
 
         saveApiModel(model, filePath) {
             return new Promise((resolve, reject) => {
-                super.saveApiModel(model, filePath)
-                    .then(res => {
-                        try {
-                            if (filePath !== this.apiFile) {
-                                throw new Error(`filePath expected:${this.apiFile} actual:${filePath}`);
-                            }
-                            this.updateConf(model).then(r=>resolve(r.toJSON())).catch(e=>reject(e));
-                        } catch (err) { // implementation error
-                            winston.error(err.message, err.stack);
-                            reject(err);
+                super.saveApiModel(model, filePath).then(res => {
+                    try {
+                        if (filePath !== this.apiFile) {
+                            throw new Error(`filePath expected:${this.apiFile} actual:${filePath}`);
                         }
-                    })
-                    .catch(e => reject(e));
+                        this.updateConf(model).then(r=>resolve(r.toJSON())).catch(e=>{
+                            winston.warn(e.stack);
+                            reject(e);
+                        });
+                    } catch (err) { // implementation error
+                        winston.error(err.stack);
+                        reject(err);
+                    }
+                }).catch(e => {
+                    winston.error(e.stack);
+                    reject(e);
+                });
             });
         }
 
@@ -265,16 +269,22 @@
                                     d.evt = evt;
                                 });
                                 resolve(r);
-                            }).catch(e => reject(e));
+                            }).catch(e => {
+                                winston.warn(e.stack);
+                                reject(e);
+                            });
                         } else {
                             dbf.sensorDataByHour(evt, endDate, days).then(r => resolve(r))
-                            .catch(e => reject(e));
+                            .catch(e => {
+                                winston.warn(e.stack);
+                                reject(e);
+                            });
                         }
                     } else {
                         throw new Error(`unknown field:${field}`);
                     }
                 } catch(e) {
-                    winston.error(e.stack);
+                    winston.warn(e.stack);
                     reject(e);
                 }
             });
@@ -358,16 +368,16 @@
                                 field,
                             });
                         }).catch(e => {
-                            winston.error(e.stack);
+                            winston.warn(e.stack);
                             reject(e);
                         });
                     } else {
                         var e = new Error(`unknown field:${req.params.field}`);
-                        winston.error(e.stack);
+                        winston.warn(e.stack);
                         reject(e);
                     }
                 } catch(e) {
-                    winston.error(e.stack);
+                    winston.warn(e.stack);
                     reject(e);
                 }
             });
@@ -405,7 +415,7 @@
                         winston.info(`${stdout}`);
                         winston.info(`${stderr}`);
                         if (error) {
-                            winston.error(error.stack);
+                            winston.warn(error.stack);
                             reject(error);
                         } else {
                             resolve({
@@ -415,6 +425,7 @@
                         }
                     });
                 } catch(e) {
+                    winston.warn(e.stack);
                     reject(e);
                 }
             });
@@ -439,6 +450,7 @@
                         }
                     });
                 } catch(e) {
+                    winston.error(e.stack);
                     reject(e);
                 }
             });
@@ -475,6 +487,7 @@
                 r.health = this.health();
                 resolve(r);
             }).catch(e => {
+                winston.warn(e.stack);
                 reject(e);
             });
         }
