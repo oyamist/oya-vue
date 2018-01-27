@@ -248,7 +248,7 @@
                     var evt = OyaMist.eventOfField(field);
                     var dbf = this.vessel.dbfacade;
                     if (evt) {
-                        if (0) {
+                        if (1) {
                             var sensor = this.oyaConf.sensorOfField(field);
                             var hours = days * 24;
                             var startDate = new Date(endDate.getTime() - hours*3600*1000);

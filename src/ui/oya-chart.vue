@@ -10,7 +10,7 @@
             property name of sensor</rb-about-item>
     </rb-about>
 
-    <div class="pt-3" v-if='linechartData && linechartData.datasets.length'
+    <div class="pt-3" v-if='isVisible'
         style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
         <div style="width: 8em; display:flex; flex-flow: column; ">
             <p class="text-xs-center subheading">{{sensorLabels[sensorProp]}}</p>
@@ -78,6 +78,9 @@ export default {
         palette: {
             default: 'red',
         },
+        date: {
+            default: new Date().toISOString().substr(0,10),
+        },
     },
     data: function() {
         return {
@@ -86,11 +89,23 @@ export default {
     },
     methods: {
         refresh(opts) {
-            var url = [this.restOrigin(), this.service, 'sensor', 'data-by-hour', this.sensorProp].join('/');
+            var url = [
+                this.restOrigin(), 
+                this.service, 
+                'sensor', 
+                'data-by-hour', 
+                this.sensorProp,
+                7,
+                this.date,
+            ].join('/');
+            var that = this;
             this.$http.get(url).then(res=>{
                 var resData = res.data;
-                this.linechartData.datasets = this.responseDatasets(resData, opts);
-                this.$refs.lineChar && this.$refs.lineChart.update();
+                that.linechartData.datasets = that.responseDatasets(resData, opts);
+                if (that.$refs.lineChart) {
+                    //console.log('updating line chart', that.sensorProp);
+                    that.$refs.lineChart.update();
+                }
             }).catch(e=>{
                 console.error(e);
             });
@@ -142,6 +157,9 @@ export default {
         },
     },
     computed: {
+        isVisible() {
+            return this.linechartData && this.linechartData.datasets.length;
+        },
         sensorLabels() {
             return {
                 tempInternal: "Internal/Root Temperature",
@@ -173,9 +191,17 @@ export default {
             labels: this.labelHours,
             datasets: [],
         });
+        var that = this;
         this.onApiModelLoaded('oya-conf').then(apiModel=>{
-            this.refresh({
+            that.refresh({
                 tempUnit: apiModel.tempUnit,
+            });
+            that.$store.watch(function() {
+                return that.rbService.reportDate;
+            },(reportDate) => {
+                that.refresh({
+                    tempUnit: apiModel.tempUnit,
+                });
             });
         });
     },
