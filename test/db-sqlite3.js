@@ -31,32 +31,32 @@
     it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
             try {
-                var dbl = new DbSqlite3(dbopts);
+                var dbfacade = new DbSqlite3(dbopts);
                 const stmtCount = `select count(*) c from sensordata as sd where sd.evt='testevt'`;
 
                 // open() must be called before use
-                var r = yield dbl.logSensor("test", "testevt", 12.34, testDate)
+                var r = yield dbfacade.logSensor("test", "testevt", 12.34, testDate)
                     .then(r=>async.throw(new Error("expected catch()"))).catch(e=>async.next(e));
                 should.deepEqual(r, DbFacade.ERROR_NOT_OPEN);
-                should(dbl.db).equal(undefined);
-                var r = yield dbl.open().then(r=>async.next(r)).catch(e=>async.throw(e));
-                dbl.should.properties(["db"]);
-                should(dbl.isOpen).equal(true);
+                should(dbfacade.db).equal(undefined);
+                var r = yield dbfacade.open().then(r=>async.next(r)).catch(e=>async.throw(e));
+                dbfacade.should.properties(["db"]);
+                should(dbfacade.isOpen).equal(true);
 
                 // remove test data
-                yield dbl.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
-                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                yield dbfacade.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbfacade.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(r.c).equal(0);
 
                 // insert sensordata row
-                yield dbl.logSensor("test", "testevt", 12.34, testDate)
+                yield dbfacade.logSensor("test", "testevt", 12.34, testDate)
                     .then(r=>async.next(r)).catch(e=>async.throw(e));
-                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbfacade.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(r.c).equal(1);
 
                 // remove test data
-                yield dbl.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
-                var r = yield dbl.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
+                yield dbfacade.sqlExec(stmtDel).then(r=>async.next(r)).catch(e=>async.throw(e));
+                var r = yield dbfacade.sqlGet(stmtCount).then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(r.c).equal(0);
 
                 done();
@@ -70,8 +70,8 @@
     it("sqlGet(sql) returns JSON object for single tuple query", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3(dbopts).open();
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
                 done();
             } catch (e) {
@@ -82,14 +82,14 @@
     it("sqlAll(sql) returns result array of tuples ", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3(dbopts).open();
-                var r = await dbl.sqlExec(stmtDel);
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.sqlExec(stmtDel);
+                var r = await dbfacade.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
-                await dbl.logSensor("test", "testevt", 12, testDate3);
-                await dbl.logSensor("test", "testevt", 13, testDate2);
+                await dbfacade.logSensor("test", "testevt", 12, testDate3);
+                await dbfacade.logSensor("test", "testevt", 13, testDate2);
 
-                var r = await dbl.sqlAll("select utc,v from sensordata as sd where sd.ctx='test'");
+                var r = await dbfacade.sqlAll("select utc,v from sensordata as sd where sd.ctx='test'");
                 should(r).instanceof(Array);
                 should(r.length).equal(2);
                 should(r[0]).properties(["utc","v"]);
@@ -118,17 +118,17 @@
     it("sensorDataByHour(evt,date) summarizes sensor data by hour for charting", function(done) {
         (async function () {
             try {
-                var dbl = await new DbSqlite3(dbopts).open();
-                var r = await dbl.sqlExec(stmtDel); // cleanup
-                var r = await dbl.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.sqlExec(stmtDel); // cleanup
+                var r = await dbfacade.sqlGet("select count(*) c from sensordata as sd where sd.ctx='test'");
                 should.deepEqual(r, { c: 0 }); 
-                await dbl.logSensor("test", "testevt", 12, testDate3);
-                await dbl.logSensor("test", "testevt", 13, testDate2);
-                await dbl.logSensor("test", "otherevt", 100, testDate2);
-                await dbl.logSensor("test", "testevt", 14, testDate);
+                await dbfacade.logSensor("test", "testevt", 12, testDate3);
+                await dbfacade.logSensor("test", "testevt", 13, testDate2);
+                await dbfacade.logSensor("test", "otherevt", 100, testDate2);
+                await dbfacade.logSensor("test", "testevt", 14, testDate);
 
                 // single event
-                var r = await dbl.sensorDataByHour('testevt', testDate2);
+                var r = await dbfacade.sensorDataByHour('testevt', testDate2);
                 should(r).properties(["sql","data"]);
                 should.deepEqual(r.data[22], {
                     evt: 'testevt',
@@ -150,7 +150,64 @@
                 // null is returned for hours with no data
                 should(r.data.filter(d=>d.vavg==null).length).equal(46);
 
-                var r = await dbl.sqlExec(stmtDel); // cleanup
+                var r = await dbfacade.sqlExec(stmtDel); // cleanup
+
+                done();
+            } catch (e) {
+                done(e);
+            }
+        })();
+    });
+    it("sensorAvgByHour(fields,startdate,hours) summarizes sensor data by hour", function(done) {
+        (async function () {
+            try {
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.open();
+                should(r).properties({
+                    dbname: 'unit-test-v1.0.db',
+                    isOpen: true,
+                    logCount: {},
+                    logPeriod: 1,
+                    logSum: {},
+                });
+                var startdate = new Date(2018, 0, 21); // local time
+
+                // single field
+                var r = await dbfacade.sensorAvgByHour(['ecInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                var pat = new RegExp(`where utc between '2018-01-21 00:00:00.000' and '2018-01-22 00:00:00.000`,'m');
+                should(r.data).instanceOf(Array);
+                should(r.data.length).equal(24);
+                should(r.data[0].hr).equal('2018-01-21 2300');
+                should(r.data[23].hr).equal('2018-01-21 0000');
+                should.deepEqual(Object.keys(r.data[0]).sort(), [
+                    'ecInternal',
+                    'hr',
+                ]);
+                should(r.data[23].hr).equal('2018-01-21 0000');
+
+                // multiple fields 
+                var r = await dbfacade.sensorAvgByHour(['ecInternal','tempInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                should(r.data).instanceOf(Array);
+                should(r.data[0].hr).equal('2018-01-21 2300');
+                should(r.data[23].hr).equal('2018-01-21 0000');
+                should.deepEqual(Object.keys(r.data[0]).sort(), [
+                    'ecInternal',
+                    'hr',
+                    'tempInternal',
+                ]);
+                should(r.data.length).equal(24);
+                var sum = r.data.reduce((a,d) => {
+                    a.ecInternal = a.ecInternal || 0;
+                    a.ecInternal += d.ecInternal;
+                    a.tempInternal = a.tempInternal || 0;
+                    a.tempInternal += d.tempInternal;
+                    return a;
+                },{});
+                var e = 0.5;
+                should(sum.ecInternal/24).approximately(473.3,e);
+                should(sum.tempInternal/24).approximately(16.5,e);
 
                 done();
             } catch (e) {
@@ -161,8 +218,8 @@
     it("TESTTESTfinalize test suite", function(done) {
         (async function() {
             try {
-                var dbl = await new DbSqlite3(dbopts).open();
-                var r = await dbl.sqlExec(stmtDel); // cleanup
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.sqlExec(stmtDel); // cleanup
                 done();
             } catch (e) {
                 done(e);

@@ -110,7 +110,7 @@
                 var dbl = new TestLogger();
                 var r = await dbl.open();
 
-                // single events
+                // single field
                 var startdate = new Date('2017-03-09T01:02:03.456Z'); 
                 var r = await dbl.sensorAvgByHour(['ecInternal'], startdate, 24);
                 should(r).properties(["sql","data"]);
@@ -123,6 +123,21 @@
                 should(r.sql).match(/order by evt, hr desc/m);
                 should(r.sql).match(/limit 24/m);
                 should(r.data).instanceOf(Array);
+
+                // multiple fields 
+                var startdate = new Date('2017-03-09T01:02:03.456Z'); 
+                var r = await dbl.sensorAvgByHour(['ecInternal','tempInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                should(r.sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                should(r.sql).match(/from sensordata/m);
+                var pat = new RegExp(`where utc between '2017-03-09 01:02:03.456' and '2017-03-10 01:02:03.456'`,'m');
+                should(r.sql).match(pat);
+                should(r.sql).match(/and evt in \('sense: ec-internal','sense: temp-internal'\)/m);
+                should(r.sql).match(/group by evt, hr/m);
+                should(r.sql).match(/order by evt, hr desc/m);
+                should(r.sql).match(/limit 48/m);
+                should(r.data).instanceOf(Array);
+
                 done();
             } catch (e) {
                 done(e);

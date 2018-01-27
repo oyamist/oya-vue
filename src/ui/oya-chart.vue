@@ -89,6 +89,10 @@ export default {
     },
     methods: {
         refresh(opts) {
+            var date = this.date.split('-');
+            var reportDate = new Date(
+                Number(date[0]), Number(date[1])-1, Number(date[2]), 
+                23, 59, 59, 999);
             var url = [
                 this.restOrigin(), 
                 this.service, 
@@ -96,7 +100,7 @@ export default {
                 'data-by-hour', 
                 this.sensorProp,
                 7,
-                this.date,
+                reportDate.toISOString(),
             ].join('/');
             var that = this;
             this.$http.get(url).then(res=>{

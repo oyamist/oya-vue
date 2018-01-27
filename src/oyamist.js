@@ -61,6 +61,10 @@
             }[field];
         }
 
+        static isTempField(field) {
+            return (typeof field === 'string') && field.startsWith('temp');
+        }
+
     } // class OyaMist
 
     module.exports = exports.OyaMist = OyaMist;
