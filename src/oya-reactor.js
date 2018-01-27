@@ -253,14 +253,15 @@
                             var hours = days * 24;
                             var startDate = new Date(endDate.getTime() - hours*3600*1000);
                             var tempField = sensor && OyaMist.locationField(sensor.loc, 'temp');
-                            var fields = [
-                                field,
-                            ];
+                            var fields = tempField ? [field,tempField] : [field];
                             dbf.sensorAvgByHour(fields, startDate, hours).then(r => {
                                 r.data.map(d => {
-                                    var temp = 20;
-                                    d.vavg = !sensor || OyaMist.isTempField(field) 
-                                        ? d[field] : sensor.valueForTemp(d[field],temp);;
+                                    var temp = d[tempField];
+                                    if (temp != null) {
+                                        d.vavg = sensor.valueForTemp(d[field],temp);;
+                                    } else {
+                                        d.vavg = d[field];
+                                    }
                                     d.evt = evt;
                                 });
                                 resolve(r);

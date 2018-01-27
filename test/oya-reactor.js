@@ -341,24 +341,37 @@
         }();
         async.next();
     });
-    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
+                var reactor = testReactor();
 
                 // one day 
-                var url = "/test/sensor/data-by-hour/tempInternal/1/2017-03-10T08:10:20Z";
+                var enddate = new Date(2018, 0, 22); // local time
+                var hh = (""+enddate.getUTCHours()).padStart(2,'0');
+                var url = `/test/sensor/data-by-hour/ecInternal/1/${enddate.toISOString()}`;
                 var response = yield supertest(app).get(url).expect((res) => {
                     res.statusCode.should.equal(200);
                     var sql = res.body.sql;
                     should(sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
                     should(sql).match(/from sensordata/m);
-                    should(sql).match(/where utc between '2017-03-09 08:10:20.000' and '2017-03-10 08:10:20.000'/m);
-                    should(sql).match(/and evt in \('sense: temp-internal'\)/m);
-                    should(sql).match(/group by evt, hr/m);
-                    should(sql).match(/order by evt, hr desc/m);
+                    var pat = new RegExp(`where utc between `+
+                        `'2018-01-21 ${hh}:00:00.000' and '2018-01-22 ${hh}:00:00.000`,'m');
+                    should(sql).match(pat);
+                    should(sql).match(/and evt in \('sense: ec-internal'\)/m);
                     should(sql).match(/limit 24;/m);
-                    should(res.body.data).instanceOf(Array);
+                    var data = res.body.data;
+                    should(data).instanceOf(Array);
+                    should(data.length).equal(24);
+                    should(data[0].hr).equal('2018-01-21 2300');
+                    should(data[23].hr).equal('2018-01-21 0000');
+                    should.deepEqual(Object.keys(data[0]).sort(), [
+                        'ecInternal',
+                        'evt',
+                        'hr',
+                        'vavg',
+                    ]);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
 
                 // seven days
@@ -383,6 +396,65 @@
                     should(res.body.sql).match(/limit 168/m); // 7 days
                     should(res.body.data).instanceOf(Array);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
+    it("TESTTESTGET /sensor/data-by-hour returns sensor temperature compensated data", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var reactor = testReactor();
+                var sensor = new Sensor({
+                    type: Sensor.TYPE_EZO_EC_K1,
+                    loc: OyaMist.LOC_INTERNAL,
+                });
+                sensor.calibrateTemp([{
+                    tempInternal: 17,
+                    ecInternal: 500,
+                },{
+                    tempInternal: 18,
+                    ecInternal: 510,
+                }]);
+
+                reactor.oyaConf.sensors[0] = sensor;
+
+                // one day 
+                var enddate = new Date(2018, 0, 22); // local time
+                var hh = (""+enddate.getUTCHours()).padStart(2,'0');
+                var url = `/test/sensor/data-by-hour/ecInternal/1/${enddate.toISOString()}`;
+                var response = yield supertest(app).get(url).expect((res) => {
+                    res.statusCode.should.equal(200);
+                    var sql = res.body.sql;
+                    should(sql).match(/select strftime\("%Y-%m-%d %H00",utc,"localtime"\) hr, avg\(v\) vavg, .*evt/m);
+                    should(sql).match(/from sensordata/m);
+                    var pat = new RegExp(`where utc between `+
+                        `'2018-01-21 ${hh}:00:00.000' and '2018-01-22 ${hh}:00:00.000`,'m');
+                    should(sql).match(pat);
+                    should(sql).match(/and evt in \('sense: ec-internal','sense: temp-internal'\)/m);
+                    should(sql).match(/limit 48;/m);
+                    var data = res.body.data;
+                    should(data).instanceOf(Array);
+                    should(data.length).equal(24);
+                    should(data[0].hr).equal('2018-01-21 2300');
+                    should(data[23].hr).equal('2018-01-21 0000');
+                    should.deepEqual(Object.keys(data[0]).sort(), [
+                        'ecInternal', // raw value
+                        'evt', // deprecated
+                        'hr', // server local time 
+                        'tempInternal', // compensation temperature
+                        'vavg', // temperature compensated value
+                    ]);
+
+                    // returned data includes raw measurement as well as temperature compensated value
+                    var valueForTemp = sensor.valueForTemp(data[0].ecInternal, data[0].tempInternal);
+                    should(data[0].vavg).equal(valueForTemp);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+
                 done();
             } catch(err) {
                 winston.error(err.stack);
