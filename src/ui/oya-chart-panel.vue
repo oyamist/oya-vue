@@ -21,15 +21,26 @@
                 </v-date-picker>
             </v-menu>
         </div>
-        <oya-chart palette="red" sensorProp="tempInternal" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="humidityInternal" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="ecInternal" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="red" sensorProp="tempCanopy" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="humidityCanopy" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="ecCanopy" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="red" sensorProp="tempAmbient" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="humidityAmbient" :date="date" :service='service'></oya-chart>
-        <oya-chart palette="blue" sensorProp="ecAmbient" :date="date" :service='service'></oya-chart>
+        <div v-if="this.rbService['oya-conf'].apiModel">
+            <oya-chart palette="red" sensorProp="tempInternal" :date="date" 
+                :stepSize="stepSize('temp')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="humidityInternal" :date="date" 
+                :stepSize="stepSize('humidity')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="ecInternal" :date="date" 
+                :stepSize="stepSize('ec')" :service='service'></oya-chart>
+            <oya-chart palette="red" sensorProp="tempCanopy" :date="date" 
+                :stepSize="stepSize('temp')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="humidityCanopy" :date="date" 
+                :stepSize="stepSize('humidity')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="ecCanopy" :date="date" 
+                :stepSize="stepSize('ec')" :service='service'></oya-chart>
+            <oya-chart palette="red" sensorProp="tempAmbient" :date="date" 
+                :stepSize="stepSize('temp')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="humidityAmbient" :date="date" 
+                :stepSize="stepSize('humidity')" :service='service'></oya-chart>
+            <oya-chart palette="blue" sensorProp="ecAmbient" :date="date" 
+                :stepSize="stepSize('ec')" :service='service'></oya-chart>
+        </div>
     </div>
 
 </template><script>
@@ -55,6 +66,13 @@ export default {
     props: {
     },
     methods: {
+        stepSize(prefix) {
+            var key = `${prefix}StepSize`;
+            var oyaConf = this.rbService['oya-conf'];
+            var apiModel = oyaConf && oyaConf.apiModel;
+            var chart = apiModel && apiModel.chart;
+            return Number(chart && chart[key] || 10);
+        },
         formatDate (date = new Date().toISOString().substr(0,10)) {
             const [year, month, day] = date.split('-')
             var result = `${month}/${day}/${year}`

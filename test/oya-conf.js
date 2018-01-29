@@ -86,7 +86,9 @@
             })),
         ],
         chart: {
-            stepSize: 5,
+            ecStepSize: 5,
+            tempStepSize: 2,
+            humidityStepSize: 5,
             showRaw: false,
         },
     };

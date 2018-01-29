@@ -602,12 +602,12 @@
                             if (r.temp && this.readTemp) {
                                 r.temp = r.temp * this.tempScale + this.tempOffset;
                                 this.data.temp = r.temp;
-                                this.emit(r.temp, Sensor.EVENT_TEMP_MAP);
+                                this.emitMap(r.temp, Sensor.EVENT_TEMP_MAP);
                             }
                             if (r.humidity && this.readHumidity) {
                                 r.humidity = r.humidity * this.humidityScale + this.humidityOffset;
                                 this.data.humidity = r.humidity;
-                                this.emit(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
+                                this.emitMap(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
                             }
                             this.lastRead = new Date();
                             resolve(r);
@@ -734,7 +734,7 @@
             if (temp != null) {
                 if (this.readTemp) {
                     temp = temp * this.tempScale + this.tempOffset;
-                    this.emit(temp, Sensor.EVENT_TEMP_MAP);
+                    this.emitMap(temp, Sensor.EVENT_TEMP_MAP);
                 } else {
                     temp = null;
                 }
@@ -742,7 +742,7 @@
             if (humidity != null) {
                 if (this.readHumidity) {
                     humidity = humidity * this.humidityScale + this.humidityOffset;
-                    this.emit(humidity, Sensor.EVENT_HUMIDITY_MAP);
+                    this.emitMap(humidity, Sensor.EVENT_HUMIDITY_MAP);
                 } else {
                     humidity = null;
                 }
@@ -750,7 +750,7 @@
             if (ec != null) {
                 if (this.readEC) {
                     ec = Number(ec);
-                    this.emit(ec, Sensor.EVENT_EC_MAP);
+                    this.emitMap(ec, Sensor.EVENT_EC_MAP);
                 } else {
                     ec = null;
                 }
@@ -763,14 +763,14 @@
             }
         }
 
-        emit(value, eventMap) {
+        emitMap(value, eventMap) {
             var event = eventMap[this.loc];
             if (event == null) {
-                winston.warn(`no event for sensor ${this.name} location ${this.loc}`);
+                winston.warn(`Sensor.emitMap() no event for sensor ${this.name} location ${this.loc}`);
             } else if (this.emitter == null) {
-                winston.info(`no event emitter for sensor ${this.name}`);
+                winston.info(`Sensor.emitMap() no event emitter for sensor ${this.name}`);
             } else {
-                winston.debug(`emit ${event} ${value}`);
+                winston.debug(`Sensor.emitMap() emit ${event} ${value}`);
                 this.emitter.emit(event, value);
             }
         }

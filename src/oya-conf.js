@@ -132,10 +132,11 @@
             this.mcuHat = opts.mcuHat || this.mcuHat || OyaConf.MCU_HAT_NONE.value;
             this.hostTimeout = opts.hostTimeout == null ? 200 : opts.hostTimeout;
             this.healthPoll = opts.healthPoll || 60;
-            this.chart = Object.assign({
-                stepSize: 5,
-                showRaw: false, // vs. show calibrated value (temperaature compensated)
-            }, this.chart, opts.chart);
+            this.chart = opts.chart || {};
+            this.chart.ecStepSize = this.chart.ecStepSize || 10;
+            this.chart.tempStepSize = this.chart.tempStepSize || 2;
+            this.chart.humidityStepSize = this.chart.humidityStepSize || 5;
+            this.chart.showRaw = this.chart.showRaw == null ? false : opts.chart.showRaw;
 
             return this;
         }

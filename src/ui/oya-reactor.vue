@@ -277,8 +277,12 @@
                 <v-card>
                     <v-card-text>
                         <rb-dialog-row label="Display">
-                            <v-text-field type="number" v-model="apiModelCopy.chart.stepSize"
-                                label="Y-axis step size" class="input-group" />
+                            <v-text-field type="number" v-model="apiModelCopy.chart.tempStepSize"
+                                label="Temperature chart step size" class="input-group" />
+                            <v-text-field type="number" v-model="apiModelCopy.chart.humidityStepSize"
+                                label="Humidity chart step size" class="input-group" />
+                            <v-text-field type="number" v-model="apiModelCopy.chart.ecStepSize"
+                                label="Nutrient/EC chart step size" class="input-group" />
                             <v-checkbox label="Display raw sensor values" 
                                 v-model="apiModelCopy.chart.showRaw" light>
                             </v-checkbox>

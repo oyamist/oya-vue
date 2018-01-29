@@ -82,11 +82,8 @@ export default {
         date: {
             default: new Date().toISOString().substr(0,10),
         },
-        valueMax: {
-            default: null,
-        },
-        valueMin: {
-            default: null,
+        stepSize: {
+            default: 10,
         },
     },
     data: function() {
@@ -183,11 +180,6 @@ export default {
                 humidityAmbient: "Ambient Humidity",
                 ecAmbient: "Ambient EC",
             };
-        },
-        stepSize() {
-            var s = Number(this.rbService['oya-conf'].apiModel.chart.stepSize) || 5;
-            console.log('stepsize', s);
-            return s;
         },
         labelHours() {
             var result = [];
