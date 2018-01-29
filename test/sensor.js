@@ -724,12 +724,18 @@
             tempMax: 18,
             tempMin: 17,
         });
-        var json = JSON.stringify(s);
-        var s2 = new Sensor(JSON.parse(json));
+        var json = JSON.parse(JSON.stringify(s));
+        var s2 = new Sensor(json);
         var e = 0.1;
         should(s2.valueForTemp(400, 17)).approximately(100,e);
         should(s2.valueForTemp(410, 18)).approximately(100,e);
         should(s2.valueForTemp(420, 19)).approximately(100,e);
+
+        var s3 = new Sensor();
+        Sensor.update(s3,json); 
+        should(s3.valueForTemp(400, 17)).approximately(100,e);
+        should(s3.valueForTemp(410, 18)).approximately(100,e);
+        should(s3.valueForTemp(420, 19)).approximately(100,e);
     });
     it("TESTTESTcalibrateTemp(seq,date,hrs) performs temperature calibration", function() {
         var vals = [{

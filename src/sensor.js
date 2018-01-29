@@ -168,6 +168,9 @@
         }
 
         static calibratedValue(ann, temp, reading, nominal) {
+            if (typeof ann.activate !== 'function') {
+                winston.warn('DEBUG', typeof ann, ann.constructor.name, ann);
+            }
             var annValue = ann.activate([temp])[0];
             return reading * (nominal/annValue);
         }
@@ -275,6 +278,10 @@
                     sensor[propName] = opts[propName];
                 }
             });
+
+            if (sensor.tempAnn && !(sensor.tempAnn instanceof OyaAnn)) {
+                sensor.tempAnn = OyaAnn.Factory.fromJSON(sensor.tempAnn);
+            }
 
             return sensor;
         }

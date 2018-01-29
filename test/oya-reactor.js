@@ -359,8 +359,8 @@
                     var pat = new RegExp(`where utc between `+
                         `'2018-01-21 ${hh}:00:00.000' and '2018-01-22 ${hh}:00:00.000`,'m');
                     should(sql).match(pat);
-                    should(sql).match(/and evt in \('sense: ec-internal'\)/m);
-                    should(sql).match(/limit 24;/m);
+                    should(sql).match(/and evt in \('sense: ec-internal','sense: temp-internal'\)/m);
+                    should(sql).match(/limit 48;/m);
                     var data = res.body.data;
                     should(data).instanceOf(Array);
                     should(data.length).equal(24);
@@ -370,6 +370,7 @@
                         'ecInternal',
                         'evt',
                         'hr',
+                        'tempInternal',
                         'vavg',
                     ]);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
@@ -413,13 +414,9 @@
                     type: Sensor.TYPE_EZO_EC_K1,
                     loc: OyaMist.LOC_INTERNAL,
                 });
-                sensor.calibrateTemp([{
-                    tempInternal: 17,
-                    ecInternal: 500,
-                },{
-                    tempInternal: 18,
-                    ecInternal: 510,
-                }]);
+                var calPath = path.join(__dirname, 'test-cal.json');
+                var calJson = JSON.parse(fs.readFileSync(calPath).toString());
+                sensor.calibrateTemp(calJson);
 
                 reactor.oyaConf.sensors[0] = sensor;
 
