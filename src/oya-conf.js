@@ -132,6 +132,9 @@
             this.mcuHat = opts.mcuHat || this.mcuHat || OyaConf.MCU_HAT_NONE.value;
             this.hostTimeout = opts.hostTimeout == null ? 200 : opts.hostTimeout;
             this.healthPoll = opts.healthPoll || 60;
+            this.chart = Object.assign({
+                stepSize: 2
+            }, this.chart, opts.chart);
 
             return this;
         }
@@ -153,6 +156,7 @@
                 mcuHat: this.mcuHat,
                 hostTimeout: this.hostTimeout,
                 healthPoll: this.healthPoll,
+                chart: this.chart,
             };
         }
 

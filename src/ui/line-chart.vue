@@ -47,6 +47,10 @@
                 type: String,
                 default: "",
             },
+            stepSize: {
+                type: Number,
+                default: 2,
+            },
             palette: {
                 type: String,
                 default: "red",
@@ -70,6 +74,7 @@
                         yAxes: [{
                             ticks: {
                                 beginAtZero: false,
+                                stepSize: this.stepSize,
                             },
                             gridLines: {
                                 display: true

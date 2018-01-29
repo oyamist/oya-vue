@@ -126,6 +126,9 @@
                         <v-text-field v-model='apiModelCopy.hostTimeout'
                             type="number"
                             :label="`Network host HTTP timeout (ms)`" class="input-group" />
+                        <v-text-field v-model='apiModelCopy.chart.stepSize'
+                            type="number"
+                            :label="`Chart y-axis step size`" class="input-group" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>

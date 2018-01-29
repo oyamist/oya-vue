@@ -85,6 +85,9 @@
                 vesselIndex: 1,
             })),
         ],
+        chart: {
+            stepSize: 2,
+        },
     };
     winston.level = 'error';
 
@@ -177,6 +180,7 @@
                 defaultConf.sensors[1],
                 defaultConf.sensors[2],
             ],
+            chart: defaultConf.chart,
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
@@ -330,6 +334,7 @@
             lights: defaultConf.lights,
             sensors: defaultConf.sensors,
             switches: defaultConf.switches,
+            chart: defaultConf.chart,
         });
 
     });
