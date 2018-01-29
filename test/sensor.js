@@ -354,7 +354,7 @@
                 should.deepEqual(i2cOut[1], Buffer.from([0x03, 0x00, 0x04])); // read
                 should(i2cOut.length).equal(2);
                 should(data.humidity).approximately(.323, 0.0001);
-                should(data.timestamp - Date.now()).approximately(0,5);
+                should(data.timestamp - Date.now()).approximately(0,8);
                 should.deepEqual(data, sensor.data);
 
                 // read() rejects bad data 5x then doesn't read anymore

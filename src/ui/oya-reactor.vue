@@ -442,7 +442,7 @@ export default {
                     this.updateComplete = r.data.stdout.split("\n");
                 }
             }).catch(e => {
-                if (e.message === 'Network error') {
+                if (e.message === 'Network Error') {
                     this.updateStatus = `Server has shut down for update...`;
                 } else {
                     this.updateStatus = `Update failed:${e.message}`;

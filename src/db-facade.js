@@ -163,11 +163,12 @@
                     `${this.logSum[evt] / this.logCount[evt]}` +
                     ');';
                 if (!this.isOpen) {
-                    return Promise.reject(DbFacade.ERROR_NOT_OPEN);
+                    throw DbFacade.ERROR_NOT_OPEN;
                 }
                 return this.logCount[evt] == this.logPeriod 
                     ? this.sqlExec(stmt) : Promise.resolve(null);
             } catch(e) {
+                winston.warn(e.stack);
                 return Promise.reject(e);
             }
         }
