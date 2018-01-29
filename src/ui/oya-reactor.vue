@@ -431,8 +431,12 @@ export default {
                     this.updateComplete = r.data.stdout.split("\n");
                 }
             }).catch(e => {
-                this.updateStatus = `Update failed:${e.message}`;
-                console.error("error", e);
+                if (e.message === 'Network error') {
+                    this.updateStatus = `Server has shut down for update...";
+                } else {
+                    this.updateStatus = `Update failed:${e.message}`;
+                    console.error("error", e);
+                }
             });
         },
         clickActuator(actuator) {
