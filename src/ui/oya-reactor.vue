@@ -126,9 +126,6 @@
                         <v-text-field v-model='apiModelCopy.hostTimeout'
                             type="number"
                             :label="`Network host HTTP timeout (ms)`" class="input-group" />
-                        <v-text-field v-model='apiModelCopy.chart.stepSize'
-                            type="number"
-                            :label="`Chart y-axis step size`" class="input-group" />
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -271,6 +268,20 @@
                                 v-model="sensor.address"
                                 label="Address"
                                 ></v-select>
+                        </rb-dialog-row>
+                    </v-card-text>
+                </v-card>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content>
+                <div slot="header">Charts</div>
+                <v-card>
+                    <v-card-text>
+                        <rb-dialog-row label="Display">
+                            <v-text-field type="number" v-model="apiModelCopy.chart.stepSize"
+                                label="Y-axis step size" class="input-group" />
+                            <v-checkbox label="Display raw sensor values" 
+                                v-model="apiModelCopy.chart.showRaw" light>
+                            </v-checkbox>
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -432,7 +443,7 @@ export default {
                 }
             }).catch(e => {
                 if (e.message === 'Network error') {
-                    this.updateStatus = `Server has shut down for update...";
+                    this.updateStatus = `Server has shut down for update...`;
                 } else {
                     this.updateStatus = `Update failed:${e.message}`;
                     console.error("error", e);

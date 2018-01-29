@@ -86,7 +86,8 @@
             })),
         ],
         chart: {
-            stepSize: 2,
+            stepSize: 5,
+            showRaw: false,
         },
     };
     winston.level = 'error';

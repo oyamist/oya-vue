@@ -133,7 +133,8 @@
             this.hostTimeout = opts.hostTimeout == null ? 200 : opts.hostTimeout;
             this.healthPoll = opts.healthPoll || 60;
             this.chart = Object.assign({
-                stepSize: 2
+                stepSize: 5,
+                showRaw: false, // vs. show calibrated value (temperaature compensated)
             }, this.chart, opts.chart);
 
             return this;

@@ -261,10 +261,10 @@
                             dbf.sensorAvgByHour(fields, startDate, hours).then(r => {
                                 r.data.map(d => {
                                     var temp = d[tempField];
-                                    if (temp != null) {
-                                        d.vavg = sensor.valueForTemp(d[field],temp);;
-                                    } else {
+                                    if (temp == null || this.oyaConf.chart.showRaw) {
                                         d.vavg = d[field];
+                                    } else {
+                                        d.vavg = sensor.valueForTemp(d[field],temp);;
                                     }
                                     d.evt = evt;
                                 });
