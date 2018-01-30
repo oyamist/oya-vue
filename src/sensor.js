@@ -29,6 +29,7 @@
             // BEGIN serializable toJSON() properties
             this.address = opts.address || typeProps.address;
             this.addresses = typeProps.addresses; // read-only and serializable
+            this.cmdCalDry = typeProps.cmdCalDry; // read-only and serializable
             this.comm = opts.comm || typeProps.comm;
             this.desc = opts.desc || typeProps.desc || 'generic sensor';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
@@ -52,6 +53,7 @@
             // sensor type properties
             this.tempRegExp = typeProps.tempRegExp;
             this.cmdWakeup = typeProps.cmdWakeup;
+            this.cmdInfo = typeProps.cmdInfo;
             this.cmdRead = typeProps.cmdRead;
             this.dataRead = typeProps.dataRead;
             this.tempScale = typeProps.tempScale;
@@ -387,6 +389,7 @@
                 baud: 100000,
                 cmdRead: [0x52],
                 cmdInfo: [0x49],
+                cmdCalDry: [0x43,0x61,0x6c,0x2c,0x64,0x72,0x79], // Cal,dry
                 comm: Sensor.COMM_I2C,
                 dataRead: [ 
                     Sensor.BYTE_RES_1,
@@ -420,6 +423,8 @@
             return {
                 address: SystemFacade.NO_DEVICE,
                 addresses: [SystemFacade.NO_DEVICE],
+                cmdCalDry: null,
+                cmdInfo: null,
                 cmdRead: null,
                 cmdWakeup: null, 
                 comm: null,
@@ -567,6 +572,13 @@
 
         get key() {
             return `${this.type}@${this.loc}`;
+        }
+
+        calibrateDry() {
+            if (!this.cmdCalDry) {
+                throw new Error("Sensor.calibrateDry() ${this.name} cannot be dry calibrated");
+            }
+            this.write(this.cmdCalDry);
         }
 
         write(cmd) {

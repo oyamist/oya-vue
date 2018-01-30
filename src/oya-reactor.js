@@ -358,10 +358,17 @@
                     var startDate = opts.startDate && new Date(opts.startDate) || new Date();
                     var hours = opts.hours || 24;
                     var dbf = this.vessel.dbfacade;
-                    var sensor = this.oyaConf.sensorOfField(field);
+                    var sensor = this.oyaConf.sensors.filter(s=>s.name===opts.sensor)[0];
+                    sensor = sensor || this.oyaConf.sensorOfField(field);
                     if (sensor == null) {
                         throw new Error(`no sensor found for field:${req.params.field}`);
-                    } else if (field === 'ecInternal') {
+                    } 
+                    if (opts.calibrateDry) {
+                        sensor.calibrateDry();
+                        resolve(`Performed dry calibration for sensor:${sensor.name}`);
+                        return;
+                    }
+                    if (field === 'ecInternal') {
                         dbf.sensorAvgByHour([field,'tempInternal'], startDate, hours).then(r => {
                             var status = sensor.calibrateTemp(r.data, {
                                 nominal: opts.nominal,

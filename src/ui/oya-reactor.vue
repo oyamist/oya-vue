@@ -268,8 +268,15 @@
                                 v-model="sensor.address"
                                 label="Address"
                                 ></v-select>
-                            <div v-if="sensor.readEC">
-                            </div>
+                            <v-btn v-if="sensor.cmdCalDry" @click="calibrateDry(sensor)">
+                                Calibrate Dry
+                            </v-btn>
+                            <v-alert type=error v-show='alertCalDryError'>
+                                {{alertCalDryError}}
+                            </v-alert>
+                            <v-alert type=success color="darken-4" v-show="alertCalDry">
+                                {{alertCalDry}}
+                            </v-alert>
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -351,6 +358,8 @@ export default {
         var date = new Date().toISOString().substr(0,10);
         var dateFormatted = this.formatDate(date);
         return {
+            alertCalDry: null,
+            alertCalDryError: null,
             alertRestarting: false,
             alertUpdate: false,
             apiEditDialog: false,
@@ -372,6 +381,24 @@ export default {
         }
     },
     methods: {
+        calibrateDry(sensor) {
+            console.log("calibrate dry", sensor.name);
+            this.alertCalDry = null;
+            this.alertCalDryError = null;
+            var url = [this.restOrigin(), this.service, 'sensor', 'calibrate'].join('/');
+            this.$http.post(url, {
+                sensor: sensor.name,
+                calibrateDry: true,
+            }).then(r => {
+                this.alertCalDry = `${sensor.name} has been dry calibrated`;
+                console.log(this.alertCalDry);
+            }).catch(e => {
+                var data = e.response && e.response.data;
+                var error = data && data.error;
+                this.alertCalDryError = `Could not perform dry calibration:${e.message} ${error}`;
+                console.error(this.alertCalDryError);
+            });
+        },
         formatDate (date = new Date().toISOString().substr(0,10)) {
             const [year, month, day] = date.split('-')
             var result = `${month}/${day}/${year}`
@@ -449,6 +476,8 @@ export default {
             return vessel && cycle && vessel.cycles[cycle];
         },
         clickSettings() {
+            this.alertCalDry = null;
+            this.alertCalDryError = null;
             this.rbDispatch("apiLoad").then(r => {
                 this.apiEdit();
             });
@@ -665,50 +694,6 @@ export default {
         mutableSwitches( ){
             return this.apiModelCopy && this.apiModelCopy.switches;
         },
-        mutableActuators( ){
-            return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
-                a.vesselIndex === this.vesselIndex);
-        },
-        mutableLights( ){
-            return this.apiModelCopy && this.apiModelCopy.lights;
-        },
-        mutableSensors( ){
-            return this.apiModelCopy && this.apiModelCopy.sensors.filter(a => 
-                a.vesselIndex === this.vesselIndex);
-        },
-        actuators( ){
-            return this.apiModel && this.apiModel.actuators.filter(a => 
-                a.vesselIndex === this.vesselIndex);
-        },
-        name() {
-            return this.vessel && this.vessel.name;
-        },
-        httpErr() {
-            return this.rbResource.httpErr;
-        },
-        cycleKeys() {
-            var vessel = this.vessel;
-            if (vessel  == null) {
-                return [];
-            }
-            return Object.keys(this.vessel.cycles).sort();
-        },
-        cycles() {
-            var keys = this.cycleKeys;
-            return this.cycleKeys.map(key => this.vessel.cycles[key]);
-        },
-        editCycles() {
-            var cycleNames = Object.keys(this.vessel.cycles).sort();
-            var vessel = this.apiModelCopy.vessels[this.vesselIndex];
-            return cycleNames.map(name => {
-                return {
-                    name: name,
-                    cycle: vessel.cycles[name],
-                }
-            });
-        },
-    },
-    components: {
         mutableActuators( ){
             return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
                 a.vesselIndex === this.vesselIndex);

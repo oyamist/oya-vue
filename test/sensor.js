@@ -388,6 +388,25 @@
         }();
         async.next();
     });
+    it("TESTTESTcalibrateDry() performs dry calibration", function(done) {
+        var sensor = new Sensor();
+        should.throws(()=>{
+            sensor.calibrateDry();
+        });
+
+        var i2cOut = [];
+        var sensor = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1, {
+            loc: OyaMist.LOC_INTERNAL,
+            i2cWrite: (addr, buf) => {
+                i2cOut.push(buf);
+                return 0; // success
+            },
+        }));
+        sensor.calibrateDry();
+        should(i2cOut.join('')).equal("Cal,dry");
+
+        done();
+    });
     it("TESTTESTread() works for Altas Scientific EZO EC", function(done) {
         var async = function*() {
             try {
