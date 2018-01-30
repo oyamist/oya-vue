@@ -268,6 +268,8 @@
                                 v-model="sensor.address"
                                 label="Address"
                                 ></v-select>
+                            <div v-if="sensor.readEC">
+                            </div>
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -286,6 +288,35 @@
                             <v-checkbox label="Display raw sensor values" 
                                 v-model="apiModelCopy.chart.showRaw" light>
                             </v-checkbox>
+                        </rb-dialog-row>
+                        <rb-dialog-row label="Nutrients">
+                            <v-select 
+                                v-bind:items="nutrientUnits()"
+                                v-model="apiModelCopy.chart.ecUnits"
+                                label="Units"
+                                ></v-select>
+                            <v-text-field type="number" v-model="apiModelCopy.chart.ecStepSize"
+                                label="Calibration solution value" class="input-group" />
+                            <v-menu lazy :close-on-content-click="false" v-model="ecmenu"
+                                 transition="scale-transition" offset-y  
+                                 :nudge-right="40" max-width="290px" min-width="290px" >
+                                <v-text-field slot="activator" readonly v-model="dateFormatted"
+                                    label="Calbration start date" prepend-icon="event" 
+                                    @blur="date = parseDate(dateFormatted)"
+                                ></v-text-field>
+                                <v-date-picker v-model="date" scrollable actions
+                                    @input="dateFormatted = formatDate($event)">
+                                  <template slot-scope="{ save, cancel }">
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn flat color="primary" @click="cancel">Cancel</v-btn>
+                                      <v-btn flat color="primary" @click="save">OK</v-btn>
+                                    </v-card-actions>
+                                  </template>
+                                </v-date-picker>
+                            </v-menu>
+                            <!--
+                            -->
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -317,24 +348,44 @@ export default {
         },
     },
     data: function() {
+        var date = new Date().toISOString().substr(0,10);
+        var dateFormatted = this.formatDate(date);
         return {
-            apiEditDialog: false,
             alertRestarting: false,
+            alertUpdate: false,
+            apiEditDialog: false,
+            cycleStartTimeMenu: false,
+            cycleToggle: false,
+            date,
+            dateFormatted,
+            ecmenu: false,
+            mcuHatItems: null,
+            mockPhase: 0,
+            msUpdate: null,
             restartStatus: "",
             restartToggle: false,
-            updateToggle: false,
-            msUpdate: null,
-            updateSeconds: null,
-            alertUpdate: false,
-            updateStatus: null,
             updateComplete: null,
-            cycleToggle: false,
-            mockPhase: 0,
-            cycleStartTimeMenu: false,
-            mcuHatItems: null,
+            updateSeconds: null,
+            updateStatus: null,
+            updateToggle: false,
+
         }
     },
     methods: {
+        formatDate (date = new Date().toISOString().substr(0,10)) {
+            const [year, month, day] = date.split('-')
+            var result = `${month}/${day}/${year}`
+            this.rbService && Vue.set(this.rbService, 'reportDate', date);
+            return result;
+        },
+        parseDate (date) {
+            if (!date) {
+                return null;
+            }
+
+            const [month, day, year] = date.split('/');
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        },
         alertRestart() {
             var s1 = "";
             s1 += this.apiModel.mcuHat;
@@ -343,6 +394,18 @@ export default {
             s2 += this.apiModel.mcuHat;
             s2 = this.apiModelCopy.switches.reduce((acc,a)=>acc+a.pin,s2);  
             return s1 !== s2;
+        },
+        nutrientUnits() {
+            return [{
+                text: "% of calibration solution",
+                value: "%",
+            },{
+                text: "parts/million (ppm)",
+                value: "ppm",
+            },{
+                text: "conductivity (microsiemens)",
+                value: "\u00b5S",
+            }];
         },
         sensorAddresses(sensor) {
             var st =  this.sensorTypes.filter( st => st.type === sensor.type)[0];

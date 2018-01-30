@@ -755,7 +755,7 @@
             }
             if (ec != null) {
                 if (this.readEC) {
-                    ec = Number(ec);
+                    ec = Number(ec.replace(/\0/g,''));
                     this.emitMap(ec, Sensor.EVENT_EC_MAP);
                 } else {
                     ec = null;

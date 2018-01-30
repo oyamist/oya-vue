@@ -12,7 +12,7 @@
 
     <div class="pt-3" v-if='isVisible'
         style="display:flex; flex-flow: row wrap; align-items: flex-start; justify-content: space-evenly ">
-        <div style="width: 8em; display:flex; flex-flow: column; ">
+        <div style="width: 8em; display:flex; flex-flow: column; align-items: center;">
             <p class="text-xs-center subheading">{{sensorLabels[sensorProp]}}</p>
             <oya-sensor :service='service' :sensorProp="sensorProp"/>
         </div>
@@ -172,7 +172,7 @@ export default {
             return {
                 tempInternal: "Internal/Root Temperature",
                 humidityInternal: "Internal/Root Humidity",
-                ecInternal: "Internal/Root EC",
+                ecInternal: "Internal/Root Nutrient/EC",
                 tempCanopy: "Canopy Temperature",
                 humidityCanopy: "Canopy Humidity",
                 ecCanopy: "Canopy EC",

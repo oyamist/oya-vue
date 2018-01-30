@@ -388,6 +388,54 @@
         }();
         async.next();
     });
+    it("TESTTESTread() works for Altas Scientific EZO EC", function(done) {
+        var async = function*() {
+            try {
+                var testData = Buffer.from([0x01,0x31,0x38,0x36,0x32,0x00,0x00]);
+                var i2cOut = [];
+                var msRead = null;
+                var readDelay = 15;
+                var sensor = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1, {
+                    readDelay, // some sensors such as SHT31-DIS have a read delay
+                    loc: OyaMist.LOC_INTERNAL,
+                    maxReadErrors: 1,
+                    i2cRead: (addr, buf) => {
+                        msRead = Date.now();
+                        testData.copy(buf);
+                    },
+                    i2cWrite: (addr, buf) => {
+                        i2cOut.push(buf);
+                        return 0; // success
+                    },
+                }));
+
+                // read() high magnitude ####
+                var msNow = Date.now();
+                var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(msRead == null).equal(false);
+                should(msRead - msNow).above(readDelay-2);
+                should(data.ec).approximately(1862, 0.01);
+                should(data.timestamp - Date.now()).approximately(0,8);
+                should.deepEqual(data, sensor.data);
+
+                // read() low magnitude ###.#
+                var msNow = Date.now();
+                testData = Buffer.from([0x01,0x31,0x38,0x36,0x2e,0x32,0x00]);
+                var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(msRead == null).equal(false);
+                should(msRead - msNow).above(readDelay-2);
+                should(data.ec).approximately(186.2, 0.01);
+                should(data.timestamp - Date.now()).approximately(0,8);
+                should.deepEqual(data, sensor.data);
+
+                done();
+            } catch(err) {
+                winston.error(err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
     it("heat(enable) turns heater on/off", function(done) {
         var async = function*() {
             try {
