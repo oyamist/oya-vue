@@ -99,7 +99,7 @@
             if (this.readEC) {
                 var dataField = OyaMist.locationField(this.loc, 'ec');
             } else {
-                throw new Error(`Sensor.calibrate(${this.name}) cannot be calibrated`);
+                throw new Error(`Sensor.calibrateTemp(${this.name}) cannot be calibrated`);
             }
 
             var tempField = opts.tempField || OyaMist.locationField(this.loc,'temp');
@@ -107,42 +107,47 @@
                 s.hasOwnProperty(tempField) && s.hasOwnProperty(dataField) && a.push(s);
                 return a;
             },[]);
-            var temps = seqAvail.map(s=>s[tempField]);
+            var mono = Sensor.monotonic(seqAvail,tempField);
+            var monoSeq = seqAvail.slice(mono.start, mono.end);
+            var temps = monoSeq.map(s=>s[tempField]);
             var quality = Sensor.tempQuality(temps);
             var tempMin = temps.length ? Math.min.apply(null, temps) : null;
             var tempMax = temps.length ? Math.max.apply(null, temps) : null;
             var nominal = opts.nominal || 100;
             var result = {
+                dataField,
                 quality,
                 tempMin,
                 tempMax,
                 nominal,
-                date: opts.date || new Date(),
+                data: monoSeq,
+                startDate: (opts.startDate || new Date()).toISOString(),
                 hours: opts.hours || 24,
             }
 
-            if (seqAvail.length === 0 ) { 
+            if (monoSeq.length === 0 ) { 
                 // no calibration data => generate temperature independent data
-                seqAvail.push({
+                monoSeq.push({
                     [tempField]: 18,
                     [dataField]: nominal,
                 });
-                seqAvail.push({
+                monoSeq.push({
                     [tempField]: 28,
                     [dataField]: nominal,
                 });
-            } else if (seqAvail.length === 1 ) { 
+            } else if (monoSeq.length === 1 ) { 
                 // single data point: generate temperature indepedent data
-                seqAvail.push({
-                    [tempField]: seqAvail[0][tempField] + 10,
-                    [dataField]: seqAvail[0][dataField],
+                monoSeq.push({
+                    [tempField]: monoSeq[0][tempField] + 10,
+                    [dataField]: monoSeq[0][dataField],
                 });
             } else { 
                 // calibrate to provided sequence
             }
-            this.tempData = seqAvail;
+            this.tempData = monoSeq;
+            this.tempStartDate = result.startDate;
             this.tempNominal = nominal;
-            this.tempAnn = Sensor.calibrationANN(seqAvail, dataField, tempField);
+            this.tempAnn = Sensor.calibrationANN(monoSeq, dataField, tempField);
 
             return result;
         }
@@ -163,7 +168,7 @@
             }
 
             var diff = Math.max.apply(null,temps) - Math.min.apply(null,temps)
-            var q = Math.pow(Math.E,-1/diff); // raw quality
+            var q = Math.pow(Math.E,-0.7/diff); // raw quality
             return Math.min(100, Math.round((100)*(bottom+q))); // pretty quality
         }
 
@@ -176,8 +181,9 @@
         }
 
         static calibrationANN(seq, dataKey='ecInternal', tempKey='tempInternal') {
-            var mono = Sensor.monotonic(seq,tempKey);
-            var examples = seq.slice(mono.start, mono.end).map(s => {
+            //var mono = Sensor.monotonic(seq,tempKey);
+            //var examples = seq.slice(mono.start, mono.end).map(s => {
+            var examples = seq.map(s => {
                 return new OyaAnn.Example([s[tempKey]], [s[dataKey]]);
             });
             var v = OyaAnn.Variable.variables(examples);

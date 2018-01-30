@@ -6,7 +6,7 @@
         OyaMist,
     } = require("../index");
 
-    it("TESTTESTlocationField(loc,fieldPrefix) returns field for location", function() {
+    it("locationField(loc,fieldPrefix) returns field for location", function() {
         should(OyaMist.locationField(OyaMist.LOC_INTERNAL,'temp')).equal('tempInternal');
         should(OyaMist.locationField(OyaMist.LOC_INTERNAL,'ec')).equal('ecInternal');
         should(OyaMist.locationField(OyaMist.LOC_AMBIENT,'abc')).equal('abcAmbient');

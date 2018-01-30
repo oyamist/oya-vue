@@ -86,7 +86,7 @@
             })),
         ],
         chart: {
-            ecStepSize: 5,
+            ecStepSize: 10,
             tempStepSize: 2,
             humidityStepSize: 5,
             showRaw: false,
@@ -357,7 +357,7 @@
         //should(oc.sensors[0]).equal(sensor0);
         //should(oc.sensors[1]).equal(sensor1);
     });
-    it("TESTTESTsensorOfField(field) returns source sensor for field", function() {
+    it("sensorOfField(field) returns source sensor for field", function() {
         var oc = new OyaConf({
             sensors: [{
                 type: Sensor.TYPE_AM2315.type,

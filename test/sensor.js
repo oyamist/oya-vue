@@ -65,7 +65,7 @@
             }
         })();
     });
-    it("TESTTESTisFieldSource(field) returns true if sensor provides data for field", function() {
+    it("isFieldSource(field) returns true if sensor provides data for field", function() {
         var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
             loc: OyaMist.LOC_CANOPY,
         }));
@@ -613,13 +613,15 @@
         should(Sensor.tempQuality([])).equal(0);
 
         should(Sensor.tempQuality([13])).equal(13); // A single data point is abysmal quality
-        should(Sensor.tempQuality([13,12,13])).equal(50); // 1C is horrible quality
-        should(Sensor.tempQuality([1.5,3.5,2])).equal(74); // 2C is poor quality
-        should(Sensor.tempQuality([-1.5,2.5,2])).equal(91); // 3C is good quality
-        should(Sensor.tempQuality([28,24])).equal(91); // 4C is good quality
-        should(Sensor.tempQuality([24,29])).equal(95); // 5C is very good quality
-        should(Sensor.tempQuality([24,30])).equal(98); // 6C is excellent quality
+        should(Sensor.tempQuality([13,12,13])).equal(63); // 1C is poor quality
+        should(Sensor.tempQuality([1.5,3.5,2])).equal(83); // 2C is acceptable quality
+        should(Sensor.tempQuality([-1.5,2.5,2])).equal(97); // 3C is good quality
+        should(Sensor.tempQuality([28,24])).equal(97); // 4C is good quality
+        should(Sensor.tempQuality([24,29])).equal(100); // 5C is top quality
+        should(Sensor.tempQuality([24,30])).equal(100); // 6C is top excellent quality
         should(Sensor.tempQuality([31,24])).equal(100); // 7C is top quality
+
+        should(Sensor.tempQuality([18.183,14.51])).equal(96); // actual data 
     });
     it("valueForTemp(value,temp) returns temperature compensated value", function() {
         var seq = [];
@@ -634,7 +636,7 @@
         // empty data sequence -- no temp comp
         var opts = {
             nominal: 1000,
-            date: new Date('2018-01-02T10:20:30Z'),
+            startDate: new Date('2018-01-02T10:20:30Z'),
             hours: 22.5,
             tempMin: null,
             tempMax: null,
@@ -642,7 +644,13 @@
         var r = s.calibrateTemp(seq, Object.assign({
             quality: 0,
         },opts));
-        should(r).properties(opts);
+        should(r).properties({
+            nominal: 1000,
+            startDate: '2018-01-02T10:20:30.000Z',
+            hours: 22.5,
+            tempMin: null,
+            tempMax: null,
+        });
         var e = 0.1;
         should(s.valueForTemp(400, 35)).approximately(400,e);
 
@@ -689,7 +697,7 @@
         });
         var r = s.calibrateTemp(seq);
         should(r).properties({
-            quality: 50,
+            quality: 63,
             nominal: 100,
             hours: 24,
             tempMax: 18,
@@ -700,7 +708,7 @@
         should(s.valueForTemp(410, 18)).approximately(100,e);
         should(s.valueForTemp(420, 19)).approximately(100,e);
     });
-    it("TESTTESTcalibrations are serializable", function() {
+    it("calibrations are serializable", function() {
         var seq = [];
         var s = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1,{
             loc: OyaMist.LOC_INTERNAL,
@@ -718,7 +726,7 @@
         });
         var r = s.calibrateTemp(seq);
         should(r).properties({
-            quality: 50,
+            quality: 63,
             nominal: 100,
             hours: 24,
             tempMax: 18,
@@ -737,7 +745,7 @@
         should(s3.valueForTemp(410, 18)).approximately(100,e);
         should(s3.valueForTemp(420, 19)).approximately(100,e);
     });
-    it("TESTTESTcalibrateTemp(seq,date,hrs) performs temperature calibration", function() {
+    it("calibrateTemp(seq,date,hrs) performs temperature calibration", function() {
         var vals = [{
             tempInternal: 17,
             ecInternal: 400,

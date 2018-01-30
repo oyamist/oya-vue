@@ -358,23 +358,23 @@
                     var startDate = opts.startDate && new Date(opts.startDate) || new Date();
                     var hours = opts.hours || 24;
                     var dbf = this.vessel.dbfacade;
-                    if (field === 'ecInternal') {
+                    var sensor = this.oyaConf.sensorOfField(field);
+                    if (sensor == null) {
+                        throw new Error(`no sensor found for field:${req.params.field}`);
+                    } else if (field === 'ecInternal') {
                         dbf.sensorAvgByHour([field,'tempInternal'], startDate, hours).then(r => {
-                            resolve({
-                                sql: r.sql,
-                                startDate: startDate.toISOString(),
-                                hours,
-                                data: r.data,
-                                field,
+                            var status = sensor.calibrateTemp(r.data, {
+                                nominal: opts.nominal,
+                                startDate,
                             });
+
+                            resolve(status);
                         }).catch(e => {
                             winston.warn(e.stack);
                             reject(e);
                         });
                     } else {
-                        var e = new Error(`unknown field:${req.params.field}`);
-                        winston.warn(e.stack);
-                        reject(e);
+                        throw new Error(`unknown field:${req.params.field}`);
                     }
                 } catch(e) {
                     winston.warn(e.stack);

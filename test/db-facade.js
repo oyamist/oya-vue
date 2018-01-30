@@ -79,7 +79,7 @@
             }
         })();
     });
-    it("TESTTESTsensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
+    it("sensorDataByHour(evt,date) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = new TestLogger();
@@ -104,7 +104,7 @@
             }
         })();
     });
-    it("TESTTESTsensorAvgByHour(fields,startdate,hours) summarizes sensor data by hour", function(done) {
+    it("sensorAvgByHour(fields,startdate,hours) summarizes sensor data by hour", function(done) {
         (async function () {
             try {
                 var dbl = new TestLogger();

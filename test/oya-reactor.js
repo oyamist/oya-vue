@@ -16,17 +16,19 @@
     const winston = require('winston');
     const path = require('path');
     const {
-        OyaConf,
+        Actuator,
         DbReport,
         DbSqlite3,
+        Light,
+        OyaConf,
         OyaMist,
         OyaReactor,
-        Actuator,
-        Light,
+        OyaVessel,
         Sensor,
         Switch,
-        OyaVessel,
+
     } = require('../index');
+    const OyaAnn = require('oya-ann');
     const STANDARD_ON = 0.005;
     const STANDARD_OFF = 0.01;
     const FAN_ON = 2*STANDARD_ON;
@@ -341,7 +343,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -405,7 +407,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor temperature compensated data", function(done) {
+    it("GET /sensor/data-by-hour returns sensor temperature compensated data", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -822,47 +824,51 @@
         }();
         async.next();
     });
-    it("POST /sensor/calibrate calibrates sensor", function(done) {
+    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
+                var reactor = testReactor();
+                var oyaConf = reactor.oyaConf;
+                var sensor0 = oyaConf.sensors[0];
+                var sensor = new Sensor({
+                    type: Sensor.TYPE_EZO_EC_K1.type,
+                    loc: OyaMist.LOC_INTERNAL,
+                });
+                var e = 0.2;
+                should(sensor.valueForTemp(400, 17)).approximately(400,e); // uncalibrated
+                oyaConf.sensors[0] = sensor;
 
-                var vessel = testReactor().vessels[0];
-                vessel.activate(false);
-                should(vessel.state.active).equal(false);
-
-                // activate vessel
                 var command = {
-                    startDate: new Date('2018-01-21T10:20:30Z'),
+                    startDate: '2018-01-21T10:20:30Z',
                     hours: 24,
                     field: 'ecInternal',
                 }
                 var res = yield supertest(app).post("/test/sensor/calibrate").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
-                var sql = res.body.sql;
-                should(sql).match(/select strftime.*evt/m);
-                should(sql).match(/from sensordata/m);
-                should(sql).match(/where utc between '2018-01-21 10:20:30.000' and '2018-01-22 10:20:30.000'/m);
-                should(sql).match(/and evt in \('sense: ec-internal','sense: temp-internal'\)/m);
-                should(sql).match(/group by evt, hr/m);
-                should(sql).match(/order by evt, hr desc/m);
-                should(sql).match(/limit 48;/m);
-                var data = res.body.data;
-                should(data).instanceOf(Array);
-                should(data.length).equal(23);
                 var e = 0.1;
-                should(data[0].hr).equal('2018-01-22 0200');
-                should(data[0].ecInternal).approximately(479.4,e);
-                should(data[0].tempInternal).approximately(17.1,e);
-                should(data[22].hr).equal('2018-01-21 0400');
-                should(data[22].ecInternal).approximately(461,e);
-                should(data[22].tempInternal).approximately(15.4,e);
-                should(res.body).properties({
-                    hours: 24,
-                    startDate: '2018-01-21T10:20:30.000Z',
-                    field: 'ecInternal',
-                });
+                var status = res.body;
+                should(status.dataField).equal('ecInternal');
+                should(status.quality).equal(96);
+                should(status.nominal).equal(100);
+                should(status.tempMin).approximately(14.5,e);
+                should(status.tempMax).approximately(18.2,e);
+                should(status.hours).equal(24);
+                should(status.data).instanceOf(Array); // actual calibration data
+                should(status.data.length).equal(13);
+                should(status.startDate).equal('2018-01-21T10:20:30.000Z');
 
+                should(sensor.tempNominal).equal(status.nominal);
+                should(sensor.tempStartDate).equal(status.startDate);
+                should.deepEqual(sensor.tempData, status.data);
+                should(sensor.tempAnn).instanceOf(OyaAnn.Network);
+
+                e = 0.2;
+                should(sensor.valueForTemp(400, 17)).approximately(83.3,e);
+                should(sensor.valueForTemp(400, 18)).approximately(81.4,e);
+                should(sensor.valueForTemp(400, 19)).approximately(80.3,e);
+
+                oyaConf.sensors[0] = sensor0; // restore
                 done();
             } catch(err) {
                 winston.error(err.stack);
