@@ -17,13 +17,14 @@
             this.name = opts.name || `Calibration ${this.startDate.toISOString().substr(0,10)}`;
             this.desc = opts.desc || '';
             this.ann = opts.ann || null;
-            this.range = opts.range || {};
+            if (this.ann && !(this.ann instanceof OyaAnn.Network)) {
+                this.ann = OyaAnn.Factory.fromJSON(this.ann);
+            }
             this.range = Object.assign({
-                field: 'ecInternal',
+                field: opts.rangeField || 'ecInternal',
             }, opts.range);
-            this.domain = opts.domain || {};
             this.domain = Object.assign({
-                field: 'tempInternal',
+                field: opts.domainField || 'tempInternal',
             }, opts.domain);
             this.nominal = opts.nominal || 100;
             this.unit = opts.unit || OyaMist.NUTRIENT_UNIT.PERCENT;
@@ -69,15 +70,23 @@
             return { start, end };
         }
 
+        get isCalibrated() {
+            return this.ann != null;
+        }
+
         calibratedValue(rangeValue, domainValue, ann=this.ann) {
-            if (typeof ann.activate !== 'function') {
-                winston.warn('DEBUG', typeof ann, ann.constructor.name, ann);
+            if (!this.isCalibrated) {
+                return rangeValue;
             }
             var annValue = ann.activate([domainValue])[0];
             return rangeValue * (this.nominal/annValue);
         }
 
-        createNetwork(seq=this.data) {
+        calibrate(seq=this.data) {
+            this.data = seq;
+            if (seq == null || seq.length == 0) {
+                return (this.ann = null);
+            }
             var rangeField = this.range.field;
             var domainField = this.domain.field;
             this.range.min = null;
@@ -120,10 +129,11 @@
             var factory = new OyaAnn.Factory(v, opts);
             var network = factory.createNetwork();
             network.train(examples);
+            this.ann = network;
             return network;
         }
 
-        calibrate(seq=[], opts={}) {
+        xcalibrate(seq=[], opts={}) {
         /*
             var domainField = this.domainField;
             var seqAvail = seq.reduce((a,s) => {

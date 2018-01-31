@@ -35,35 +35,41 @@
         });
     });
     it("TESTTESTcalibrations can be serialized", function() {
-        var props = {
-            ann: [],
-            data: [{
-                ecAmbient: 100,
-                tempAmbient: 17,
-            },{
-                ecAmbient: 110,
-                tempAmbient: 18,
-            }],
-            startDate: "2017-01-02T10:20:30.123Z",
-            desc: 'KCl 2930 microSiemens@25C',
-            domain: {
-                field: 'tempAmbient',
-            },
-            hours: 12,
-            name: "General Hydroponics PPM Reference Solution",
-            nominal: 1500,
-            range: {
-                field: 'ecAmbient',
-            },
-            unit: OyaMist.NUTRIENT_UNIT.PPM,
-
+        var data = [{
+            ecAmbient: 1500,
+            tempAmbient: 25,
+        },{
+            ecAmbient: 1510,
+            tempAmbient: 26,
+        }];
+        var startDate = "2017-01-02T10:20:30.123Z";
+        var desc = 'KCl 2930 microSiemens@25C';
+        var domainField = 'tempAmbient';
+        var hours = 12;
+        var name = "General Hydroponics PPM Reference Solution";
+        var nominal = 1500;
+        var rangeField = 'ecAmbient';
+        var unit = OyaMist.NUTRIENT_UNIT.PPM;
+        var props = { 
+            data, startDate, desc, hours, name, nominal, unit,
+            domainField,
+            rangeField,
         };
         var cal = new Calibration(props);
         var json = JSON.parse(JSON.stringify(cal));
 
         var cal2 = new Calibration(json);
         should.deepEqual(cal2, cal);
-        should.deepEqual(props, json);
+        should.deepEqual(json, {
+            data, startDate, desc, hours, name, nominal, unit,
+            ann: null,
+            domain: {
+                field: 'tempAmbient',
+            },
+            range: {
+                field: 'ecAmbient',
+            },
+        });
     });
     it("TESTTESTmonotonic(seq,key) finds longest monotonic contiguous subsequence", function() {
         var seq = [];
@@ -105,7 +111,7 @@
             end: seq.length, // exclusive
         });
     });
-    it("TESTTESTcreateNetwork(seq) creates calibration ANN for given data", function() {
+    it("TESTTESTcalibrate(seq) creates calibration ANN for given data", function() {
         // create sample data for diurnal temperature cycle
         // For testing, we use a linear relationship, but non-linear relationships can
         // also be handled
@@ -132,7 +138,7 @@
                 field: 'tempInternal',
             },
         });
-        var ann = cal.createNetwork(seq);
+        var ann = cal.calibrate(seq);
 
         // fractional readings should correspond with fractions of nominal value independent of temperature
         // over all measured values
@@ -157,5 +163,55 @@
             max: 20,
             min: 16,
         });
+    });
+    it("TESTTESTcalibrations are serialized", function() {
+        var cal = new Calibration({
+            rangeField: 'ecInternal',
+            domainField: 'tempInternal',
+            data: [{
+                ecInternal: 1500,
+                tempInternal: 25,
+            },{
+                ecInternal: 1510,
+                tempInternal: 26,
+            }],
+        });
+        cal.calibrate();
+        var e = 0.1;
+        should(cal.isCalibrated).equal(true);
+        should(cal.calibratedValue(1500, 25)).equal(100);
+        should(cal.calibratedValue(1500, 26)).approximately(99.3,e);
+
+        // (de)serialize
+        var cal2 = new Calibration(JSON.parse(JSON.stringify(cal)));
+        should(cal2.isCalibrated).equal(true);
+        should(cal2.calibratedValue(1500, 25)).equal(100);
+        should(cal2.calibratedValue(1500, 26)).approximately(99.3,e);
+    });
+    it("TESTTESTcalibrate([]) clears the calibration", function() {
+        var cal = new Calibration({
+            rangeField: 'ecInternal',
+            domainField: 'tempInternal',
+            data: [{
+                ecInternal: 1500,
+                tempInternal: 25,
+            },{
+                ecInternal: 1510,
+                tempInternal: 26,
+            }],
+        });
+        cal.calibrate();
+        var e = 0.1;
+        should(cal.isCalibrated).equal(true);
+        should(cal.calibratedValue(1500, 25)).equal(100);
+        should(cal.calibratedValue(1500, 26)).approximately(99.3,e);
+        should(cal.calibratedValue(1510, 26)).approximately(100,e);
+
+        // clear calibration
+        cal.calibrate([]);
+        should(cal.isCalibrated).equal(false);
+        should(cal.calibratedValue(1500, 25)).equal(1500);
+        should(cal.calibratedValue(1500, 26)).equal(1500);
+        should(cal.calibratedValue(1510, 26)).equal(1510);
     });
 })
