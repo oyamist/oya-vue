@@ -355,7 +355,11 @@
                 try {
                     var opts = req.body;
                     var field = opts.field || 'ecInternal';
-                    var startDate = opts.startDate && new Date(opts.startDate) || new Date();
+                    var startDateStr = opts.startDate || OyaMist.localDate().toISOString();
+                    if (startDateStr.indexOf('T') < 0) {
+                        startDateStr = OyaMist.localDate(startDateStr);
+                    }
+                    var startDate = new Date(startDateStr);
                     var hours = opts.hours || 24;
                     var dbf = this.vessel.dbfacade;
                     var sensor = this.oyaConf.sensors.filter(s=>s.name===opts.sensor)[0];
