@@ -46,6 +46,7 @@
             if (this.tempAnn && !(this.tempAnn instanceof OyaAnn)) {
                 this.tempAnn = OyaAnn.Factory.fromJSON(this.tempAnn);
             }
+            this.tempCal = opts.tempCal;
             this.type = type;
             this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
@@ -114,6 +115,7 @@
                 hours: opts.hours,
                 startDate: (opts.startDate || new Date()).toISOString(),
             });
+            this.tempCal = cal;
             this.tempAnn = cal.calibrate(seq);
             var temps = cal.data.map(s=>s[tempField]);
             var quality = Sensor.tempQuality(temps);
