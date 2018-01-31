@@ -552,7 +552,6 @@
             'tempAnn',
             'tempCal',
             'tempData',
-            'tempNominal',
             'type',
             'vesselIndex',
         ];
@@ -573,7 +572,6 @@
             'tempAnn',
             'tempCal',
             'tempData',
-            'tempNominal',
             'type',
             'vesselIndex',
 

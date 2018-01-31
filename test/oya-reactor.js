@@ -858,7 +858,7 @@
                 should(status.data.length).equal(13);
                 should(status.startDate).equal('2018-01-21T10:20:30.000Z');
 
-                should(sensor.tempNominal).equal(status.nominal);
+                should(sensor.tempCal.nominal).equal(status.nominal);
                 should(sensor.tempStartDate).equal(status.startDate);
                 should.deepEqual(sensor.tempData, status.data);
                 should(sensor.tempAnn).instanceOf(OyaAnn.Network);
