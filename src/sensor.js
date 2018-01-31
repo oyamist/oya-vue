@@ -127,7 +127,6 @@
                 startDate: cal.startDate,
                 hours: cal.hours,
             }
-            this.tempStartDate = cal.startDate;
 
             return result;
         }
