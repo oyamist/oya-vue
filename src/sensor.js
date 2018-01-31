@@ -46,7 +46,7 @@
             if (this.tempAnn && !(this.tempAnn instanceof OyaAnn)) {
                 this.tempAnn = OyaAnn.Factory.fromJSON(this.tempAnn);
             }
-            this.tempCal = opts.tempCal;
+            this.tempCal = new Calibration(opts.tempCal);
             this.type = type;
             this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
@@ -137,6 +137,9 @@
         }
 
         valueForTemp(value, temp) {
+            return this.tempCal
+                ? this.tempCal.calibratedValue(value, temp)
+                : value;
             return this.tempAnn 
                 ? Sensor.calibratedValue(this.tempAnn, temp, value, this.tempNominal)
                 : value;
@@ -198,6 +201,9 @@
 
             if (sensor.tempAnn && !(sensor.tempAnn instanceof OyaAnn)) {
                 sensor.tempAnn = OyaAnn.Factory.fromJSON(sensor.tempAnn);
+            }
+            if (sensor.tempCal && !(sensor.tempCal instanceof Calibration)) {
+                sensor.tempCal = new Calibration(sensor.tempCal);
             }
 
             return sensor;

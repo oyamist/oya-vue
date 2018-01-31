@@ -706,7 +706,7 @@
         should(s.valueForTemp(410, 18)).approximately(100,e);
         should(s.valueForTemp(420, 19)).approximately(100,e);
     });
-    it("calibrations are serializable", function() {
+    it("TESTTESTcalibrations are serializable", function() {
         var seq = [];
         var s = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1,{
             loc: OyaMist.LOC_INTERNAL,
@@ -730,6 +730,7 @@
             tempMax: 18,
             tempMin: 17,
         });
+        should(s.tempCal.isCalibrated).equal(true);
         var json = JSON.parse(JSON.stringify(s));
         var s2 = new Sensor(json);
         var e = 0.1;
@@ -739,6 +740,7 @@
 
         var s3 = new Sensor();
         Sensor.update(s3,json); 
+        s3.tempCal.isCalibrated.should.equal(true);
         should(s3.valueForTemp(400, 17)).approximately(100,e);
         should(s3.valueForTemp(410, 18)).approximately(100,e);
         should(s3.valueForTemp(420, 19)).approximately(100,e);
