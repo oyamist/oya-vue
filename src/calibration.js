@@ -151,7 +151,7 @@
             var network = factory.createNetwork();
             network.train(examples);
             this.ann = network;
-            return network;
+            return null; // TBD
         }
 
         toJSON() {

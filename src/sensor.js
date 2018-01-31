@@ -40,10 +40,6 @@
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
             this.readEC = opts.readEC == null ? typeProps.readEC : opts.readEC;
-            this.tempAnn = opts.tempAnn;
-            if (this.tempAnn && !(this.tempAnn instanceof OyaAnn)) {
-                this.tempAnn = OyaAnn.Factory.fromJSON(this.tempAnn);
-            }
             this.tempCal = new Calibration(opts.tempCal);
             this.type = type;
             this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
@@ -114,7 +110,7 @@
                 startDate: (opts.startDate || new Date()).toISOString(),
             });
             this.tempCal = cal;
-            this.tempAnn = cal.calibrate(seq);
+            cal.calibrate(seq);
             var temps = cal.data.map(s=>s[tempField]);
             var quality = Sensor.tempQuality(temps);
             var result = {
@@ -191,9 +187,6 @@
                 }
             });
 
-            if (sensor.tempAnn && !(sensor.tempAnn instanceof OyaAnn)) {
-                sensor.tempAnn = OyaAnn.Factory.fromJSON(sensor.tempAnn);
-            }
             if (sensor.tempCal && !(sensor.tempCal instanceof Calibration)) {
                 sensor.tempCal = new Calibration(sensor.tempCal);
             }

@@ -138,7 +138,7 @@
                 field: 'tempInternal',
             },
         });
-        var ann = cal.calibrate(seq);
+        cal.calibrate(seq);
 
         // fractional readings should correspond with fractions of nominal value independent of temperature
         // over all measured values
@@ -147,7 +147,7 @@
         seq.forEach(s => {
             [1,1/2,1/4,1/10,1/100].forEach(fraction => {
                 var fractionalReading = s.ecInternal * fraction;
-                var cv = cal.calibratedValue(fractionalReading, s.tempInternal, ann);
+                var cv = cal.calibratedValue(fractionalReading, s.tempInternal);
                 should(cv).approximately(percent * fraction, e);
             });
         });

@@ -861,7 +861,7 @@
                 should(sensor.tempCal.nominal).equal(status.nominal);
                 should(sensor.tempCal.startDate).equal(status.startDate);
                 should.deepEqual(sensor.tempCal.data, status.data);
-                should(sensor.tempAnn).instanceOf(OyaAnn.Network);
+                should(sensor.tempCal.ann).instanceOf(OyaAnn.Network);
 
                 e = 0.2;
                 should(sensor.valueForTemp(400, 17)).approximately(83.3,e);
