@@ -97,4 +97,41 @@
             end: seq.length, // exclusive
         });
     });
+    it("TESTTESTcreateNetwork(seq) creates calibration ANN for given data", function() {
+        // create sample data for diurnal temperature cycle
+        // For testing, we use a linear relationship, but non-linear relationships can
+        // also be handled
+        var seq = [];
+        for (var degree=0; degree<360; degree += 10) {
+            var v = Math.sin(degree*Math.PI/180);
+            var temp = 2*v + 18; // centigrade
+            var ec = 20*v + 400; // microsiemens
+            seq.push({
+                tempInternal: temp,
+                ecInternal: ec,
+            });
+        }
+
+        // create artificial neural network for calibration from sample data
+        // Calibration is based on the longest monotonic subsequence
+        // of sampled temperatures to avoid hysteresis effects which
+        // affect EC probes.
+        var cal = new Calibration({
+            rangeField: 'ecInternal',
+            domainField: 'tempInternal',
+        });
+        var ann = cal.createNetwork(seq);
+
+        // fractional readings should correspond with fractions of nominal value independent of temperature
+        // over all measured values
+        var e = 0.01;
+        var percent = 100; // arbitrary nominal value conversion
+        seq.forEach(s => {
+            [1,1/2,1/4,1/10,1/100].forEach(fraction => {
+                var fractionalReading = s.ecInternal * fraction;
+                var cv = cal.calibratedValue(fractionalReading, s.tempInternal, ann);
+                should(cv).approximately(percent * fraction, e);
+            });
+        });
+    });
 })

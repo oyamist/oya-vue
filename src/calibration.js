@@ -63,6 +63,49 @@
             return { start, end };
         }
 
+        calibratedValue(rangeValue, domainValue, ann=this.ann) {
+            if (typeof ann.activate !== 'function') {
+                winston.warn('DEBUG', typeof ann, ann.constructor.name, ann);
+            }
+            var annValue = ann.activate([domainValue])[0];
+            return rangeValue * (this.nominal/annValue);
+        }
+
+        createNetwork(seq=this.data) {
+            var rangeField = this.rangeField;
+            var domainField = this.domainField;
+            var examples = seq.map(s => {
+                return new OyaAnn.Example([s[domainField]], [s[rangeField]]);
+            });
+            var v = OyaAnn.Variable.variables(examples);
+            var opts = {
+                maxMSE: 1,
+                preTrain: true,
+                trainingReps: 50, // max reps to reach maxMSE
+            };
+            switch (examples.length) {
+                case 0:
+                case 1:
+                case 2:
+                    break;
+                case 3:
+                    opts.power = 2;
+                    break;
+                case 4:
+                    opts.power = 3;
+                    break;
+                case 5:
+                    opts.power = 4;
+                    break;
+                default:
+                    opts.power = 5;
+                    break;
+            }
+            var factory = new OyaAnn.Factory(v, opts);
+            var network = factory.createNetwork();
+            network.train(examples);
+            return network;
+        }
 
         calibrate(seq=[], opts={}) {
         /*
