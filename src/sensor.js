@@ -106,20 +106,7 @@
             }
 
             var tempField = opts.tempField || OyaMist.locationField(this.loc,'temp');
-            var seqAvail = seq.reduce((a,s) => {
-                s.hasOwnProperty(tempField) && s.hasOwnProperty(dataField) && a.push(s);
-                return a;
-            },[]);
-            var mono = Calibration.monotonic(seqAvail,tempField);
-            var monoSeq = seqAvail.slice(mono.start, mono.end);
-            var result = {
-                dataField,
-                data: monoSeq,
-                hours: opts.hours || 24,
-            }
 
-            this.tempData = monoSeq;
-            this.tempStartDate = result.startDate;
             var cal = new Calibration({
                 rangeField: dataField,
                 domainField: tempField,
@@ -127,19 +114,20 @@
                 hours: opts.hours,
                 startDate: (opts.startDate || new Date()).toISOString(),
             });
-            this.tempAnn = cal.calibrate(monoSeq);
+            this.tempAnn = cal.calibrate(seq);
             var temps = cal.data.map(s=>s[tempField]);
             var quality = Sensor.tempQuality(temps);
             var result = {
                 dataField,
                 quality,
-                data: monoSeq,
+                data: cal.data,
                 tempMin: cal.domain.min,
                 tempMax: cal.domain.max,
                 nominal: cal.nominal,
                 startDate: cal.startDate,
                 hours: cal.hours,
             }
+            this.tempData = cal.data;
             this.tempNominal = cal.nominal;
             this.tempStartDate = cal.startDate;
 
