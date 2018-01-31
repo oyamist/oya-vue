@@ -17,8 +17,14 @@
             this.name = opts.name || `Calibration ${this.startDate.toISOString().substr(0,10)}`;
             this.desc = opts.desc || '';
             this.ann = opts.ann || null;
-            this.rangeField = opts.rangeField || 'ecInternal';
-            this.domainField = opts.domainField || 'tempInternal';
+            this.range = opts.range || {};
+            this.range = Object.assign({
+                field: 'ecInternal',
+            }, opts.range);
+            this.domain = opts.domain || {};
+            this.domain = Object.assign({
+                field: 'tempInternal',
+            }, opts.domain);
             this.nominal = opts.nominal || 100;
             this.unit = opts.unit || OyaMist.NUTRIENT_UNIT.PERCENT;
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
@@ -72,10 +78,20 @@
         }
 
         createNetwork(seq=this.data) {
-            var rangeField = this.rangeField;
-            var domainField = this.domainField;
+            var rangeField = this.range.field;
+            var domainField = this.domain.field;
+            this.range.min = null;
+            this.range.max = null;
+            this.domain.min = null;
+            this.domain.max = null;
             var examples = seq.map(s => {
-                return new OyaAnn.Example([s[domainField]], [s[rangeField]]);
+                var sd = s[domainField];
+                var sr = s[rangeField];
+                this.domain.min = this.domain.min == null ? sd : Math.min(this.domain.min,sd);
+                this.domain.max = this.domain.max == null ? sd : Math.max(this.domain.max,sd);
+                this.range.min = this.range.min == null ? sr : Math.min(this.range.min,sr);
+                this.range.max = this.range.max == null ? sr : Math.max(this.range.max,sr);
+                return new OyaAnn.Example([sd], [sr]);
             });
             var v = OyaAnn.Variable.variables(examples);
             var opts = {

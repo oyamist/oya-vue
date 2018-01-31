@@ -21,11 +21,15 @@
             startDate,
             data: [],
             desc: '',
-            domainField: 'tempInternal',
+            domain: {
+                field: 'tempInternal',
+            },
             hours: 24,
             name: `Calibration ${startDate.toISOString().substr(0,10)}`,
             nominal: 100,
-            rangeField: 'ecInternal',
+            range: {
+                field: 'ecInternal',
+            },
             unit: OyaMist.NUTRIENT_UNIT.PERCENT,
 
         });
@@ -42,11 +46,15 @@
             }],
             startDate: "2017-01-02T10:20:30.123Z",
             desc: 'KCl 2930 microSiemens@25C',
-            domainField: "ecAmbient",
+            domain: {
+                field: 'tempAmbient',
+            },
             hours: 12,
             name: "General Hydroponics PPM Reference Solution",
             nominal: 1500,
-            rangeField: "tempAmbient",
+            range: {
+                field: 'ecAmbient',
+            },
             unit: OyaMist.NUTRIENT_UNIT.PPM,
 
         };
@@ -117,8 +125,12 @@
         // of sampled temperatures to avoid hysteresis effects which
         // affect EC probes.
         var cal = new Calibration({
-            rangeField: 'ecInternal',
-            domainField: 'tempInternal',
+            range: {
+                field: 'ecInternal',
+            },
+            domain: {
+                field: 'tempInternal',
+            },
         });
         var ann = cal.createNetwork(seq);
 
@@ -132,6 +144,18 @@
                 var cv = cal.calibratedValue(fractionalReading, s.tempInternal, ann);
                 should(cv).approximately(percent * fraction, e);
             });
+        });
+
+        // min/max values are calculated for range and domain
+        should.deepEqual(cal.range, {
+            field: 'ecInternal',
+            max: 420,
+            min: 380,
+        });
+        should.deepEqual(cal.domain, {
+            field: 'tempInternal',
+            max: 20,
+            min: 16,
         });
     });
 })
