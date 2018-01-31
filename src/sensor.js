@@ -95,45 +95,28 @@
 
         calibrateTemp(seq=[], opts={}) {
             if (this.readEC) {
-                var dataField = OyaMist.locationField(this.loc, 'ec');
+                var rangeField = OyaMist.locationField(this.loc, 'ec');
             } else {
                 throw new Error(`Sensor.calibrateTemp(${this.name}) cannot be calibrated`);
             }
 
-            var tempField = opts.tempField || OyaMist.locationField(this.loc,'temp');
-
-            var cal = new Calibration({
-                rangeField: dataField,
-                domainField: tempField,
+            this.tempCal = new Calibration({
+                rangeField,
+                domainField: OyaMist.locationField(this.loc,'temp'),
                 nominal: opts.nominal,
                 hours: opts.hours,
+                unit: opts.unit,
                 startDate: (opts.startDate || new Date()).toISOString(),
             });
-            this.tempCal = cal;
-            cal.calibrate(seq);
-            var temps = cal.data.map(s=>s[tempField]);
-            var quality = Sensor.tempQuality(temps);
-            var result = {
-                dataField,
-                quality,
-                data: cal.data,
-                tempMin: cal.domain.min,
-                tempMax: cal.domain.max,
-                nominal: cal.nominal,
-                startDate: cal.startDate,
-                hours: cal.hours,
-            }
-
-            return result;
+            this.tempCal.calibrate(seq);
+            return this.tempCal;
         }
 
         valueForTemp(value, temp) {
-            return this.tempCal
-                ? this.tempCal.calibratedValue(value, temp)
-                : value;
+            return this.tempCal ? this.tempCal.calibratedValue(value, temp) : value;
         }
 
-        static tempQuality(temps) {
+        static tempQuality(temps) { // TBD
             var bottom = 0.13;
             if (!(temps instanceof Array) || temps.length === 0) {
                 return 0;

@@ -848,11 +848,10 @@
                     .end((e,r) => e ? async.throw(e) : async.next(r));
                 var e = 0.1;
                 var status = res.body;
-                should(status.dataField).equal('ecInternal');
-                should(status.quality).equal(96);
+                should(status.range.field).equal('ecInternal');
                 should(status.nominal).equal(100);
-                should(status.tempMin).approximately(14.5,e);
-                should(status.tempMax).approximately(18.2,e);
+                should(status.domain.min).approximately(14.5,e);
+                should(status.domain.max).approximately(18.2,e);
                 should(status.hours).equal(24);
                 should(status.data).instanceOf(Array); // actual calibration data
                 should(status.data.length).equal(13);
