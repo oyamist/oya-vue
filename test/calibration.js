@@ -14,7 +14,7 @@
     } = require("../index");
 
     it("TESTTESTdefault calibration is for ec/internal", function() {
-        var startDate = OyaMist.localDate();
+        var startDate = OyaMist.localDate().toISOString();
         var cal = new Calibration();
         should.deepEqual(cal.toJSON(), {
             ann: null,
@@ -25,7 +25,7 @@
                 field: 'tempInternal',
             },
             hours: 24,
-            name: `Calibration ${startDate.toISOString().substr(0,10)}`,
+            name: `Calibration ${startDate.substr(0,10)}`,
             nominal: 100,
             range: {
                 field: 'ecInternal',

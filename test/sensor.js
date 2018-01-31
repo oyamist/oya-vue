@@ -594,39 +594,6 @@
         should(['a','b']+"").equal("a,b");
         should([a,b,c]+"").equal("test,test,test");
     });
-    it("calibrationANN(seq,yKey,xKey) creates calibration ANN for sampled data", function() {
-        // create sample data for diurnal temperature cycle
-        // For testing, we use a linear relationship, but non-linear relationships can
-        // also be handled
-        var seq = [];
-        for (var degree=0; degree<360; degree += 10) {
-            var v = Math.sin(degree*Math.PI/180);
-            var temp = 2*v + 18; // centigrade
-            var ec = 20*v + 400; // microsiemens
-            seq.push({
-                tempInternal: temp,
-                ecInternal: ec,
-            });
-        }
-
-        // create artificial neural network for calibration from sample data
-        // Calibration is based on the longest monotonic subsequence
-        // of sampled temperatures to avoid hysteresis effects which
-        // affect EC probes.
-        var ann = Sensor.calibrationANN(seq, 'ecInternal', 'tempInternal');
-
-        // fractional readings should correspond with fractions of nominal value independent of temperature
-        // over all measured values
-        var e = 0.01;
-        var percent = 100; // arbitrary nominal value conversion
-        seq.forEach(s => {
-            [1,1/2,1/4,1/10,1/100].forEach(fraction => {
-                var fractionalReading = s.ecInternal * fraction;
-                var cv = Sensor.calibratedValue(ann, s.tempInternal, fractionalReading, percent);
-                should(cv).approximately(percent * fraction, e);
-            });
-        });
-    });
     it("calibrate(...) cannot calibrate some sensors", function() {
         var seq = [];
         var s = new Sensor(Sensor.TYPE_DS18B20);
@@ -665,7 +632,7 @@
         // empty data sequence -- no temp comp
         var opts = {
             nominal: 1000,
-            startDate: new Date('2018-01-02T10:20:30Z'),
+            startDate: new Date('2018-01-02T10:20:30.000Z'),
             hours: 22.5,
             tempMin: null,
             tempMax: null,

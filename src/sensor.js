@@ -112,45 +112,36 @@
             },[]);
             var mono = Calibration.monotonic(seqAvail,tempField);
             var monoSeq = seqAvail.slice(mono.start, mono.end);
-            var temps = monoSeq.map(s=>s[tempField]);
-            var quality = Sensor.tempQuality(temps);
-            var tempMin = temps.length ? Math.min.apply(null, temps) : null;
-            var tempMax = temps.length ? Math.max.apply(null, temps) : null;
-            var nominal = opts.nominal || 100;
             var result = {
                 dataField,
-                quality,
-                tempMin,
-                tempMax,
-                nominal,
                 data: monoSeq,
-                startDate: (opts.startDate || new Date()).toISOString(),
                 hours: opts.hours || 24,
             }
 
-            if (monoSeq.length === 0 ) { 
-                // no calibration data => generate temperature independent data
-                monoSeq.push({
-                    [tempField]: 18,
-                    [dataField]: nominal,
-                });
-                monoSeq.push({
-                    [tempField]: 28,
-                    [dataField]: nominal,
-                });
-            } else if (monoSeq.length === 1 ) { 
-                // single data point: generate temperature indepedent data
-                monoSeq.push({
-                    [tempField]: monoSeq[0][tempField] + 10,
-                    [dataField]: monoSeq[0][dataField],
-                });
-            } else { 
-                // calibrate to provided sequence
-            }
             this.tempData = monoSeq;
             this.tempStartDate = result.startDate;
-            this.tempNominal = nominal;
-            this.tempAnn = Sensor.calibrationANN(monoSeq, dataField, tempField);
+            var cal = new Calibration({
+                rangeField: dataField,
+                domainField: tempField,
+                nominal: opts.nominal,
+                hours: opts.hours,
+                startDate: (opts.startDate || new Date()).toISOString(),
+            });
+            this.tempAnn = cal.calibrate(monoSeq);
+            var temps = cal.data.map(s=>s[tempField]);
+            var quality = Sensor.tempQuality(temps);
+            var result = {
+                dataField,
+                quality,
+                data: monoSeq,
+                tempMin: cal.domain.min,
+                tempMax: cal.domain.max,
+                nominal: cal.nominal,
+                startDate: cal.startDate,
+                hours: cal.hours,
+            }
+            this.tempNominal = cal.nominal;
+            this.tempStartDate = cal.startDate;
 
             return result;
         }
@@ -181,42 +172,6 @@
             }
             var annValue = ann.activate([temp])[0];
             return reading * (nominal/annValue);
-        }
-
-        static calibrationANN(seq, dataKey='ecInternal', tempKey='tempInternal') {
-            //var mono = Calibration.monotonic(seq,tempKey);
-            //var examples = seq.slice(mono.start, mono.end).map(s => {
-            var examples = seq.map(s => {
-                return new OyaAnn.Example([s[tempKey]], [s[dataKey]]);
-            });
-            var v = OyaAnn.Variable.variables(examples);
-            var opts = {
-                maxMSE: 1,
-                preTrain: true,
-                trainingReps: 50, // max reps to reach maxMSE
-            };
-            switch (examples.length) {
-                case 0:
-                case 1:
-                case 2:
-                    break;
-                case 3:
-                    opts.power = 2;
-                    break;
-                case 4:
-                    opts.power = 3;
-                    break;
-                case 5:
-                    opts.power = 4;
-                    break;
-                default:
-                    opts.power = 5;
-                    break;
-            }
-            var factory = new OyaAnn.Factory(v, opts);
-            var network = factory.createNetwork();
-            network.train(examples);
-            return network;
         }
 
         static update(sensor=new Sensor(), ...args) {
