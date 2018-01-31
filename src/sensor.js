@@ -40,7 +40,6 @@
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
             this.readEC = opts.readEC == null ? typeProps.readEC : opts.readEC;
-            this.tempData = opts.tempData;
             this.tempAnn = opts.tempAnn;
             if (this.tempAnn && !(this.tempAnn instanceof OyaAnn)) {
                 this.tempAnn = OyaAnn.Factory.fromJSON(this.tempAnn);
@@ -128,7 +127,6 @@
                 startDate: cal.startDate,
                 hours: cal.hours,
             }
-            this.tempData = cal.data;
             this.tempStartDate = cal.startDate;
 
             return result;

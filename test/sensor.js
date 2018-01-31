@@ -551,7 +551,6 @@
             'readTemp',
             'tempAnn',
             'tempCal',
-            'tempData',
             'type',
             'vesselIndex',
         ];
@@ -571,7 +570,6 @@
             'readTemp',
             'tempAnn',
             'tempCal',
-            'tempData',
             'type',
             'vesselIndex',
 
