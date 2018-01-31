@@ -388,7 +388,7 @@
         }();
         async.next();
     });
-    it("TESTTESTcalibrateDry() performs dry calibration", function(done) {
+    it("calibrateDry() performs dry calibration", function(done) {
         var sensor = new Sensor();
         should.throws(()=>{
             sensor.calibrateDry();
@@ -407,7 +407,7 @@
 
         done();
     });
-    it("TESTTESTread() works for Altas Scientific EZO EC", function(done) {
+    it("read() works for Altas Scientific EZO EC", function(done) {
         var async = function*() {
             try {
                 var testData = Buffer.from([0x01,0x31,0x38,0x36,0x32,0x00,0x00]);
@@ -539,6 +539,7 @@
         var serializableKeys = [
             'address',
             'addresses',
+            'cmdCalDry',
             'comm',
             'desc',
             'healthTimeout',
@@ -558,6 +559,7 @@
         should.deepEqual(Object.keys(json).sort(), [
             'address',
             'addresses',
+            'cmdCalDry',
             'comm',
             'desc',
             'healthTimeout',
@@ -574,46 +576,6 @@
             'vesselIndex',
 
         ]);
-    });
-    it("monotonic(seq,key) finds longest monotonic contiguous subsequence", function() {
-        var seq = [];
-        var phase = 135;
-        for (var degree=phase; degree<360+phase; degree += 10) {
-            seq.push({
-                value: Math.sin(degree*Math.PI/180)
-            });
-        }
-        should.deepEqual(Sensor.monotonic(seq,'value'), {
-            start: 13, // inclusive
-            end: 33, // exclusive
-        });
-
-        //
-        seq = [];
-        for (var t=17; t < 25; t++) {
-            seq.push({
-                upvalue: t,
-                downvalue: -t,
-                updown: t < 20 ? t : -t,
-                downup: t < 20 ? -t : t,
-            });
-        }
-        should.deepEqual(Sensor.monotonic(seq,'upvalue'), {
-            start: 0, // inclusive
-            end: seq.length, // exclusive
-        });
-        should.deepEqual(Sensor.monotonic(seq,'downvalue'), {
-            start: 0, // inclusive
-            end: seq.length, // exclusive
-        });
-        should.deepEqual(Sensor.monotonic(seq,'updown'), {
-            start: 2, // inclusive
-            end: seq.length, // exclusive
-        });
-        should.deepEqual(Sensor.monotonic(seq,'downup'), {
-            start: 2, // inclusive
-            end: seq.length, // exclusive
-        });
     });
     it("strings are equal", function() {
         var a = 'test';

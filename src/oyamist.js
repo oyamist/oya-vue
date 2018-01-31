@@ -26,6 +26,21 @@
         static get SENSE_EC_INTERNAL() { return "sense: ec-internal"; }
         static get SENSE_EC_CANOPY() { return "sense: ec-canopy"; }
         static get SENSE_EC_AMBIENT() { return "sense: ec-ambient"; }
+        static get NUTRIENT_UNIT() {
+            return {
+                EC: "microSiemens",
+                PPM: "ppm",
+                PRECENT: "%",
+            }
+        }
+
+        static localDate(date=new Date()) {
+            var d = new Date(date.getTime());
+            d.setHours(0);
+            d.setMinutes(0);
+            d.setSeconds(0,0);
+            return d;
+        }
 
         static fieldOfEvent(event) {
             return {

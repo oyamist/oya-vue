@@ -1,6 +1,7 @@
 (function(exports) {
     const winston = require("winston");
     const OyaMist = require("./oyamist");
+    const Calibration = require("./calibration");
     const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
 
@@ -109,7 +110,7 @@
                 s.hasOwnProperty(tempField) && s.hasOwnProperty(dataField) && a.push(s);
                 return a;
             },[]);
-            var mono = Sensor.monotonic(seqAvail,tempField);
+            var mono = Calibration.monotonic(seqAvail,tempField);
             var monoSeq = seqAvail.slice(mono.start, mono.end);
             var temps = monoSeq.map(s=>s[tempField]);
             var quality = Sensor.tempQuality(temps);
@@ -183,7 +184,7 @@
         }
 
         static calibrationANN(seq, dataKey='ecInternal', tempKey='tempInternal') {
-            //var mono = Sensor.monotonic(seq,tempKey);
+            //var mono = Calibration.monotonic(seq,tempKey);
             //var examples = seq.slice(mono.start, mono.end).map(s => {
             var examples = seq.map(s => {
                 return new OyaAnn.Example([s[tempKey]], [s[dataKey]]);
@@ -216,43 +217,6 @@
             var network = factory.createNetwork();
             network.train(examples);
             return network;
-        }
-
-        static monotonic(list, key) {
-            var start = 0;
-            var end = 0;
-            var descStart = 0;
-            var ascStart = 0;
-            var iprev = 0;
-            for (var i = 0; i < list.length; i++) {
-                if (list[i][key] < list[iprev][key]) { // decreasing
-                    if ((i - ascStart) > (end - start)) {
-                        start = ascStart;
-                        end = i;
-                    }
-                    ascStart = i;
-                    if ((i - descStart) >= (end -start)) {
-                        start = descStart;
-                    }
-                    if (descStart === start) {
-                        end = i+1;
-                    }
-                } else { //  increasing
-                    if ((i - descStart) > (end - start)) {
-                        start = descStart;
-                        end = i;
-                    }
-                    descStart = i;
-                    if ((i - ascStart) >= (end - start)) {
-                        start = ascStart;
-                    }
-                    if (ascStart === start) {
-                        end = i+1;
-                    }
-                }
-                iprev = i;
-            }
-            return { start, end };
         }
 
         static update(sensor=new Sensor(), ...args) {

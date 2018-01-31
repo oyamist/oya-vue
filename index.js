@@ -1,5 +1,6 @@
 module.exports = {
     Actuator: require("./src/actuator"),
+    Calibration: require("./src/calibration"),
     DbFacade: require("./src/db-facade"),
     DbSqlite3: require('./src/db-sqlite3'),
     Light: require("./src/light"),

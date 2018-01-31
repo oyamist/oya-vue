@@ -824,7 +824,7 @@
         }();
         async.next();
     });
-    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
+    it("POST /sensor/calibrate calibrates sensor", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
