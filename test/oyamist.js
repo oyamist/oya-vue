@@ -25,5 +25,9 @@
 
         var date2 = OyaMist.localDate();
         should.deepEqual(date2, date);
+
+        var date3 = OyaMist.localDate(new Date(2017,10,05)); // local
+        var date4 = OyaMist.localDate("2017-11-05"); // local (but Date would parse it as gmt)
+        should.deepEqual(date3, date4);
     });
 })

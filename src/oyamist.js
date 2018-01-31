@@ -35,7 +35,15 @@
         }
 
         static localDate(date=new Date()) {
-            var d = new Date(date.getTime());
+            if (typeof date === 'string') {
+                if (date.indexOf('T') < 0) {
+                    var time = new Date().toISOString().split('T');
+                    date = `${date}T${time[1]}`;
+                }
+                var d = new Date(date);
+            } else {
+                var d = new Date(date.getTime());
+            }
             d.setHours(0);
             d.setMinutes(0);
             d.setSeconds(0,0);
