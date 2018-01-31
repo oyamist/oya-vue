@@ -240,6 +240,7 @@
                             :label="`Trending sensitivity (exponential smoothing rate)`" class="input-group" />
                         </rb-dialog-row>
                         <rb-dialog-row v-for="(sensor,i) in mutableSensors" :key="name+i"
+                            class="pb-5"
                             :label="`Sensor #${i+1}`" >
                             <v-select
                                 v-bind:items="sensorTypes"
@@ -258,6 +259,8 @@
                                 item-value="id"
                                 ></v-select>
                             <div style="display:flex">
+                                <v-checkbox v-if="sensor.readEC != null"
+                                    label="Nutrient strength (EC/PPM/%)" v-model="sensor.readEC" light></v-checkbox>
                                 <v-checkbox v-if="sensor.readTemp != null"
                                     label="Temperature" v-model="sensor.readTemp" light></v-checkbox>
                                 <v-checkbox v-if="sensor.readHumidity != null"
@@ -274,7 +277,7 @@
                             <v-alert type=error v-show='alertCalDryError'>
                                 {{alertCalDryError}}
                             </v-alert>
-                            <v-alert type=success color="darken-4" v-show="alertCalDry">
+                            <v-alert type=success color="green darken-4" v-show="alertCalDry">
                                 {{alertCalDry}}
                             </v-alert>
                         </rb-dialog-row>

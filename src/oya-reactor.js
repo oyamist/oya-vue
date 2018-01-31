@@ -365,7 +365,9 @@
                     } 
                     if (opts.calibrateDry) {
                         sensor.calibrateDry();
-                        resolve(`Performed dry calibration for sensor:${sensor.name}`);
+                        var msg = `Performed dry calibration for sensor:${sensor.name}`;
+                        winston.info(`OyaReactor.postSensorCalibrate() ${msg}`);
+                        resolve(msg);
                         return;
                     }
                     if (field === 'ecInternal') {
