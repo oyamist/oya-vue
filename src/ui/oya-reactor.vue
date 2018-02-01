@@ -284,64 +284,6 @@
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
-            <v-expansion-panel-content>
-                <div slot="header">Charts</div>
-                <v-card>
-                    <v-card-text>
-                        <rb-dialog-row label="Display">
-                            <v-text-field type="number" v-model="apiModelCopy.chart.tempStepSize"
-                                label="Temperature chart step size" class="input-group" />
-                            <v-text-field type="number" v-model="apiModelCopy.chart.humidityStepSize"
-                                label="Humidity chart step size" class="input-group" />
-                            <v-text-field type="number" v-model="apiModelCopy.chart.ecStepSize"
-                                label="Nutrient/EC chart step size" class="input-group" />
-                            <v-checkbox label="Display raw sensor values" 
-                                v-model="apiModelCopy.chart.showRaw" light>
-                            </v-checkbox>
-                        </rb-dialog-row>
-                        <rb-dialog-row label="Nutrients">
-                            <v-select 
-                                v-bind:items="nutrientUnits()"
-                                v-model="apiModelCopy.chart.ecUnits"
-                                label="Units"
-                                ></v-select>
-                            <v-text-field type="number" v-model="apiModelCopy.chart.ecStepSize"
-                                label="Calibration solution value" class="input-group" />
-                            <v-text-field type="text" v-model="calText"
-                                placeholder="Enter solution name"
-                                label="Calibration solution" class="input-group" />
-                            <v-menu lazy :close-on-content-click="false" v-model="ecmenu"
-                                 transition="scale-transition" offset-y  
-                                 :nudge-right="40" max-width="290px" min-width="290px" >
-                                <v-text-field slot="activator" readonly v-model="calDate"
-                                    label="Calibration start date" prepend-icon="event" 
-                                    @blur="calPickerDate = toPickerDate(calDate)"
-                                ></v-text-field>
-                                <v-date-picker v-model="calPickerDate" scrollable actions
-                                    @input="calDate = fromPickerDate($event)">
-                                  <template slot-scope="{ save, cancel }">
-                                    <v-card-actions>
-                                      <v-spacer></v-spacer>
-                                      <v-btn flat color="primary" @click="cancel">Cancel</v-btn>
-                                      <v-btn flat color="primary" @click="save">OK</v-btn>
-                                    </v-card-actions>
-                                  </template>
-                                </v-date-picker>
-                            </v-menu>
-                            <v-btn color="primary" @click="calibrate('ecInternal')">Calibrate</v-btn>
-                            <v-alert type=warning v-show="alertCalWait" color="orange">
-                                {{alertCalWait}}
-                            </v-alert>
-                            <v-alert type=error v-show="alertCalError">
-                                <div v-show="alertCalError"> {{alertCalError}} </div>
-                            </v-alert>
-                            <v-alert type=success v-show="alertCal" color="green darken-3">
-                                <div v-show="alertCal"> {{alertCal}} </div>
-                            </v-alert>
-                        </rb-dialog-row>
-                    </v-card-text>
-                </v-card>
-            </v-expansion-panel-content>
         </v-expansion-panel>
     </rb-api-dialog>
     <v-btn class="amber" v-show="about" @click="mockSensors()">Mock Sensors </v-btn>
@@ -369,13 +311,7 @@ export default {
         },
     },
     data: function() {
-        var calPickerDate = new Date().toISOString().substr(0,10);
-        var calDate = this.fromPickerDate(calPickerDate);
         return {
-            calText: null,
-            alertCalWait: null,
-            alertCal: null,
-            alertCalError: null,
             alertCalDry: null,
             alertCalDryError: null,
             alertRestarting: false,
@@ -383,8 +319,6 @@ export default {
             apiEditDialog: false,
             cycleStartTimeMenu: false,
             cycleToggle: false,
-            calPickerDate,
-            calDate,
             ecmenu: false,
             mcuHatItems: null,
             mockPhase: 0,
@@ -417,35 +351,6 @@ export default {
                 console.error(this.alertCalDryError);
             });
         },
-        calibrate(field) {
-            this.alertCalWait = "Calibration in progress...";
-            var opts = {
-                startDate: this.calPickerDate,
-                unit: '%',
-                name: this.calText,
-            };
-            console.log('calibrate', opts);
-            var url = [this.restOrigin(), this.service, 'sensor', 'calibrate'].join('/');
-            this.$http.post(url, opts).then(r => {
-                this.alertCalWait = null;
-                this.alertCal = r.data;
-            }).catch(e => {
-                this.alertCalWait = null;
-                this.alertCalError = e;
-            });
-        },
-        fromPickerDate (date = new Date().toISOString().substr(0,10)) {
-            const [year, month, day] = date.split('-')
-            return `${month}/${day}/${year}`
-        },
-        toPickerDate (date) {
-            if (!date) {
-                return null;
-            }
-
-            const [month, day, year] = date.split('/');
-            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        },
         alertRestart() {
             var s1 = "";
             s1 += this.apiModel.mcuHat;
@@ -454,18 +359,6 @@ export default {
             s2 += this.apiModel.mcuHat;
             s2 = this.apiModelCopy.switches.reduce((acc,a)=>acc+a.pin,s2);  
             return s1 !== s2;
-        },
-        nutrientUnits() {
-            return [{
-                text: "% of calibration solution",
-                value: "%",
-            },{
-                text: "parts/million (ppm)",
-                value: "ppm",
-            },{
-                text: "conductivity (microsiemens)",
-                value: "\u00b5S",
-            }];
         },
         sensorAddresses(sensor) {
             var st =  this.sensorTypes.filter( st => st.type === sensor.type)[0];

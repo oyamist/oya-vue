@@ -561,6 +561,7 @@
                 };
                 newConf.name = 'OyaMist01';
                 newConf.vessels[0].coolThreshold = 81;
+                newConf.vessels[0].name = 'UnitTest #1';
                 newConf.vessels[0].cycles[OyaMist.CYCLE_STANDARD].on = 3;
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
@@ -572,7 +573,7 @@
                     should.deepEqual(apiModel, Object.assign({},newConf,{
                         rbHash: rbh.hash(newConf),
                     }));
-                    should(testReactor().vessels[0].name).equal('vessel1');
+                    should(testReactor().vessels[0].name).equal('UnitTest #1');
                     should(testReactor().vessels[0].cycles[OyaMist.CYCLE_STANDARD].on).equal(3);
                     should(testReactor().vessels[0].coolThreshold).equal(81);
                     should.ok(apiModel);
