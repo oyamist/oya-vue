@@ -307,15 +307,18 @@
                                 ></v-select>
                             <v-text-field type="number" v-model="apiModelCopy.chart.ecStepSize"
                                 label="Calibration solution value" class="input-group" />
+                            <v-text-field type="text" v-model="calText"
+                                placeholder="Enter solution name"
+                                label="Calibration solution" class="input-group" />
                             <v-menu lazy :close-on-content-click="false" v-model="ecmenu"
                                  transition="scale-transition" offset-y  
                                  :nudge-right="40" max-width="290px" min-width="290px" >
-                                <v-text-field slot="activator" readonly v-model="dateFormatted"
-                                    label="Calbration start date" prepend-icon="event" 
-                                    @blur="date = parseDate(dateFormatted)"
+                                <v-text-field slot="activator" readonly v-model="calDate"
+                                    label="Calibration start date" prepend-icon="event" 
+                                    @blur="calPickerDate = toPickerDate(calDate)"
                                 ></v-text-field>
-                                <v-date-picker v-model="date" scrollable actions
-                                    @input="dateFormatted = formatDate($event)">
+                                <v-date-picker v-model="calPickerDate" scrollable actions
+                                    @input="calDate = fromPickerDate($event)">
                                   <template slot-scope="{ save, cancel }">
                                     <v-card-actions>
                                       <v-spacer></v-spacer>
@@ -325,8 +328,16 @@
                                   </template>
                                 </v-date-picker>
                             </v-menu>
-                            <!--
-                            -->
+                            <v-btn color="primary" @click="calibrate('ecInternal')">Calibrate</v-btn>
+                            <v-alert type=warning v-show="alertCalWait" color="orange">
+                                {{alertCalWait}}
+                            </v-alert>
+                            <v-alert type=error v-show="alertCalError">
+                                <div v-show="alertCalError"> {{alertCalError}} </div>
+                            </v-alert>
+                            <v-alert type=success v-show="alertCal" color="green darken-3">
+                                <div v-show="alertCal"> {{alertCal}} </div>
+                            </v-alert>
                         </rb-dialog-row>
                     </v-card-text>
                 </v-card>
@@ -358,9 +369,13 @@ export default {
         },
     },
     data: function() {
-        var date = new Date().toISOString().substr(0,10);
-        var dateFormatted = this.formatDate(date);
+        var calPickerDate = new Date().toISOString().substr(0,10);
+        var calDate = this.fromPickerDate(calPickerDate);
         return {
+            calText: null,
+            alertCalWait: null,
+            alertCal: null,
+            alertCalError: null,
             alertCalDry: null,
             alertCalDryError: null,
             alertRestarting: false,
@@ -368,8 +383,8 @@ export default {
             apiEditDialog: false,
             cycleStartTimeMenu: false,
             cycleToggle: false,
-            date,
-            dateFormatted,
+            calPickerDate,
+            calDate,
             ecmenu: false,
             mcuHatItems: null,
             mockPhase: 0,
@@ -402,13 +417,28 @@ export default {
                 console.error(this.alertCalDryError);
             });
         },
-        formatDate (date = new Date().toISOString().substr(0,10)) {
-            const [year, month, day] = date.split('-')
-            var result = `${month}/${day}/${year}`
-            this.rbService && Vue.set(this.rbService, 'reportDate', date);
-            return result;
+        calibrate(field) {
+            this.alertCalWait = "Calibration in progress...";
+            var opts = {
+                startDate: this.calPickerDate,
+                unit: '%',
+                name: this.calText,
+            };
+            console.log('calibrate', opts);
+            var url = [this.restOrigin(), this.service, 'sensor', 'calibrate'].join('/');
+            this.$http.post(url, opts).then(r => {
+                this.alertCalWait = null;
+                this.alertCal = r.data;
+            }).catch(e => {
+                this.alertCalWait = null;
+                this.alertCalError = e;
+            });
         },
-        parseDate (date) {
+        fromPickerDate (date = new Date().toISOString().substr(0,10)) {
+            const [year, month, day] = date.split('-')
+            return `${month}/${day}/${year}`
+        },
+        toPickerDate (date) {
             if (!date) {
                 return null;
             }

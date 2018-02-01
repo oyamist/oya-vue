@@ -106,6 +106,7 @@
                 nominal: opts.nominal,
                 hours: opts.hours,
                 unit: opts.unit,
+                name: opts.name,
                 startDate: (opts.startDate || new Date()).toISOString(),
             });
             this.tempCal.calibrate(seq);
