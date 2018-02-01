@@ -13,7 +13,7 @@
         Calibration,
     } = require("../index");
 
-    it("TESTTESTdefault calibration is for ec/internal", function() {
+    it("default calibration is for ec/internal", function() {
         var startDate = OyaMist.localDate().toISOString();
         var cal = new Calibration();
         should.deepEqual(cal.toJSON(), {
@@ -23,18 +23,22 @@
             desc: '',
             domain: {
                 field: 'tempInternal',
+                max: null,
+                min: null,
             },
             hours: 24,
             name: `Calibration ${startDate.substr(0,10)}`,
             nominal: 100,
             range: {
                 field: 'ecInternal',
+                max: null,
+                min: null,
             },
             unit: OyaMist.NUTRIENT_UNIT.PERCENT,
 
         });
     });
-    it("TESTTESTcalibrations can be serialized", function() {
+    it("calibrations can be serialized", function() {
         var data = [{
             ecAmbient: 1500,
             tempAmbient: 25,
@@ -65,13 +69,17 @@
             ann: null,
             domain: {
                 field: 'tempAmbient',
+                max: 26,
+                min: 25,
             },
             range: {
                 field: 'ecAmbient',
+                max: 1510,
+                min: 1500,
             },
         });
     });
-    it("TESTTESTmonotonic(seq,key) finds longest monotonic contiguous subsequence", function() {
+    it("monotonic(seq,key) finds longest monotonic contiguous subsequence", function() {
         var seq = [];
         var phase = 135;
         for (var degree=phase; degree<360+phase; degree += 10) {
@@ -111,7 +119,7 @@
             end: seq.length, // exclusive
         });
     });
-    it("TESTTESTcalibrate(seq) creates calibration ANN for given data", function() {
+    it("calibrate(seq) creates calibration ANN for given data", function() {
         // create sample data for diurnal temperature cycle
         // For testing, we use a linear relationship, but non-linear relationships can
         // also be handled
@@ -164,7 +172,45 @@
             min: 16,
         });
     });
-    it("TESTTESTcalibrations are serialized", function() {
+    it("TESTTESTcalibrate(seq) can calibrate real data", function() {
+        var fname = path.join(__dirname, '2018-01-31EC.json');
+        var seq = JSON.parse(fs.readFileSync(fname));
+        var cal = new Calibration({
+            rangeField: 'ecInternal',
+            domainField: 'tempInternal',
+            data: seq,
+        });
+        var maxMSE = cal.range.max * 0.0065;
+        cal.calibrate(seq);
+        should(cal.mse).below(maxMSE);
+
+        return;
+
+        // fractional readings should correspond with fractions of nominal value independent of temperature
+        // over all measured values
+        var e = 0.01;
+        var percent = 100; // arbitrary nominal value conversion
+        seq.forEach(s => {
+            [1,1/2,1/4,1/10,1/100].forEach(fraction => {
+                var fractionalReading = s.ecInternal * fraction;
+                var cv = cal.calibratedValue(fractionalReading, s.tempInternal);
+                should(cv).approximately(percent * fraction, e);
+            });
+        });
+
+        // min/max values are calculated for range and domain
+        should.deepEqual(cal.range, {
+            field: 'ecInternal',
+            max: 420,
+            min: 380,
+        });
+        should.deepEqual(cal.domain, {
+            field: 'tempInternal',
+            max: 20,
+            min: 16,
+        });
+    });
+    it("calibrations are serialized", function() {
         var cal = new Calibration({
             rangeField: 'ecInternal',
             domainField: 'tempInternal',
@@ -188,7 +234,7 @@
         should(cal2.calibratedValue(1500, 25)).equal(100);
         should(cal2.calibratedValue(1500, 26)).approximately(99.3,e);
     });
-    it("TESTTESTcalibrate([]) clears the calibration", function() {
+    it("calibrate([]) clears the calibration", function() {
         var cal = new Calibration({
             rangeField: 'ecInternal',
             domainField: 'tempInternal',

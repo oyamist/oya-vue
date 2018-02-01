@@ -12,6 +12,7 @@
 
     class Calibration {
         constructor(opts={}) {
+            // add serializable properties
             var startDate  = opts.startDate || OyaMist.localDate();
             if (typeof startDate === 'string') {
                 startDate = new Date(startDate);
@@ -25,17 +26,18 @@
             if (this.ann && !(this.ann instanceof Network)) {
                 this.ann = Factory.fromJSON(this.ann);
             }
-            this.range = Object.assign({
-                field: opts.rangeField || 'ecInternal',
-            }, opts.range);
-            this.domain = Object.assign({
-                field: opts.domainField || 'tempInternal',
-            }, opts.domain);
+            this.range = opts.range || {};
+            this.domain = opts.domain || {};
+            this.range.field = opts.rangeField || this.range.field;
+            this.domain.field = opts.domainField || this.domain.field;
+            var rangeDomain = this.rangeDomain(this.data, this.range.field, this.domain.field);
+            Object.assign(this, rangeDomain);
+
             this.nominal = opts.nominal || 100;
             this.unit = opts.unit || OyaMist.NUTRIENT_UNIT.PERCENT;
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
 
-            // non-serializable
+            // add non-serializable properties
         }
 
         static monotonic(list, key) {
@@ -87,13 +89,32 @@
             return rangeValue * (this.nominal/annValue);
         }
 
-        calibrate(rawData=this.data) {
+        rangeDomain(seq=[], rangeField='ecInternal', domainField='tempInternal') {
+            var range = {
+                field: rangeField,
+                max: null,
+                min: null,
+            };
+            var domain = {
+                field: domainField,
+                max: null,
+                min: null,
+            };
+            var rangeDomain = { range, domain, };
+            seq.forEach(s => {
+                var sd = s[domainField];
+                var sr = s[rangeField];
+                domain.min = domain.min == null ? sd : Math.min(domain.min,sd);
+                domain.max = domain.max == null ? sd : Math.max(domain.max,sd);
+                range.min = range.min == null ? sr : Math.min(range.min,sr);
+                range.max = range.max == null ? sr : Math.max(range.max,sr);
+            });
+            return rangeDomain;
+        }
+
+        calibrate(rawData=this.data, opts={}) {
             if (rawData == null || rawData.length == 0) {
                 this.data = [];
-                this.range.min = null;
-                this.range.max = null;
-                this.domain.min = null;
-                this.domain.max = null;
                 return (this.ann = null);
             }
             var usableData = rawData.reduce((a,s) => {
@@ -107,50 +128,57 @@
             this.data = monoSeq;
             var rangeField = this.range.field;
             var domainField = this.domain.field;
-            this.range.min = null;
-            this.range.max = null;
-            this.domain.min = null;
-            this.domain.max = null;
+            Object.assign(this, this.rangeDomain(this.data, rangeField, domainField));
             var examples = this.data.map(s => {
-                var sd = s[domainField];
-                var sr = s[rangeField];
-                this.domain.min = this.domain.min == null ? sd : Math.min(this.domain.min,sd);
-                this.domain.max = this.domain.max == null ? sd : Math.max(this.domain.max,sd);
-                this.range.min = this.range.min == null ? sr : Math.min(this.range.min,sr);
-                this.range.max = this.range.max == null ? sr : Math.max(this.range.max,sr);
-                return new Example([sd], [sr]);
+                return new Example([s[domainField]], [s[rangeField]]);
             });
             if (examples.length === 1) {
                 examples.push(new Example([examples[0].input[0]*2], examples[0].target));
             }
             var v = Variable.variables(examples);
-            var opts = {
-                maxMSE: 1,
-                preTrain: true,
-                trainingReps: 50, // max reps to reach maxMSE
-            };
             switch (examples.length) {
                 case 0:
                 case 1:
                 case 2:
+                    var power = 1;
                     break;
                 case 3:
-                    opts.power = 2;
+                    var power = 2;
                     break;
                 case 4:
-                    opts.power = 3;
+                    var power = 3;
                     break;
                 case 5:
-                    opts.power = 4;
+                    var power = 4;
                     break;
                 default:
-                    opts.power = 5;
+                    var power = 5;
                     break;
             }
-            var factory = new Factory(v, opts);
-            var network = factory.createNetwork();
-            network.train(examples);
-            this.ann = network;
+            var maxMSE = opts.maxMSE || this.range.max * 0.0065;
+            var annopts = Object.assign({
+                maxMSE,
+                preTrain: true,
+                trainingReps: 10, // max reps to reach maxMSE
+            }, opts);
+            this.ann = null;
+            this.mse = null;
+            for (var i= 0; i< 3; i++) { // keep looking if not good enough
+                do { // pick best polynomial model
+                    annopts.power = power--;
+                    var factory = new Factory(v, annopts);
+                    var network = factory.createNetwork();
+                    network.train(examples);
+                    var mse = network.mse(examples);
+                    if (this.ann == null || mse < this.mse) {
+                        this.ann = network;
+                        this.mse = mse;
+                    }
+                } while (power > 0 && this.mse > maxMSE);
+                if (this.mse <= maxMSE) {
+                    break;
+                }
+            }
             return null; // TBD
         }
 

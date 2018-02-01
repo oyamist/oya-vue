@@ -863,7 +863,7 @@
                 should.deepEqual(sensor.tempCal.data, status.data);
                 should(sensor.tempCal.ann).instanceOf(OyaAnn.Network);
 
-                e = 0.2;
+                e = 1;
                 should(sensor.valueForTemp(400, 17)).approximately(83.3,e);
                 should(sensor.valueForTemp(400, 18)).approximately(81.4,e);
                 should(sensor.valueForTemp(400, 19)).approximately(80.3,e);
