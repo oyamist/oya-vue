@@ -177,7 +177,11 @@ export default {
         },
         clickSettings() {
             this.rbDispatch("apiLoad").then(r => {
-                this.apiEdit();
+                this.apiEdit({
+                    onSave: () => {
+                        window.location.reload();
+                    },
+                });
             });
         },
         stepSize(prefix) {
