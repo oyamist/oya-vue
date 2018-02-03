@@ -93,9 +93,6 @@
                         <v-alert type=error v-show="alertCalError">
                             <div v-show="alertCalError"> {{alertCalError}} </div>
                         </v-alert>
-                        <v-alert type=success v-show="alertCal" color="green darken-3">
-                            <div v-show="alertCal"> {{alertCal}} </div>
-                        </v-alert>
                     </rb-dialog-row>
                 </v-card-text>
             </v-card>
@@ -121,7 +118,6 @@ export default {
         return {
             calText: null,
             alertCalWait: null,
-            alertCal: null,
             alertCalError: null,
             calDate,
             calPickerDate,
@@ -145,10 +141,15 @@ export default {
             var url = [this.restOrigin(), this.service, 'sensor', 'calibrate'].join('/');
             this.$http.post(url, opts).then(r => {
                 this.alertCalWait = null;
-                this.alertCal = r.data;
+                var cal = r.data;
+                var msg = `${cal.name} completed. Nominal:${cal.nominal}`; 
+                console.log(msg);
+                this.alertSuccess(msg);
+                this.apiCancel();
             }).catch(e => {
                 this.alertCalWait = null;
                 this.alertCalError = e;
+                this.alertError(e.message);
             });
         },
         fromPickerDate (date = new Date().toISOString().substr(0,10)) {
