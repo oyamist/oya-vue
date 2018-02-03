@@ -111,9 +111,10 @@ export default {
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),
     ],
     data: function() {
-        var calPickerDate = new Date().toISOString().substr(0,10);
+        var now = new Date();
+        var calPickerDate = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
         var calDate = this.fromPickerDate(calPickerDate);
-        var date = new Date().toISOString().substr(0,10);
+        var date = calPickerDate;
         var dateFormatted = this.formatDate(date);
         return {
             calText: null,
@@ -142,7 +143,7 @@ export default {
             this.$http.post(url, opts).then(r => {
                 this.alertCalWait = null;
                 var cal = r.data;
-                var msg = `${cal.name} completed. Nominal:${cal.nominal}`; 
+                var msg = `Calibration complete: ${cal.name} value:${cal.nominal} ${cal.unit}`; 
                 console.log(msg);
                 this.alertSuccess(msg);
                 this.apiCancel();
@@ -208,7 +209,9 @@ export default {
         },
     },
     mounted() {
-        var reportDate = new Date().toISOString().substr(0,10);
+        var now = new Date();
+        var reportDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        console.log('now', now, now.getDate());
         Vue.set(this.rbService, 'reportDate', reportDate);
     },
 }

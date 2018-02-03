@@ -12,7 +12,7 @@
         should(OyaMist.locationField(OyaMist.LOC_AMBIENT,'abc')).equal('abcAmbient');
         should(OyaMist.locationField(OyaMist.LOC_CANOPY,'abc')).equal('abcCanopy');
     });
-    it("TESTTESTlocalDate(date) returns 00:00 of local date", function() {
+    it("localDate(date) returns 00:00 of local date", function() {
         var now = new Date();
         var date = OyaMist.localDate(now);
         should(date.getHours()).equal(0);
@@ -28,6 +28,6 @@
 
         var date3 = OyaMist.localDate(new Date(2017,10,05)); // local
         var date4 = OyaMist.localDate("2017-11-05"); // local (but Date would parse it as gmt)
-        should.deepEqual(date3, date4);
+        should.deepEqual(date4, date3);
     });
 })

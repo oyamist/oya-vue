@@ -37,8 +37,8 @@
         static localDate(date=new Date()) {
             if (typeof date === 'string') {
                 if (date.indexOf('T') < 0) {
-                    var time = new Date().toISOString().split('T');
-                    date = `${date}T${time[1]}`;
+                    var d = date.split("-");
+                    date = new Date(Number(d[0]), Number(d[1])-1, Number(d[2]));
                 }
                 var d = new Date(date);
             } else {

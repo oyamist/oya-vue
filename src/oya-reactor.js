@@ -374,6 +374,7 @@
                         resolve(msg);
                         return;
                     }
+
                     if (field === 'ecInternal') {
                         winston.info(`OyaReactor.postSensorCalibrate() ${startDate}`);
                         dbf.sensorAvgByHour([field,'tempInternal'], startDate, hours).then(r => {
@@ -381,6 +382,7 @@
                                 nominal: opts.nominal,
                                 startDate,
                                 name: opts.name,
+                                unit: opts.unit,
                             });
 
                             this.saveApiModel(this.oyaConf, this.apiFile).then(r => {
