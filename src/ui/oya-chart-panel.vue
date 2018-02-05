@@ -58,14 +58,12 @@
             <v-card class="pl-3 pr-3">
                 <v-card-title class="title">Calibrate nutrient sensor {{ecSensor.name}}</v-card-title>
                 <v-card-text>
-                    Nutrient recipe affects conductivity measurement.
+                    <div>Nutrient recipe affects conductivity measurement.</div>
                     <v-text-field type="text" v-model="calText"
                         placeholder='Enter description (e.g., "GH Flora Grow/Micro/Bloom 2:2:2")'
-                        class="input-group" />
-                </v-card-text>
-                <v-card-text>
-                    Choose date with large temperature variations for training nutrient sensor AI.
-                    <v-menu lazy :close-on-content-click="false" v-model="ecmenu"
+                        class="input-group pl-3" />
+                    <div>Choose date with large temperature variations for training nutrient sensor AI.</div>
+                    <v-menu lazy :close-on-content-click="false" v-model="ecmenu" class="pl-3"
                          transition="scale-transition" 
                          :nudge-right="40" max-width="290px" min-width="290px" >
                         <v-text-field slot="activator" readonly v-model="calDate"
@@ -82,18 +80,12 @@
                           </template>
                         </v-date-picker>
                     </v-menu>
-                </v-card-text>
-                <v-card-text>
-                    Choose measurement unit.
-                    <v-select 
-                        v-bind:items="nutrientUnits()"
-                        v-model="ecUnit"
-                    ></v-select>
+                    <div>Choose measurement unit.</div>
+                    <v-select class="pl-3" v-bind:items="nutrientUnits()" 
+                        v-model="ecUnit"></v-select>
                     <div v-if="ecUnit!=='%'">
-                        <p> Enter nominal measurement value to display for calibration solution
-                        </p>
-                        <v-text-field type="number" v-model="ecNominal"
-                            label='Nominal calibration value' class="input-group" />
+                        Enter nominal measurement value to display for calibration solution
+                        <v-text-field type="number" v-model="ecNominal" class="input-group pl-3" />
                     </div>
                 </v-card-text>
                 <v-alert type=error v-show="alertCalError">
@@ -209,7 +201,7 @@ export default {
             this.alertCalWait = "Calibrating...";
             var opts = {
                 startDate: this.calPickerDate,
-                nominal: this.ecNominal,
+                nominal: this.ecUnit === '%' ? 100 : this.ecNominal,
                 unit: this.ecUnit,
                 name: this.calText || "(unknown solution)",
             };
@@ -288,9 +280,15 @@ export default {
         var reportDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         console.log('now', now, now.getDate());
         Vue.set(this.rbService, 'reportDate', reportDate);
-        this.onApiModelLoaded(apiModel => {
-            console.log('ecSensor', ecSensor);
+        this.onApiModelLoaded('oya-conf').then(apiModel => {
+            console.log('ecSensor', this.ecSensor);
             this.calText = this.ecSensor.tempCal.name;
+            this.ecNominal = this.ecSensor.tempCal.nominal;
+            this.ecUnit = this.ecSensor.tempCal.unit;
+            this.calPickerDate = this.ecSensor.tempCal.startDate.split("T")[0];
+            this.calDate = this.fromPickerDate(this.calPickerDate);
+        }).catch(e => {
+            console.error(e);
         });
     },
 }
