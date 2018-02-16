@@ -11,10 +11,11 @@
     </rb-about>
 
     <div class="pt-4 pb-4 oya-dashboard">
-        <div class="oya-plant " :style="plantStyle">
+        <div v-if="!camera" class="oya-plant " :style="plantStyle">
             <img v-show="rbService.active" src="/assets/mist-off.svg" height=200px/>
             <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
         </div>
+        <vmc-camera v-if="camera" service="vmc"></vmc-camera>
         <div class="oya-dashboard-controls">
             <div class="title text-xs-center">
                 {{name}}
@@ -72,6 +73,16 @@ export default {
         },
     },
     computed: {
+        camera() {
+            var rb = this.$store.state.restBundle;
+            var service = rb && rb[this.service];
+            var oyaConf = service && service['oya-conf'];
+            var apiModel = oyaConf && oyaConf.apiModel;
+            if (!apiModel) {
+                return false;
+            }
+            return apiModel.camera;
+        },
         plantStyle() {
             var bgDark = `linear-gradient(to bottom, #ccc, #d4d4d4 40%, transparent 70%)`;
             var bgLight = `linear-gradient(to bottom, white, white 30%, transparent 70%)`;

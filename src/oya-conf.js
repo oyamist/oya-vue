@@ -137,6 +137,8 @@
             this.chart.tempStepSize = this.chart.tempStepSize || 2;
             this.chart.humidityStepSize = this.chart.humidityStepSize || 5;
             this.chart.showRaw = this.chart.showRaw == null ? false : opts.chart.showRaw;
+            this.camera = opts.camera || false;
+            this.heapReboot = opts.heapReboot || 50*1000*1000;
 
             return this;
         }
@@ -159,6 +161,8 @@
                 hostTimeout: this.hostTimeout,
                 healthPoll: this.healthPoll,
                 chart: this.chart,
+                camera: this.camera,
+                heapReboot: this.heapReboot,
             };
         }
 

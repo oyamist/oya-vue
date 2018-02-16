@@ -115,6 +115,10 @@
                             label="MCU hardware extension hats"
                             class="input-group"
                             ></v-select>
+                        <v-checkbox label="Camera" v-model="apiModelCopy.camera" light></v-checkbox>
+                        <v-text-field v-model='apiModelCopy.heapReboot' 
+                            type="number"
+                            :label="`Reboot heap threshold`" class="input-group" />
                         <v-text-field v-model='coolThreshold' 
                             type="number"
                             :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group" />

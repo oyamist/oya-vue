@@ -12,7 +12,11 @@
     const OyaVessel = require("./oya-vessel");
     const OyaNet = require('./oya-net');
     const path = require("path");
-    const rb = require("rest-bundle");
+    const {
+        RestBundle,
+        RbHash,
+        RbSingleton,
+    } = require("rest-bundle");
     const DiffUpsert = require('diff-upsert').DiffUpsert;
     const exec = require('child_process').exec;
     const memwatch = require('memwatch-next');
@@ -25,7 +29,7 @@
         ecInternal: OyaMist.SENSE_EC_INTERNAL,
     };
 
-    class OyaReactor extends rb.RestBundle {
+    class OyaReactor extends RestBundle {
         constructor(name = "test", opts = {}) {
             super(name, Object.assign({
                 srcPkg,
@@ -53,6 +57,12 @@
             });
             this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
+            RbSingleton.emitter.on("heapMax", heapStat => {
+                if (heapStat.total_heap_size > this.oyaConf.heapReboot) {
+                    winston.warn(`Memory heap exceeds heapReboot threshold. Restarting server...`);
+                    this.restart();
+                }
+            });
             this.lights = {
                 white: {
                     active: false,
@@ -147,7 +157,7 @@
         }
 
         onApiModelLoaded(apiModel) {
-            var rbHash = apiModel && new rb.RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+            var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
             // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
             // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
@@ -431,8 +441,13 @@
         }
 
         postAppRestart(req, res, next) {
+            winston.info('OyaReactor.postAppRestart() restart server');
+            this.restart();
+        }
+
+        restart() {
+            winston.info('OyaReactor.restart() *** RESTARTING SERVER ***');
             return new Promise((resolve,reject) => {
-                winston.info('OyaReactor.postAppRestart() restart server');
                 try {
                     var script = exec(`shutdown -r now`, (error, stdout, stderr) => {
                         winston.info(`${stdout}`);

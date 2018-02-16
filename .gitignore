@@ -1,5 +1,6 @@
 # OyaMist
 dist
+.motion
 api-model/
 oyamist*.db
 unit-test*.db

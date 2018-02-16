@@ -13,10 +13,12 @@
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
         name: 'test',
+        camera: false,
         type: 'OyaConf',
         tempUnit: 'F',
         hostTimeout: 200,
         healthPoll: 60,
+        heapReboot: 50*1000*1000,
         mcuHat: 'mcu-hat:none',
         vessels: [
             OyaConf.createVesselConfig(0,{
@@ -171,6 +173,7 @@
             tempUnit: 'C',
             hostTimeout: 200,
             healthPoll: 60,
+            heapReboot: 50*1000*1000,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 updatedVessel,
@@ -184,6 +187,7 @@
                 defaultConf.sensors[2],
             ],
             chart: defaultConf.chart,
+            camera: defaultConf.camera,
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
@@ -326,6 +330,7 @@
             tempUnit: 'C',
             hostTimeout: 200,
             healthPoll: 60,
+            heapReboot: 50*1000*1000,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 OyaConf.createVesselConfig(0, {
@@ -338,6 +343,8 @@
             sensors: defaultConf.sensors,
             switches: defaultConf.switches,
             chart: defaultConf.chart,
+            camera: defaultConf.camera,
+
         });
 
     });

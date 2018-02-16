@@ -6,6 +6,7 @@ const compression = require("compression");
 const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
+const { VmcBundle } = require("vue-motion-cam");
 const OyaReactor = require("../index").OyaReactor;
 const DbSqlite3 = require('../index').DbSqlite3;
 const DbFacade = require('../index').DbFacade;
@@ -55,6 +56,8 @@ let async = function*() {
             });
             restBundles.push(oya);
         }
+        var vmc = new VmcBundle("vmc");
+        restBundles.push(vmc);
 
         // declare ports
         var isTesting = module.parent != null && false;

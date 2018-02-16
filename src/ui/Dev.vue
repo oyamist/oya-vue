@@ -72,7 +72,7 @@
         <rb-web-socket/>
     </v-toolbar>
     <v-content class="oya-content">
-        <oya-plant service="test"></oya-plant>
+        <oya-plant :service="service"></oya-plant>
         <v-container fluid style="padding-right:1em">
             <router-view> </router-view>
         </v-container>
@@ -89,6 +89,11 @@ import appvue from "../../index-vue";
 
 export default {
     name: 'dev',
+    props: {
+        service: {
+            default: "test",
+        },
+    },
     data() {
         return {
             package: require("../../package.json"),
@@ -109,6 +114,8 @@ export default {
                 : location.host;
             return "http://" + host + path;
         },
+    },
+    computed: {
     },
     components: {
         Home,
