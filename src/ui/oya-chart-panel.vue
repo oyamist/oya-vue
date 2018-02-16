@@ -282,10 +282,12 @@ export default {
         Vue.set(this.rbService, 'reportDate', reportDate);
         this.onApiModelLoaded('oya-conf').then(apiModel => {
             console.log('ecSensor', this.ecSensor);
-            this.calText = this.ecSensor.tempCal.name;
-            this.ecNominal = this.ecSensor.tempCal.nominal;
-            this.ecUnit = this.ecSensor.tempCal.unit;
-            this.calPickerDate = this.ecSensor.tempCal.startDate.split("T")[0];
+            if (this.ecSensor) {
+                this.calText = this.ecSensor.tempCal.name;
+                this.ecNominal = this.ecSensor.tempCal.nominal;
+                this.ecUnit = this.ecSensor.tempCal.unit;
+                this.calPickerDate = this.ecSensor.tempCal.startDate.split("T")[0];
+            }
             this.calDate = this.fromPickerDate(this.calPickerDate);
         }).catch(e => {
             console.error(e);
