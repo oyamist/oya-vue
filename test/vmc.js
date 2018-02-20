@@ -16,7 +16,7 @@
     const winston = require('winston');
     const path = require('path');
 
-    it("TESTTESTGET /identity returns VMC identity", function(done) {
+    it("GET /identity returns VMC identity", function(done) {
         var async = function* () {
             try {
                 var response = yield supertest(app).get("/vmc/identity").expect((res) => {

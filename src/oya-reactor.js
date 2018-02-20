@@ -58,8 +58,9 @@
             this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
             RbSingleton.emitter.on("heapMax", heapStat => {
-                if (heapStat.total_heap_size > this.oyaConf.heapReboot) {
-                    winston.warn(`Memory heap exceeds heapReboot threshold. Restarting server...`);
+                var heapReboot = this.oyaConf.heapReboot;
+                if (heapStat.total_heap_size > heapReboot) {
+                    winston.warn(`Memory heap exceeds heapReboot threshold (${heapReboot}. Restarting server...`);
                     this.restart();
                 }
             });
@@ -262,34 +263,26 @@
                     var evt = OyaMist.eventOfField(field);
                     var dbf = this.vessel.dbfacade;
                     if (evt) {
-                        if (1) {
-                            var sensor = this.oyaConf.sensorOfField(field);
-                            var hours = days * 24;
-                            var startDate = new Date(endDate.getTime() - hours*3600*1000);
-                            var tempField = sensor && OyaMist.locationField(sensor.loc, 'temp');
-                            var fields = tempField ? [field,tempField] : [field];
-                            dbf.sensorAvgByHour(fields, startDate, hours).then(r => {
-                                r.data.map(d => {
-                                    var temp = d[tempField];
-                                    if (temp == null || this.oyaConf.chart.showRaw) {
-                                        d.vavg = d[field];
-                                    } else {
-                                        d.vavg = sensor.valueForTemp(d[field],temp);;
-                                    }
-                                    d.evt = evt;
-                                });
-                                resolve(r);
-                            }).catch(e => {
-                                winston.warn(e.stack);
-                                reject(e);
+                        var sensor = this.oyaConf.sensorOfField(field);
+                        var hours = days * 24;
+                        var startDate = new Date(endDate.getTime() - hours*3600*1000);
+                        var tempField = sensor && OyaMist.locationField(sensor.loc, 'temp') || 'tempInternal';
+                        var fields = tempField && field !== tempField ? [field,tempField] : [field];
+                        dbf.sensorAvgByHour(fields, startDate, hours).then(r => {
+                            r.data.map(d => {
+                                var temp = d[tempField];
+                                if (sensor == null || temp == null || this.oyaConf.chart.showRaw) {
+                                    d.vavg = d[field];
+                                } else {
+                                    d.vavg = sensor.valueForTemp(d[field],temp);;
+                                }
+                                d.evt = evt;
                             });
-                        } else {
-                            dbf.sensorDataByHour(evt, endDate, days).then(r => resolve(r))
-                            .catch(e => {
-                                winston.warn(e.stack);
-                                reject(e);
-                            });
-                        }
+                            resolve(r);
+                        }).catch(e => {
+                            winston.warn(e.stack);
+                            reject(e);
+                        });
                     } else {
                         throw new Error(`unknown field:${field}`);
                     }

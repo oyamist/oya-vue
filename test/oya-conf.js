@@ -13,7 +13,7 @@
     const defaultCycles = OyaVessel.DEFAULT_CYCLES;
     const defaultConf = {
         name: 'test',
-        camera: false,
+        camera: "none",
         type: 'OyaConf',
         tempUnit: 'F',
         hostTimeout: 200,

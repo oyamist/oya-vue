@@ -343,9 +343,10 @@
         }();
         async.next();
     });
-    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
+            winston.level="info";
                 var app = testInit();
                 var reactor = testReactor();
 

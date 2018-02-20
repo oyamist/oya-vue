@@ -24,6 +24,9 @@
         static get EVENT_CYCLE_MIST() { return "event:cycle-mist"; }
         static get EVENT_CYCLE_COOL() { return "event:cycle-cool"; }
         static get EVENT_CYCLE_PRIME() { return "event:cycle-prime"; }
+        static get CAMERA_NONE() { return "none"; }
+        static get CAMERA_MANUAL() { return "manual"; }
+        static get CAMERA_WHEN_LIT() { return "when-lit"; }
 
         update(opts = {}) {
             var i2cRead = opts.i2cRead;
@@ -137,7 +140,8 @@
             this.chart.tempStepSize = this.chart.tempStepSize || 2;
             this.chart.humidityStepSize = this.chart.humidityStepSize || 5;
             this.chart.showRaw = this.chart.showRaw == null ? false : opts.chart.showRaw;
-            this.camera = opts.camera || false;
+            this.camera = opts.camera || OyaConf.CAMERA_NONE;
+            this.camera === true && (this.camera = OyaConf.CAMERA_MANUAL);
             this.heapReboot = opts.heapReboot || 50*1000*1000;
 
             return this;

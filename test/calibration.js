@@ -172,7 +172,7 @@
             min: 16,
         });
     });
-    it("TESTTESTcalibrate(seq) can calibrate real data", function() {
+    it("calibrate(seq) can calibrate real data", function() {
         var fname = path.join(__dirname, '2018-01-31EC.json');
         var seq = JSON.parse(fs.readFileSync(fname));
         var cal = new Calibration({

@@ -707,7 +707,7 @@
         should(s.valueForTemp(410, 18)).approximately(100,e);
         should(s.valueForTemp(420, 19)).approximately(100,e);
     });
-    it("TESTTESTcalibrations are serializable", function() {
+    it("calibrations are serializable", function() {
         var seq = [];
         var s = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1,{
             loc: OyaMist.LOC_INTERNAL,
