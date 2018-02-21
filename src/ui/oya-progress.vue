@@ -5,7 +5,7 @@
         <p> Display cycle progress
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="service" value="oyavue" slot="prop">RestBundle name</rb-about-item>
     </rb-about>
 
     <div class='oya-progress' v-if="rbService.active" >

@@ -7,6 +7,7 @@
     const Actuator = require("./actuator");
     const Light = require("./light");
     const Sensor = require("./sensor");
+    const { VmcBundle } = require("vue-motion-cam");
     const Switch = require("./switch");
     const fs = require('fs');
     const OyaVessel = require("./oya-vessel");
@@ -35,6 +36,7 @@
                 srcPkg,
             }, opts));
 
+            winston.info(`OyaReactor.ctor(${name})`);
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
                     this.resourceMethod("get", "mcu/hats", this.getMcuHats),
@@ -57,7 +59,7 @@
             });
             this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
             this.oyaConf = new OyaConf(opts);
-            RbSingleton.emitter.on("heapMax", heapStat => {
+            RbSingleton.emitter.once("heapMax", heapStat => {
                 var heapReboot = this.oyaConf.heapReboot;
                 if (heapStat.total_heap_size > heapReboot) {
                     winston.warn(`Memory heap exceeds heapReboot threshold (${heapReboot}. Restarting server...`);
@@ -115,12 +117,14 @@
             });
             this.vessel = this.vessels[0];
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
+            var that = this;
             this.loadApiModel(this.apiFile).then(apiModelCopy => {
-                var oyaConf = this.oyaConf;
-                this.onApiModelLoaded(oyaConf);
+                var oyaConf = that.oyaConf;
+                that.onApiModelLoaded(oyaConf);
             }).catch(e => {
                 winston.error('oya-reactor:', e.stack);
             });
+            this.restart = opts.restart || OyaReactor.restart;
         }
 
         static get EVENT_RELAY() { return "event:relay"; }
@@ -163,6 +167,12 @@
             // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
             this.activate(!!this.autoActivate);
+            if (this.oyaConf.camera === OyaConf.CAMERA_NONE) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${this.oyaConf.camera} `);
+            } else if (this.oyaConf.camera === OyaConf.CAMERA_ALWAYS_ON) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${this.oyaConf.camera} activating...`);
+                this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
+            }
         }
 
         updateConf(conf) {
@@ -438,7 +448,7 @@
             this.restart();
         }
 
-        restart() {
+        static restart() {
             winston.info('OyaReactor.restart() *** RESTARTING SERVER ***');
             return new Promise((resolve,reject) => {
                 try {

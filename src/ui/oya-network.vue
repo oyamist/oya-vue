@@ -6,7 +6,7 @@
         <p> Display network informationprogress
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="service" value="oyavue" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="queryService" value="(service)" slot="prop">Service name to query</rb-about-item>
     </rb-about>
 

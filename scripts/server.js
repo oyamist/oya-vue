@@ -11,6 +11,9 @@ const OyaReactor = require("../index").OyaReactor;
 const DbSqlite3 = require('../index').DbSqlite3;
 const DbFacade = require('../index').DbFacade;
 const memwatch = require('memwatch-next');
+const EventEmitter = require('events');
+const oyaEmitter = new EventEmitter();
+
 memwatch.on('leak', (info) => {
     winston.warn(`memwatch leak:${info}`);
 });
@@ -38,9 +41,15 @@ let async = function*() {
     try {
         // define RestBundles
         var restBundles = app.locals.restBundles = [];
-        var services = ['test'].concat(argv.filter((a, i) => i>1 && a[0]!=='-' && a!=="test"));
+        if (argv.filter((arg, i) => i>1 && arg[0]!=='-' )) {
+            var services = argv.filter((a, i) => i>1 && a[0]!=='-');
+            !services.length && (services = ['test']);
+        } else {
+            var services = ['test'];
+        }
         for (var iService = 0; iService < services.length; iService++) {
             var serviceName = services[iService];
+            winston.info(`server.js setting up ${serviceName}`);
 
             // for unit tests, do not disturb real database
             //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
@@ -53,10 +62,13 @@ let async = function*() {
 
             var oya = new OyaReactor(serviceName, {
                 dbfacade,
+                emitter: oyaEmitter,
             });
             restBundles.push(oya);
         }
-        var vmc = new VmcBundle("vmc");
+        var vmc = new VmcBundle("vmc", {
+            emitter: oyaEmitter,
+        });
         restBundles.push(vmc);
 
         // declare ports

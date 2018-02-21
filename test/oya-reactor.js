@@ -6,6 +6,7 @@
     const rbh = new rb.RbHash();
     const EAVG = 0.01;
     const supertest = require('supertest');
+    const { VmcBundle } = require('vue-motion-cam');
     const fs = require('fs');
     const APIMODEL_PATH = `api-model/${srcPkg.name}.test.oya-conf.json`;
     if (fs.existsSync(APIMODEL_PATH)) {
@@ -343,10 +344,9 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /sensor/data-by-hour returns sensor data summary", function(done) {
+    it("GET /sensor/data-by-hour returns sensor data summary", function(done) {
         var async = function* () {
             try {
-            winston.level="info";
                 var app = testInit();
                 var reactor = testReactor();
 
@@ -826,7 +826,7 @@
         }();
         async.next();
     });
-    it("POST /sensor/calibrate calibrates sensor", function(done) {
+    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -867,13 +867,39 @@
                 e = 1;
                 should(sensor.valueForTemp(400, 17)).approximately(83.3,e);
                 should(sensor.valueForTemp(400, 18)).approximately(81.4,e);
-                should(sensor.valueForTemp(400, 19)).approximately(80.3,e);
+                should(sensor.valueForTemp(400, 19)).approximately(80.5,e);
 
                 oyaConf.sensors[0] = sensor0; // restore
                 done();
             } catch(err) {
                 winston.error(err.stack);
                 throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("TESTTESTactivates camera on startup", function(done) {
+        var async = function*() {
+            try {
+            winston.info('START TEST');
+                var emitter = new EventEmitter();
+                emitter.once(VmcBundle.EVT_CAMERA_ACTIVATED, value => {
+                    should(vmc.streaming).equal(true);
+                    emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, false);
+                    done();
+                });
+                var vmc = new VmcBundle('vmc', {
+                    emitter,
+                });
+                var reactor = new OyaReactor('asdf', {
+                    emitter,
+                    camera: OyaConf.CAMERA_ALWAYS_ON,
+                });
+                should(reactor.oyaConf.camera).equal(OyaConf.CAMERA_ALWAYS_ON);
+                should(vmc.streaming).equal(false);
+            } catch (e) {
+                winston.error(e.stack);
+                done(e);
             }
         }();
         async.next();

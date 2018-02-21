@@ -5,7 +5,7 @@
         <p> OyaReactor status and configuration
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="service" value="oyavue" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="vesselIndex" value="0" slot="prop">
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
@@ -115,7 +115,11 @@
                             label="MCU hardware extension hats"
                             class="input-group"
                             ></v-select>
-                        <v-checkbox label="Camera" v-model="apiModelCopy.camera" light></v-checkbox>
+                        <v-select v-bind:items="cameraItems" 
+                            v-model='apiModelCopy.camera' 
+                            label="Camera"
+                            class="input-group"
+                            ></v-select>
                         <v-text-field v-model='apiModelCopy.heapReboot' 
                             type="number"
                             :label="`Reboot heap threshold`" class="input-group" />
@@ -565,6 +569,21 @@ export default {
                 "Cycle #3",
                 "Cycle #4",
             ];
+        },
+        cameraItems() {
+            return [{
+                text: "No camera",
+                value: 'none',
+            },{
+                text: "Camera: always on",
+                value: 'always-on',
+            },{
+                text: "Camera: manually activated",
+                value: 'manual',
+            },{
+                text: "Camera: active when light is on",
+                value: 'when-lit',
+            }];
         },
         dayOfWeekItems() {
             return [{

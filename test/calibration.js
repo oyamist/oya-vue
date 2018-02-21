@@ -150,7 +150,7 @@
 
         // fractional readings should correspond with fractions of nominal value independent of temperature
         // over all measured values
-        var e = 0.01;
+        var e = 0.02;
         var percent = 100; // arbitrary nominal value conversion
         seq.forEach(s => {
             [1,1/2,1/4,1/10,1/100].forEach(fraction => {
