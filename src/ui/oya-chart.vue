@@ -5,7 +5,7 @@
         <p> Display sensor chart
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="oyavue" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="sensorProp" value='"tempInternal"' slot="prop">
             property name of sensor</rb-about-item>
     </rb-about>

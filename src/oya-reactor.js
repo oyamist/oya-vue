@@ -515,9 +515,9 @@
         }
 
         getNetHosts(req,res,next) {
-            var onet = new OyaNet({
-                service: req.params.service || this.name,
-            });
+            var service = req.params.service || this.name;
+            winston.info(`OyaNet.getNetHosts(${service})`);
+            var onet = new OyaNet({ service, });
             return onet.identifyHosts();
         }
 

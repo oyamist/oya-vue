@@ -1,6 +1,6 @@
 {
   "name": "oya-vue",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "description": "Vue/Vuetify RestBundle for OyaMist bioreactor controller",
   "main": "index.js",
   "directories": {
@@ -46,10 +46,10 @@
     "build:vue": "npm run build:vue-dev",
     "build:vue-dev": "cross-env NODE_ENV=production webpack --config cfg/webpack.dev.js --progress --hide-modules",
     "clean": "rm -f *.log*; rimraf dist; rimraf .motion",
-    "dev": "concurrently \"scripts/server.js oyavue\" \"npm run dev:vue\"",
-    "dev:debug": "concurrently \"scripts/server.js --log-debug oyavue\" \"npm run dev:vue\"",
+    "dev": "concurrently \"scripts/server.js oyamist\" \"npm run dev:vue\"",
+    "dev:debug": "concurrently \"scripts/server.js --log-debug oyamist\" \"npm run dev:vue\"",
     "dev:vue": "cross-env NODE_ENV=development webpack-dev-server --config cfg/webpack.dev.js --hot",
-    "start": "node --max_old_space_size=300 scripts/server.js oyavue",
+    "start": "node --max_old_space_size=300 scripts/server.js oyamist",
     "test": "npm run test:verbose",
     "test:test": "mocha -w -R min --inline-diffs -g TEST",
     "test:verbose": "mocha --inline-diffs",

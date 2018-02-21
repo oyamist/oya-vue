@@ -3,11 +3,11 @@
     <v-expansion-panel>
         <v-expansion-panel-content >
             <div slot="header">Controls</div>
-            <oya-reactor service="oyavue"></oya-reactor>
+            <oya-reactor service="oyamist"></oya-reactor>
         </v-expansion-panel-content>
         <v-expansion-panel-content>
             <div slot="header">Charts</div>
-            <oya-chart-panel service='oyavue'/>
+            <oya-chart-panel service='oyamist'/>
         </v-expansion-panel-content>
         <v-expansion-panel-content>
             <div slot="header">Network</div>

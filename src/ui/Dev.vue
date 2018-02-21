@@ -91,7 +91,7 @@ export default {
     name: 'dev',
     props: {
         service: {
-            default: "oyavue",
+            default: "oyamist",
         },
     },
     data() {

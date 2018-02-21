@@ -5,7 +5,7 @@
         <p> OyaReactor status and configuration
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="oyavue" slot="prop">RestBundle name</rb-about-item>
+        <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
         <rb-about-item name="vesselIndex" value="0" slot="prop">
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
