@@ -173,6 +173,9 @@
                                 <v-text-field label="Hours off" class="pr-2" required
                                     type="number" :rules="nonNegRules(light.cycleOff)"
                                     v-model="light.cycleOff" ></v-text-field>
+                                <v-text-field label="Total hours" class="pr-2" 
+                                    :append-icon="lightPeriodIcon(light)"
+                                    readonly :value="lightPeriod(light)" ></v-text-field>
                             </div>
                             <div style="display:flex; flex-flow: row wrap;">
                                 <v-select v-bind:items="dayOfWeekItems" v-model='light.cycleStartDay' 
@@ -454,6 +457,12 @@ export default {
         },
         cancelUpdate() {
             this.updateToggle = false;
+        },
+        lightPeriod(light) {
+            return Number(light.cycleOn) + Number(light.cycleOff);
+        },
+        lightPeriodIcon(light) {
+            return this.lightPeriod(light) === 24 ? "check_circle" : "warning";
         },
         confirmUpdate() {
             this.alertUpdate = true;

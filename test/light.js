@@ -204,7 +204,7 @@
         should(Light.isLightOnAt(light, date)).equal(true);
         should(light.countdown(date)).equal(cycleOnSec);
     });
-    it("countdown(date) returns seconds till next light transition", function() {
+    it("TESTTESTcountdown(date) returns seconds till next light transition", function() {
         var light = new Light({
         });
         var date = new Date(2017,0,1,06,30); // Sunday Jan 1, 2017
