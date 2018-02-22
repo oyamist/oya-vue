@@ -177,10 +177,10 @@
             // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
             this.activate(!!this.autoActivate);
-            if (this.oyaConf.camera === OyaConf.CAMERA_NONE) {
-                winston.info(`OyaReactor.onApiModelLoaded() camera:${this.oyaConf.camera} `);
-            } else if (this.oyaConf.camera === OyaConf.CAMERA_ALWAYS_ON) {
-                winston.info(`OyaReactor.onApiModelLoaded() camera:${this.oyaConf.camera} activating...`);
+            if (apiModel.camera === OyaConf.CAMERA_NONE) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} `);
+            } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} activating...`);
                 this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
             }
         }

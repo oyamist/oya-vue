@@ -878,7 +878,7 @@
         }();
         async.next();
     });
-    it("TESTTESTactivates camera on startup", function(done) {
+    it("activates camera on startup", function(done) {
         var async = function*() {
             try {
             winston.info('START TEST');
@@ -903,6 +903,31 @@
             }
         }();
         async.next();
+    });
+    it ("TESTTESTonApiModelLoaded(model) activates camera", function(done) {
+        var emitter = new EventEmitter();
+        var loaded = 0;
+        emitter.once(VmcBundle.EVT_CAMERA_ACTIVATE, value => {
+            should(value).equal(true);
+            should(loaded).equal(1);
+            done();
+        });
+        class TestReactor extends OyaReactor {
+            super(name, opts={}) {
+            }
+            onApiModelLoaded(model) {
+                loaded++;
+                return super.onApiModelLoaded(model);
+            }
+        }
+        var reactor = new TestReactor('test', {
+            emitter,
+            camera: OyaConf.CAMERA_NONE,
+        });
+        var model = Object.assign({}, reactor.oyaConf, {
+            camera: OyaConf.CAMERA_ALWAYS_ON,
+        })
+        reactor.onApiModelLoaded(model);
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
