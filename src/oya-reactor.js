@@ -119,8 +119,7 @@
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             var that = this;
             this.loadApiModel(this.apiFile).then(apiModelCopy => {
-                var oyaConf = that.oyaConf;
-                that.onApiModelLoaded(oyaConf);
+                that.onApiModelLoaded(apiModelCopy);
             }).catch(e => {
                 winston.error('oya-reactor:', e.stack);
             });
