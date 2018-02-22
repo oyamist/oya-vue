@@ -41,31 +41,25 @@ let async = function*() {
     try {
         // define RestBundles
         var restBundles = app.locals.restBundles = [];
-        if (argv.filter((arg, i) => i>1 && arg[0]!=='-' )) {
-            var services = argv.filter((a, i) => i>1 && a[0]!=='-');
-            !services.length && (services = ['test']);
+        var serviceName = argv.reduce((acc, arg, i) =>  {
+            return acc==null && i>1 && arg[0]!=='-' ? arg : acc;
+        }, null) || 'test';
+        winston.info(`server.js setting up ${serviceName}`);
+
+        // for unit tests, do not disturb real database
+        //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
+        if (serviceName === 'test') {
+            var dbname = './test/test-v1.0.db';
+            var dbfacade = new DbSqlite3({ dbname });
         } else {
-            var services = ['test'];
+            var dbfacade = new DbSqlite3();
         }
-        for (var iService = 0; iService < services.length; iService++) {
-            var serviceName = services[iService];
-            winston.info(`server.js setting up ${serviceName}`);
 
-            // for unit tests, do not disturb real database
-            //var dbfacade = serviceName === 'test' ? new DbFacade() : new DbSqlite3();
-            if (serviceName === 'test') {
-                var dbname = './test/test-v1.0.db';
-                var dbfacade = new DbSqlite3({ dbname });
-            } else {
-                var dbfacade = new DbSqlite3();
-            }
-
-            var oya = new OyaReactor(serviceName, {
-                dbfacade,
-                emitter: oyaEmitter,
-            });
-            restBundles.push(oya);
-        }
+        var oya = new OyaReactor(serviceName, {
+            dbfacade,
+            emitter: oyaEmitter,
+        });
+        restBundles.push(oya);
         var vmc = new VmcBundle("vmc", {
             emitter: oyaEmitter,
         });

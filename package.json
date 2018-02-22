@@ -1,6 +1,6 @@
 {
   "name": "oya-vue",
-  "version": "0.33.3",
+  "version": "0.33.4",
   "description": "Vue/Vuetify RestBundle for OyaMist bioreactor controller",
   "main": "index.js",
   "directories": {
