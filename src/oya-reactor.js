@@ -145,6 +145,16 @@
                 }
                 this.emitter.emit(OyaReactor.EVENT_RELAY, value, light.pin);
             };
+
+            // camera activation
+            if (this.oyaConf.camera === OyaConf.CAMERA_WHEN_LIT) {
+                var anyLightOn = false;
+                Object.keys(this.lights).forEach(key => {
+                    anyLightOn = anyLightOn || this.lights[key].active;
+                });
+                winston.info(`OyaReactor.onLight() camera:${this.oyaConf.camera} activating: ${anyLightOn} ...`);
+                this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, anyLightOn);
+            }
         }
 
         onActuator(event, value, vesselIndex) {
