@@ -205,19 +205,14 @@
             return new Promise((resolve, reject) => {
                 super.loadApiModel(filePath).then(model => {
                         try {
-                            if (model) {
-                                this.updateConf(model).then(r=> {
-                                    winston.info(`OyaReactor-${this.name}.loadApiModel() rbHash:${model.rbHash} `);
-                                    resolve(r.toJSON());
-                                }).catch(e=>reject(e));
-                            } else if (filePath === this.apiFile) {
-                                this.updateConf().then(r=> {
-                                    winston.info(`OyaReactor-${this.name}.loadApiModel() model:default `);
-                                    resolve(r.toJSON());
-                                }).catch(e=>reject(e));
-                            } else {
-                                throw new Error("unknown api model:" + filePath);
-                            }
+                            var rbh = model ? model.rbHash : 'default';
+                            this.updateConf(model).then(r=> {
+                                winston.info(`OyaReactor-${this.name}.loadApiModel() rbHash:${rbh} `);
+                                resolve(r.toJSON());
+                            }).catch(e=>{
+                                winston.warn(err.stack);
+                                reject(err);
+                            });
                         } catch (err) { // implementation error
                             winston.warn(err.stack);
                             reject(err);

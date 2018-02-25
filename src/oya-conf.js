@@ -29,7 +29,8 @@
         static get CAMERA_MANUAL() { return "manual"; }
         static get CAMERA_WHEN_LIT() { return "when-lit"; }
 
-        update(opts = {}) {
+        update(opts) {
+            opts = opts || {};
             var i2cRead = opts.i2cRead;
             var i2cWrite = opts.i2cWrite;
 
