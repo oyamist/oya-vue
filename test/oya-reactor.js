@@ -8,7 +8,7 @@
     const supertest = require('supertest');
     const { VmcBundle } = require('vue-motion-cam');
     const fs = require('fs');
-    const APIMODEL_PATH = `api-model/${srcPkg.name}.test.oya-conf.json`;
+    const APIMODEL_PATH = `api-model/${srcPkg.name}.test.json`;
     if (fs.existsSync(APIMODEL_PATH)) {
         fs.unlinkSync(APIMODEL_PATH);
     }
@@ -826,7 +826,7 @@
         }();
         async.next();
     });
-    it("TESTTESTPOST /sensor/calibrate calibrates sensor", function(done) {
+    it("POST /sensor/calibrate calibrates sensor", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -904,7 +904,7 @@
         }();
         async.next();
     });
-    it ("TESTTESTonApiModelLoaded(model) activates camera", function(done) {
+    it ("onApiModelLoaded(model) activates camera", function(done) {
         var emitter = new EventEmitter();
         var loaded = 0;
         emitter.once(VmcBundle.EVT_CAMERA_ACTIVATE, value => {

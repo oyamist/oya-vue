@@ -57,7 +57,7 @@
 
                 ]),
             });
-            this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}.oya-conf`;
+            this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}`;
             this.oyaConf = new OyaConf(opts);
             RbSingleton.emitter.once("heapMax", heapStat => {
                 var heapReboot = this.oyaConf.heapReboot;
@@ -118,7 +118,7 @@
             this.vessel = this.vessels[0];
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             var that = this;
-            this.loadApiModel(this.apiFile).then(apiModelCopy => {
+            this.loadApiModel().then(apiModelCopy => {
                 that.onApiModelLoaded(apiModelCopy);
             }).catch(e => {
                 winston.error('oya-reactor:', e.stack);
@@ -226,9 +226,6 @@
             return new Promise((resolve, reject) => {
                 super.saveApiModel(model, filePath).then(res => {
                     try {
-                        if (filePath !== this.apiFile) {
-                            throw new Error(`filePath expected:${this.apiFile} actual:${filePath}`);
-                        }
                         this.updateConf(model).then(r=>resolve(r.toJSON())).catch(e=>{
                             winston.warn(e.stack);
                             reject(e);
@@ -245,7 +242,7 @@
         }
 
         getOyaConf(req, res, next) {
-            return this.getApiModel(req, res, next, this.apiFile);
+            return this.getApiModel(req, res, next);
         }
 
         getMcuHats(req, res, next) {
@@ -320,16 +317,21 @@
         }
 
         putOyaConf(req, res, next) {
-            var confnew = JSON.parse(JSON.stringify(req.body.apiModel));
-            this.apiHash(confnew);
-            var confold = JSON.parse(JSON.stringify(this.oyaConf));
-            var delta = this.diffUpsert.diff(confnew, confold);
-            winston.info('OyaReactor.putOyaConf() delta:', delta);
-            var result = this.putApiModel(req, res, next, this.apiFile);
-            if (this.vessel.isActive) {
-                winston.debug("OyaReactor.putOyaConf() re-activating...");
-                this.activate(false);
-                setTimeout(() => this.activate(true), 500);
+            try {
+                var confnew = JSON.parse(JSON.stringify(req.body.apiModel));
+                this.apiHash(confnew);
+                var confold = JSON.parse(JSON.stringify(this.oyaConf));
+                var delta = this.diffUpsert.diff(confnew, confold);
+                winston.info('OyaReactor.putOyaConf() delta:', delta);
+                var result = this.putApiModel(req, res, next);
+                if (this.vessel.isActive) {
+                    winston.debug("OyaReactor.putOyaConf() re-activating...");
+                    this.activate(false);
+                    setTimeout(() => this.activate(true), 500);
+                }
+            } catch (e) {
+                winston.error(e.stack);
+                throw e;
             }
 
             return result;
@@ -402,7 +404,7 @@
                                 unit: opts.unit,
                             });
 
-                            this.saveApiModel(this.oyaConf, this.apiFile).then(r => {
+                            this.saveApiModel(this.oyaConf).then(r => {
                                 winston.info(`OyaReactor.postSensorCalibrate() => `, status);
                                 resolve(status);
                             }).catch(e => {

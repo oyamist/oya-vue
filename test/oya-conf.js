@@ -94,7 +94,7 @@
             showRaw: false,
         },
     };
-    winston.level = 'error';
+    winston.level = 'warn';
 
     it("toJSON() serializes configuration", function() {
         var conf = new OyaConf({
