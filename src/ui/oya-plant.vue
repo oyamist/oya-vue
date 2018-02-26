@@ -81,7 +81,7 @@ export default {
             if (!apiModel) {
                 return false;
             }
-            return apiModel.camera;
+            return apiModel.camera != "none";
         },
         plantStyle() {
             var bgDark = `linear-gradient(to bottom, #ccc, #d4d4d4 40%, transparent 70%)`;
