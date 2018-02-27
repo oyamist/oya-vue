@@ -9,7 +9,7 @@
             super(opts);
             var self = this;
             this.dbname = opts.dbname || path.join(__dirname,'../test/test-v1.0.db');
-            winston.info('DbSqlite3 dbname:${dbname}');
+            winston.info(`DbSqlite3 dbname:${this.dbname}`);
             Object.defineProperty(this, 'isOpen', {
                 get: () => this.db ? true : false,
             });

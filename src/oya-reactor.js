@@ -285,7 +285,7 @@
                                 if (sensor == null || temp == null || this.oyaConf.chart.showRaw) {
                                     d.vavg = d[field];
                                 } else {
-                                    d.vavg = sensor.valueForTemp(d[field],temp);;
+                                    d.vavg = sensor.valueForTemp(d[field],temp);
                                 }
                                 d.evt = evt;
                             });
@@ -558,11 +558,24 @@
                         this.lights.red.active = active && Light.isLightOnAt(l);
                     }
                 });
-                return Object.assign(this.vessel.state, {
+                var state = JSON.parse(JSON.stringify(this.vessel.state));
+                state = Object.assign(state, {
                     api: 'oya-reactor',
                     lights: this.lights,
                     health: this.health(),
                 });
+                if (state.ecInternal.value != null) {
+                    var field = 'ecInternal';
+                    var sensor = this.oyaConf.sensorOfField(field);
+                    var tempField = sensor && OyaMist.locationField(sensor.loc, 'temp') || 'tempInternal';
+                    var temp = tempField && state[tempField].value;
+                    if (sensor && temp != null && !this.oyaConf.chart.showRaw) {
+                        state[field].value = sensor.valueForTemp(state[field].value,temp);
+                        state[field].avg1 = sensor.valueForTemp(state[field].avg1,temp);
+                        state[field].avg2 = sensor.valueForTemp(state[field].avg2,temp);
+                    }
+                }
+                return state;
             } catch (e) {
                 winston.error(`OyaReactor-${this.name}.getState()`, e.stack);
                 return e;

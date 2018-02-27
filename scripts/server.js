@@ -41,6 +41,7 @@ let async = function*() {
     try {
         // define RestBundles
         var restBundles = app.locals.restBundles = [];
+        winston.info('argv:', argv);
         var serviceName = argv.reduce((acc, arg, i) =>  {
             return acc==null && i>1 && arg[0]!=='-' ? arg : acc;
         }, null) || 'test';
@@ -52,7 +53,7 @@ let async = function*() {
             var dbname = './test/test-v1.0.db';
             var dbfacade = new DbSqlite3({ dbname });
         } else {
-            var dbfacade = new DbSqlite3();
+            var dbfacade = new DbSqlite3({ dbname: `oyamist-v1.0.db` });
         }
 
         var oya = new OyaReactor(serviceName, {

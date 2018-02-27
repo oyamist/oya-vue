@@ -904,6 +904,15 @@
         }();
         async.next();
     });
+    it ("TESTTESTgetState() returns temperature compensated EC value", function(done) {
+        var async = function*() { try {
+            var reactor = new OyaReactor("test_getState", { 
+                apiModelDir: 'test',
+            });
+            done();
+        } catch (e) {done(e); }}();
+        async.next();
+    });
     it ("onApiModelLoaded(model) activates camera", function(done) {
         var emitter = new EventEmitter();
         var loaded = 0;
