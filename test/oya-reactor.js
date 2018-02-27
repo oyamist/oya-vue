@@ -881,7 +881,6 @@
     it("activates camera on startup", function(done) {
         var async = function*() {
             try {
-            winston.info('START TEST');
                 var emitter = new EventEmitter();
                 emitter.once(VmcBundle.EVT_CAMERA_ACTIVATED, value => {
                     should(vmc.streaming).equal(true);
@@ -891,10 +890,11 @@
                 var vmc = new VmcBundle('vmc', {
                     emitter,
                 });
-                var reactor = new OyaReactor('asdf', {
+                var reactor = new OyaReactor('testActivateCamera', {
                     emitter,
                     camera: OyaConf.CAMERA_ALWAYS_ON,
                 });
+                yield reactor.initialize().then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(reactor.oyaConf.camera).equal(OyaConf.CAMERA_ALWAYS_ON);
                 should(vmc.streaming).equal(false);
             } catch (e) {

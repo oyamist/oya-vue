@@ -18,7 +18,7 @@
         tempUnit: 'F',
         hostTimeout: 200,
         healthPoll: 60,
-        heapReboot: 50*1000*1000,
+        heapReboot: 60*1000*1000,
         mcuHat: 'mcu-hat:none',
         vessels: [
             OyaConf.createVesselConfig(0,{
@@ -173,7 +173,7 @@
             tempUnit: 'C',
             hostTimeout: 200,
             healthPoll: 60,
-            heapReboot: 50*1000*1000,
+            heapReboot: 60*1000*1000,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 updatedVessel,
@@ -258,7 +258,7 @@
             cycles: defaultCycles,
         });
     });
-    it("update(opts) updates configuration ", function() {
+    it("TESTTESTupdate(opts) updates configuration ", function() {
         var oc = new OyaConf();
         var vessel0 = oc.vessels[0];
         var actuators = [
@@ -330,7 +330,7 @@
             tempUnit: 'C',
             hostTimeout: 200,
             healthPoll: 60,
-            heapReboot: 50*1000*1000,
+            heapReboot: 60*1000*1000,
             mcuHat: 'mcu-hat:none',
             vessels: [
                 OyaConf.createVesselConfig(0, {

@@ -144,7 +144,7 @@
             this.chart.showRaw = this.chart.showRaw == null ? false : opts.chart.showRaw;
             this.camera = opts.camera || this.camera || OyaConf.CAMERA_NONE;
             this.camera === true && (this.camera = OyaConf.CAMERA_MANUAL);
-            this.heapReboot = opts.heapReboot || 50*1000*1000;
+            this.heapReboot = opts.heapReboot || 60*1000*1000;
 
             return this;
         }

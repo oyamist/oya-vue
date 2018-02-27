@@ -118,11 +118,6 @@
             this.vessel = this.vessels[0];
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             var that = this;
-            this.loadApiModel().then(apiModelCopy => {
-                that.onApiModelLoaded(apiModelCopy);
-            }).catch(e => {
-                winston.error('oya-reactor:', e.stack);
-            });
             this.restart = opts.restart || OyaReactor.restart;
         }
 
@@ -134,6 +129,24 @@
             35, // Pimoroni Automation Hat relay 2
             36, // Pimoroni Automation Hat relay 3
         ]};
+
+        initialize() {
+            var promise = super.initialize();
+            promise.then(apiModel => {
+                var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+                // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
+                // been extended. Difference will persist until model is saved
+                winston.info(`OyaReactor-${this.name}.initialize() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
+                this.activate(!!this.autoActivate);
+                if (apiModel.camera === OyaConf.CAMERA_NONE) {
+                    winston.info(`OyaReactor.initialize() camera:${apiModel.camera} `);
+                } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
+                    winston.info(`OyaReactor.initialize() camera:${apiModel.camera} activating...`);
+                    this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
+                }
+            });
+            return promise;
+        }
 
         onLight(spectrum, value, key) {
             // note: robust state enforcement continuously generates redundant light events 
