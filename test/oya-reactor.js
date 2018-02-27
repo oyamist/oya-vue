@@ -904,11 +904,46 @@
         }();
         async.next();
     });
-    it ("TESTTESTgetState() returns temperature compensated EC value", function(done) {
+    it ("getState() returns temperature compensated EC value", function(done) {
         var async = function*() { try {
             var reactor = new OyaReactor("test_getState", { 
                 apiModelDir: 'test',
             });
+            yield reactor.initialize().then(r=>async.next(r)).catch(e=>async.throw(e));
+            var oyaConf = reactor.oyaConf;
+            var ecSensor = oyaConf.sensors[1];
+            should(ecSensor.readEC).equal(true);
+            should.exist(ecSensor.tempCal.ann); // is calibrated
+            should(ecSensor).instanceOf(Sensor);
+            var state = reactor.getState();
+            should(state.tempInternal.value).equal(null);
+            should(state.ecInternal.value).equal(null);
+
+            // mock sensor values
+            reactor.vessel.emitter.emit(OyaMist.SENSE_TEMP_INTERNAL, 20);
+            reactor.vessel.emitter.emit(OyaMist.SENSE_EC_INTERNAL, 1000);
+            reactor.vessel.emitter.emit(OyaMist.SENSE_EC_INTERNAL, 1010);
+
+            // return temperature compensated EC value 
+            oyaConf.chart.showRaw = false;
+            var state = reactor.getState();
+            should(state.tempInternal.value).equal(20);
+            var tol = 0.05;
+            should(state.ecInternal.value).approximately(44.1,tol);
+            should(state.ecInternal.avg1).approximately(43.7,tol);
+            should(state.ecInternal.avg2).approximately(43.6,tol);
+            should(state.ecInternal.unit).equal('%');
+
+            // return raw EC sensor value
+            oyaConf.chart.showRaw = true;
+            var state = reactor.getState();
+            should(state.tempInternal.value).equal(20);
+            var tol = 0.05;
+            should(state.ecInternal.value).approximately(1010,tol);
+            should(state.ecInternal.avg1).approximately(1000.1,tol);
+            should(state.ecInternal.avg2).approximately(1000,tol);
+            should(state.ecInternal.unit).equal('\u00b5S');
+
             done();
         } catch (e) {done(e); }}();
         async.next();

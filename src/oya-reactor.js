@@ -586,6 +586,7 @@
                         state[field].value = sensor.valueForTemp(state[field].value,temp);
                         state[field].avg1 = sensor.valueForTemp(state[field].avg1,temp);
                         state[field].avg2 = sensor.valueForTemp(state[field].avg2,temp);
+                        state[field].unit = sensor.tempCal.unit;
                     }
                 }
                 return state;
