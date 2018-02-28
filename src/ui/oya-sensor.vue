@@ -75,15 +75,10 @@ export default {
                     result = rh.toFixed(1);
                     delta = avg1 - avg2;
                 }
-            } else if (data.unit === "\u00b5S") { // EC
-                suffix = '\u00b5S';
-            } else if (data.unit === "%") { // EC
-                suffix = '% nutrient';
-            } else if (data.unit === "ppm") { // EC
-                suffix = 'ppm';
-            } else if (data.unit === "microSiemens") { // EC
-                suffix = '\u00b5S';
+            } else if (data.unit === null) {
+                // no suffix
             } else {
+                suffix = data.unit;
             }
             result += suffix;
             if (delta > smallDelta) {

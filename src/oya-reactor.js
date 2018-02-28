@@ -589,7 +589,7 @@
                         if (sensor.tempCal.unit === OyaMist.NUTRIENT_UNIT.PERCENT) {
                             state[field].unit = `% ${sensor.tempCal.name}`;
                         } else {
-                            state[field].unit = sensor.tempCal.unit + 'hi';
+                            state[field].unit = sensor.tempCal.unit;
                         }
                     }
                 }
