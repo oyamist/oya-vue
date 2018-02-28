@@ -904,7 +904,7 @@
         }();
         async.next();
     });
-    it ("TESTTESTgetState() returns temperature compensated EC value", function(done) {
+    it ("getState() returns temperature compensated EC value", function(done) {
         var async = function*() { try {
             var reactor = new OyaReactor("test_getState", { 
                 apiModelDir: 'test',
