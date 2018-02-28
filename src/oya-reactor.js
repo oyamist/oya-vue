@@ -577,22 +577,25 @@
                     lights: this.lights,
                     health: this.health(),
                 });
-                if (state.ecInternal.value != null) {
-                    var field = 'ecInternal';
-                    var sensor = this.oyaConf.sensorOfField(field);
-                    var tempField = sensor && OyaMist.locationField(sensor.loc, 'temp') || 'tempInternal';
-                    var temp = tempField && state[tempField].value;
-                    if (sensor && temp != null && !this.oyaConf.chart.showRaw) {
-                        state[field].value = sensor.valueForTemp(state[field].value,temp);
-                        state[field].avg1 = sensor.valueForTemp(state[field].avg1,temp);
-                        state[field].avg2 = sensor.valueForTemp(state[field].avg2,temp);
-                        if (sensor.tempCal.unit === OyaMist.NUTRIENT_UNIT.PERCENT) {
-                            state[field].unit = `% ${sensor.tempCal.name}`;
-                        } else {
-                            state[field].unit = sensor.tempCal.unit;
+                ['ecInternal','ecAmbient','ecCanopy'].forEach(field => {
+                    var ecSensor = this.oyaConf.sensorOfField(field);
+                    if (ecSensor) {
+                        if (!this.oyaConf.chart.showRaw && ecSensor.tempCal.ann) {
+                            var tempField = ecSensor && OyaMist.locationField(ecSensor.loc, 'temp') || 'tempInternal';
+                            var temp = tempField && state[tempField].value;
+
+                            state[field].unit = ecSensor.tempCal.unit;
+                            if (state[field].value != null && temp != null) {
+                                state[field].value = ecSensor.valueForTemp(state[field].value,temp);
+                                state[field].avg1 = ecSensor.valueForTemp(state[field].avg1,temp);
+                                state[field].avg2 = ecSensor.valueForTemp(state[field].avg2,temp);
+                            }
+                            if (ecSensor.tempCal.ann) {
+                                state[field].annotation = ecSensor.tempCal.name;
+                            }
                         }
                     }
-                }
+                });
                 return state;
             } catch (e) {
                 winston.error(`OyaReactor-${this.name}.getState()`, e.stack);

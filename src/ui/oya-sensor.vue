@@ -10,8 +10,9 @@
             property name of sensor</rb-about-item>
     </rb-about>
 
-    <div v-if="sensorDisplay" class="subheading primary--text oya-sensor">
-        {{sensorDisplay}}
+    <div v-if="sensorDisplay" class="primary--text oya-sensor">
+        <div>{{sensorDisplay}}</div>
+        <div class='caption'>{{sensorAnnotation}}</div>
     </div>
 </div>
 
@@ -38,6 +39,17 @@ export default {
     methods: {
     },
     computed: {
+        sensorAnnotation() {
+            var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
+            if (apiModel == null) {
+                return null;
+            }
+            var data = this.rbService[this.sensorProp];
+            if (data == null) {
+                return null;
+            }
+            return data.annotation;
+        },
         sensorDisplay() {
             const deltaPrecision = 2;
             const smallDelta = 0.01;
@@ -108,6 +120,9 @@ export default {
 <style> 
 .oya-sensor {
     padding: 0.2em;
+    display: flex;
+    flex-flow: column;
+    color: red;
     text-align: center;
 }
 </style>
