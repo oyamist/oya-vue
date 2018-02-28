@@ -170,9 +170,9 @@ export default {
         },
         sensorLabels() {
             return {
-                tempInternal: "Internal/Root Temperature",
-                humidityInternal: "Internal/Root Humidity",
-                ecInternal: "Internal/Root Nutrient/EC",
+                tempInternal: "Nutrient Temperature",
+                humidityInternal: "Nutrient Humidity",
+                ecInternal: "Nutrient Strength/EC",
                 tempCanopy: "Canopy Temperature",
                 humidityCanopy: "Canopy Humidity",
                 ecCanopy: "Canopy EC",

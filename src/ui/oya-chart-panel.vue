@@ -39,19 +39,19 @@
                 :stepSize="stepSize('temp')" :service='service'></oya-chart>
             <oya-chart palette="blue" sensorProp="humidityInternal" :date="date" 
                 :stepSize="stepSize('humidity')" :service='service'></oya-chart>
-            <oya-chart palette="blue" sensorProp="ecInternal" :date="date" 
+            <oya-chart palette="green" sensorProp="ecInternal" :date="date" 
                 :stepSize="stepSize('ec')" :service='service'></oya-chart>
             <oya-chart palette="red" sensorProp="tempCanopy" :date="date" 
                 :stepSize="stepSize('temp')" :service='service'></oya-chart>
             <oya-chart palette="blue" sensorProp="humidityCanopy" :date="date" 
                 :stepSize="stepSize('humidity')" :service='service'></oya-chart>
-            <oya-chart palette="blue" sensorProp="ecCanopy" :date="date" 
+            <oya-chart palette="green" sensorProp="ecCanopy" :date="date" 
                 :stepSize="stepSize('ec')" :service='service'></oya-chart>
             <oya-chart palette="red" sensorProp="tempAmbient" :date="date" 
                 :stepSize="stepSize('temp')" :service='service'></oya-chart>
             <oya-chart palette="blue" sensorProp="humidityAmbient" :date="date" 
                 :stepSize="stepSize('humidity')" :service='service'></oya-chart>
-            <oya-chart palette="blue" sensorProp="ecAmbient" :date="date" 
+            <oya-chart palette="green" sensorProp="ecAmbient" :date="date" 
                 :stepSize="stepSize('ec')" :service='service'></oya-chart>
         </div>
         <v-dialog v-if="ecSensor" v-model="calDialog" max-width="90%" persistent>
