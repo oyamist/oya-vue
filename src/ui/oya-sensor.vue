@@ -50,8 +50,8 @@ export default {
             if (data == null) {
                 return null;
             }
-            var result = '\u254d';
-            var delta = 0;
+            var result = data.value == null ? '\u254d' : data.value.toFixed(1);
+            var delta = data.value == null ? 0 : data.avg1 - data.avg2;
             var suffix = '';
             if (data.unit === 'C') {
                 suffix = apiModel.tempUnit === 'F' ? '\u2109' : '\u2103';
@@ -64,11 +64,7 @@ export default {
                     result = f.toFixed(1);
                     delta = avg1 - avg2;
                 } else {
-                    var c = data.value;
-                    var avg1 = data.avg1;
-                    var avg2 = data.avg2;
-                    result = c.toFixed(1);
-                    delta = avg1 - avg2;
+                    // use default
                 }
             } else if (data.unit === "%RH") {
                 suffix = '%RH';
@@ -79,18 +75,15 @@ export default {
                     result = rh.toFixed(1);
                     delta = avg1 - avg2;
                 }
-            } else if (data.unit === "\u00b5S") {
+            } else if (data.unit === "\u00b5S") { // EC
                 suffix = '\u00b5S';
-                if (data.value != null) {
-                    var ec = data.value ;
-                    var avg1 = data.avg1 ;
-                    var avg2 = data.avg2 ;
-                    result = ec.toFixed(1);
-                    delta = avg1 - avg2;
-                }
+            } else if (data.unit === "%") { // EC
+                suffix = '% nutrient';
+            } else if (data.unit === "ppm") { // EC
+                suffix = 'ppm';
+            } else if (data.unit === "microSiemens") { // EC
+                suffix = '\u00b5S';
             } else {
-                result = data.value.toFixed(1);
-                delta = data.avg1 - data.avg2;
             }
             result += suffix;
             if (delta > smallDelta) {

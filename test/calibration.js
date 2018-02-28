@@ -180,7 +180,7 @@
             domainField: 'tempInternal',
             data: seq,
         });
-        var maxMSE = cal.range.max * 0.007;
+        var maxMSE = cal.range.max * 0.008;
         cal.calibrate(seq);
         should(cal.mse).below(maxMSE);
 

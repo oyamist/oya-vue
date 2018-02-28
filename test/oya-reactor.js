@@ -904,7 +904,7 @@
         }();
         async.next();
     });
-    it ("getState() returns temperature compensated EC value", function(done) {
+    it ("TESTTESTgetState() returns temperature compensated EC value", function(done) {
         var async = function*() { try {
             var reactor = new OyaReactor("test_getState", { 
                 apiModelDir: 'test',
@@ -932,7 +932,7 @@
             should(state.ecInternal.value).approximately(44.1,tol);
             should(state.ecInternal.avg1).approximately(43.7,tol);
             should(state.ecInternal.avg2).approximately(43.6,tol);
-            should(state.ecInternal.unit).equal('%');
+            should(state.ecInternal.unit).equal('% Calibration 2:2:2');
 
             // return raw EC sensor value
             oyaConf.chart.showRaw = true;

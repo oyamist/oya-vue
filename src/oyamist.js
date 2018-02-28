@@ -31,7 +31,7 @@
             return {
                 EC: "microSiemens",
                 PPM: "ppm",
-                PRECENT: "%",
+                PERCENT: "%",
             }
         }
 
