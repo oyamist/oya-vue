@@ -215,6 +215,63 @@
             }
         })();
     });
+    it("TESTTESTsensorAvgBy10m(fields,startdate,hours) summarizes sensor data by 10-minute intervals", function(done) {
+        (async function () {
+            try {
+                var dbfacade = await new DbSqlite3(dbopts).open();
+                var r = await dbfacade.open();
+                should(r).properties({
+                    dbname: 'unit-test-v1.0.db',
+                    isOpen: true,
+                    logCount: {},
+                    logPeriod: 1,
+                    logSum: {},
+                });
+                var startdate = new Date(2018, 0, 21); // local time
+
+                // single field
+                var r = await dbfacade.sensorAvgBy10m(['ecInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                var pat = new RegExp(`where utc between '2018-01-21 00:00:00.000' and '2018-01-22 00:00:00.000`,'m');
+                should(r.data).instanceOf(Array);
+                should(r.data.length).equal(6*24);
+                should(r.data[0].hr).equal('2018-01-21 2350');
+                should(r.data[143].hr).equal('2018-01-21 0000');
+                should.deepEqual(Object.keys(r.data[0]).sort(), [
+                    'ecInternal',
+                    'hr',
+                ]);
+                should(r.data[143].hr).equal('2018-01-21 0000');
+
+                // multiple fields 
+                var r = await dbfacade.sensorAvgBy10m(['ecInternal','tempInternal'], startdate, 24);
+                should(r).properties(["sql","data"]);
+                should(r.data).instanceOf(Array);
+                should(r.data[0].hr).equal('2018-01-21 2350');
+                should(r.data[143].hr).equal('2018-01-21 0000');
+                should.deepEqual(Object.keys(r.data[0]).sort(), [
+                    'ecInternal',
+                    'hr',
+                    'tempInternal',
+                ]);
+                should(r.data.length).equal(144);
+                var sum = r.data.reduce((a,d) => {
+                    a.ecInternal = a.ecInternal || 0;
+                    a.ecInternal += d.ecInternal;
+                    a.tempInternal = a.tempInternal || 0;
+                    a.tempInternal += d.tempInternal;
+                    return a;
+                },{});
+                var e = 0.5;
+                should(sum.ecInternal/144).approximately(473.3,e);
+                should(sum.tempInternal/144).approximately(16.5,e);
+
+                done();
+            } catch (e) {
+                done(e);
+            }
+        })();
+    });
     it("TESTTESTfinalize test suite", function(done) {
         (async function() {
             try {
