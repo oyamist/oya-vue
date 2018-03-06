@@ -59,6 +59,9 @@
                 [OyaMist.SENSE_TEMP_INTERNAL]:'tempInternal',
                 [OyaMist.SENSE_TEMP_CANOPY]:'tempCanopy',
                 [OyaMist.SENSE_TEMP_AMBIENT]:'tempAmbient',
+                [OyaMist.SENSE_HUMIDITY_INTERNAL]:'humidityInternal',
+                [OyaMist.SENSE_HUMIDITY_CANOPY]:'humidityCanopy',
+                [OyaMist.SENSE_HUMIDITY_AMBIENT]:'humidityAmbient',
             }[event];
         }
 

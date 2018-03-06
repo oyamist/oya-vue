@@ -257,12 +257,12 @@
                 });
             if (value < this.coolThreshold) {
                 if (this.nextCycle === this.hotCycle) {
-                    winston.info("OyaVessel.onTemp() ${field}: reverting to default cycle");
+                    winston.info(`OyaVessel.onTemp() ${field}: reverting to default cycle`);
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
             } else if (this.nextCycle !== this.hotCycle) {
-                winston.info("OyaVessel.onTemp() ${field}: next cycle will be cooling cycle");
+                winston.info(`OyaVessel.onTemp() ${field}: next cycle will be cooling cycle`);
                 this.nextCycle = this.hotCycle;
             }
             this._state[field].value = value;
