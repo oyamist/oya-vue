@@ -120,12 +120,6 @@
                             label="Camera"
                             class="input-group"
                             ></v-select>
-                        <v-text-field v-model='apiModelCopy.heapReboot' 
-                            type="number"
-                            :label="`Reboot heap threshold`" class="input-group" />
-                        <v-text-field v-model='coolThreshold' 
-                            type="number"
-                            :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group" />
                         <v-select v-bind:items="tempItems" 
                             v-model='apiModelCopy.tempUnit' 
                             label="Temperature unit"
@@ -199,18 +193,23 @@
                 <div slot="header">Pump cycles</div>
                 <v-card>
                     <v-card-text>
-                        <rb-dialog-row :label="cycleCopy.name" 
+                        <rb-dialog-row label="General">
+                            <v-text-field v-model='coolThreshold' 
+                                type="number"
+                                :label="`Cooling threshold (\u00b0${apiModelCopy.tempUnit})`" class="input-group" />
+                        </rb-dialog-row>
+                        <rb-dialog-row :label="`${cycleCopy.name}: ${cycleCopy.cycle.name}`" 
                             v-for="(cycleCopy,i) in editCycles" :key="cycleCopy.name+i">
                             <v-text-field v-model='cycleCopy.cycle.desc'
                                 label="Description" class="input-group" />
                             <v-layout>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.on' type="number"
-                                        label="On seconds" class="input-group pr-1" />
+                                        :label="'On seconds \u21d2'" class="input-group pr-1" />
                                 </v-flex>
                                 <v-flex xs3>
                                     <v-text-field v-model='cycleCopy.cycle.off' type="number"
-                                        label="Off seconds" class="input-group pr-1" />
+                                        :label="'Off seconds \u21d2'" class="input-group pr-1" />
                                 </v-flex>
                                 <v-select v-bind:items="cycleItems" 
                                     v-model='cycleCopy.cycle.nextCycle' 
@@ -572,12 +571,19 @@ export default {
             }];
         },
         cycleItems() {
-            return [
-                "Cycle #1",
-                "Cycle #2",
-                "Cycle #3",
-                "Cycle #4",
-            ];
+            return [{
+                value: "Cycle #1",
+                text: "Cycle #1: Standard",
+            },{
+                value: "Cycle #2",
+                text: "Cycle #2: Prime",
+            },{
+                value: "Cycle #3",
+                text: "Cycle #3: Cool",
+            },{
+                value: "Cycle #4",
+                text: "Cycle #4: Conserve",
+            }];
         },
         cameraItems() {
             return [{
