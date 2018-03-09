@@ -452,7 +452,7 @@
                 this.stopLight = null;
             }
             if (value) {
-                const SYNC_LIGHT_SECONDS = 60;
+                const SYNC_LIGHT_SECONDS = 3;
                 var interval = setInterval(() => this.syncLights(), SYNC_LIGHT_SECONDS * 1000);
                 this.stopLight = [() => clearInterval(interval)];
                 this.syncLights();
