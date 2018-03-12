@@ -17,6 +17,7 @@
             this.startCycle = OyaMist.CYCLE_STANDARD;
             this.hotCycle = OyaMist.CYCLE_COOL;
             this.coolThreshold = COOLTHRESHOLD;
+            this.thresholdHysteresis = opts.thresholdHysteresis || 0.99;
             this.sensorExpRate = opts.sensorExpRate || 0.01; // exponential average rate
             this.maxCycles = 0;
             this.cycles = OyaVessel.DEFAULT_CYCLES,
@@ -182,6 +183,7 @@
                 startCycle: this.startCycle,
                 hotCycle: this.hotCycle,
                 coolThreshold: this.coolThreshold,
+                thresholdHysteresis: this.thresholdHysteresis,
                 maxCycles: this.maxCycles,
                 cycles: this.cycles,
             }
@@ -255,13 +257,13 @@
                 .catch(e => {
                     winston.debug(e); // ignore sensor errors
                 });
-            if (value < this.coolThreshold) {
+            if (value <= this.coolThreshold * this.thresholdHysteresis) {
                 if (this.nextCycle === this.hotCycle) {
                     winston.info(`OyaVessel.onTemp() ${field}: reverting to default cycle`);
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
-            } else if (this.nextCycle !== this.hotCycle) {
+            } else if (value >= this.coolThreshold && this.nextCycle !== this.hotCycle) {
                 winston.info(`OyaVessel.onTemp() ${field}: next cycle will be cooling cycle`);
                 this.nextCycle = this.hotCycle;
             }

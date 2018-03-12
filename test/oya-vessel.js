@@ -121,6 +121,7 @@
             type: 'OyaVessel',
             enabled: true,
             coolThreshold: (70-32)/1.8,
+            thresholdHysteresis: 0.99,
             startCycle: OyaMist.CYCLE_STANDARD,
             hotCycle: OyaMist.CYCLE_COOL,
             maxCycles: 0,
@@ -277,6 +278,33 @@
                 should(vessel.state.Mist).equal(false);
                 should(vessel.isActive).equal(false);
 
+                done();
+            } catch (err) {
+                winston.log(err.stack);
+                done(err);
+            }
+        }();
+        async.next();
+    });
+    it ("TESTTESTonTemp() controls temperature state", function(done) {
+        var async = function*() {
+            try {
+                var vessel = new OyaVessel();
+                var evt = OyaMist.SENSE_TEMP_INTERNAL;
+                var field = OyaMist.fieldOfEvent(evt);
+                should(vessel.nextCycle).equal(vessel.startCycle);
+
+                // when temperature exceeds cooling threshold, switch to hot cycle
+                vessel.onTemp(vessel.coolThreshold, field, evt);
+                should(vessel.nextCycle).equal(vessel.hotCycle);
+
+                // when temperature dips slightly below cooling threshold, keep cooling
+                vessel.onTemp(vessel.coolThreshold-0.001, field, evt);
+                should(vessel.nextCycle).equal(vessel.hotCycle);
+
+                // when temperature dips below cooling threshold with hysteresis, turn off cooling
+                vessel.onTemp(vessel.coolThreshold*vessel.thresholdHysteresis, field, evt);
+                should(vessel.nextCycle).equal(vessel.startCycle);
                 done();
             } catch (err) {
                 winston.log(err.stack);

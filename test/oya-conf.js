@@ -203,6 +203,7 @@
             startCycle: OyaMist.CYCLE_STANDARD,
             hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
+            thresholdHysteresis: 0.99,
             maxCycles: 0,
             cycles: defaultCycles,
         });
@@ -215,6 +216,7 @@
             startCycle: OyaMist.CYCLE_STANDARD,
             hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
+            thresholdHysteresis: 0.99,
             maxCycles: 0,
             cycles: defaultCycles,
         });
@@ -238,6 +240,7 @@
             startCycle: OyaMist.CYCLE_COOL,
             hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: 81,
+            thresholdHysteresis: 0.99,
             maxCycles: 2,
             cycles: defaultCycles,
         });
@@ -254,6 +257,7 @@
             startCycle: OyaMist.CYCLE_STANDARD,
             hotCycle: OyaMist.CYCLE_COOL,
             coolThreshold: (70-32)/1.8,
+            thresholdHysteresis: 0.99,
             maxCycles: 0,
             cycles: defaultCycles,
         });
