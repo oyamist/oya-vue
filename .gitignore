@@ -1,4 +1,6 @@
 # OyaMist
+archive/
+local/
 dist
 .motion
 api-model/

@@ -215,7 +215,7 @@
             }
         })();
     });
-    it("TESTTESTsensorAvgBy10m(fields,startdate,hours) summarizes sensor data by 10-minute intervals", function(done) {
+    it("sensorAvgBy10m(fields,startdate,hours) summarizes sensor data by 10-minute intervals", function(done) {
         (async function () {
             try {
                 var dbfacade = await new DbSqlite3(dbopts).open();

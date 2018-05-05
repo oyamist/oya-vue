@@ -262,7 +262,7 @@
             cycles: defaultCycles,
         });
     });
-    it("TESTTESTupdate(opts) updates configuration ", function() {
+    it("update(opts) updates configuration ", function() {
         var oc = new OyaConf();
         var vessel0 = oc.vessels[0];
         var actuators = [

@@ -286,7 +286,7 @@
         }();
         async.next();
     });
-    it ("TESTTESTonTemp() controls temperature state", function(done) {
+    it ("onTemp() controls temperature state", function(done) {
         var async = function*() {
             try {
                 var vessel = new OyaVessel();
