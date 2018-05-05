@@ -15,6 +15,7 @@
         static get EVENT_COOL() { return "event:Cool"; }
         static get EVENT_PRIME() { return "event:Prime"; }
         static get EVENT_ACTIVATE() { return "event:activate"; }
+        static get EVENT_FAN_PWM() { return "event:fan:pwm"; }
         static get CAMERA_ACTIVATE() { return "camera: activate"; }
         static get SENSE_TEMP_INTERNAL() { return "sense: temp-internal"; }
         static get SENSE_TEMP_CANOPY() { return "sense: temp-canopy"; }

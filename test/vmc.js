@@ -35,7 +35,7 @@
         async.next();
     });
     it("finalize TEST suite", function() {
-        app.locals.rbServer.close();
+        app.locals.rbServer && app.locals.rbServer.close();
         winston.info("end test suite");
     });
 })

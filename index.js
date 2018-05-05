@@ -3,6 +3,7 @@ module.exports = {
     Calibration: require("./src/calibration"),
     DbFacade: require("./src/db-facade"),
     DbSqlite3: require('./src/db-sqlite3'),
+    Fan: require("./src/fan"),
     Light: require("./src/light"),
     OyaConf: require("./src/oya-conf"),
     OyaMist: require('./src/oyamist'),
