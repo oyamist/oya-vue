@@ -268,7 +268,7 @@
             cycles: defaultCycles,
         });
     });
-    it("update(opts) updates configuration ", function() {
+    it("TESTTESTupdate(opts) updates configuration ", function() {
         var oc = new OyaConf();
         var vessel0 = oc.vessels[0];
         var actuators = [
@@ -334,7 +334,7 @@
         should.equal(vessel0, oc.vessels[0]);
         should(vessel0.guid).match(/.*-.*-.*-.*-.*/);
         ocv0 = oc.vessels[0];
-        should.deepEqual(oc.toJSON(), {
+        should(oc.toJSON()).properties( {
             name: 'foo',
             type: 'OyaConf',
             tempUnit: 'C',
@@ -349,14 +349,13 @@
                 updatedVessel,
             ],
             actuators,
-            lights: defaultConf.lights,
-            sensors: defaultConf.sensors,
-            switches: defaultConf.switches,
-            chart: defaultConf.chart,
-            camera: defaultConf.camera,
-            fan: defaultConf.fan,
-
         });
+        should.deepEqual(oc.toJSON().lights, defaultConf.lights);
+        should.deepEqual(oc.toJSON().sensors, defaultConf.sensors);
+        should.deepEqual(oc.toJSON().switches, defaultConf.switches);
+        should.deepEqual(oc.toJSON().chart, defaultConf.chart);
+        should.deepEqual(oc.toJSON().camera, defaultConf.camera);
+        should.deepEqual(oc.toJSON().fan, defaultConf.fan);
 
     });
     it("update(opts) retains sensor instances", function() {
