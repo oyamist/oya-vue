@@ -5,6 +5,7 @@
         OyaConf,
         OyaMist,
         Actuator,
+        Fan,
         Light,
         Sensor,
         Switch,
@@ -93,6 +94,7 @@
             humidityStepSize: 5,
             showRaw: false,
         },
+        fan: new Fan(),
     };
     winston.level = 'warn';
 
@@ -104,7 +106,10 @@
                 guid: 'testguid1',
             }],
         });
-        should.deepEqual(conf.toJSON(), defaultConf);
+        var json = JSON.parse(JSON.stringify(conf));
+        var jsonExpected = JSON.parse(JSON.stringify(defaultConf));
+        should.deepEqual(json.fan, jsonExpected.fan);
+        should.deepEqual(json, jsonExpected);
     });
     it("ctor creates default configuration", function() {
         var oc = new OyaConf();
@@ -188,6 +193,7 @@
             ],
             chart: defaultConf.chart,
             camera: defaultConf.camera,
+            fan: defaultConf.fan,
         });
     });
     it("createVesselConfig(index,opts) creates a custom vessel", function() {
@@ -348,6 +354,7 @@
             switches: defaultConf.switches,
             chart: defaultConf.chart,
             camera: defaultConf.camera,
+            fan: defaultConf.fan,
 
         });
 

@@ -3,14 +3,16 @@
     const EventEmitter = require('events');
     const winston = require('winston');
     const OyaMist = require('./oyamist');
+    var JSONKEYS = null;
 
     class Fan {
         constructor(options = {}) {
             var opts = Object.assign(Fan.FAN_DEFAULT, options);
 
             this.update(opts);
-            this.jsonKeys = Object.keys(this).sort();
+            JSONKEYS = JSONKEYS || Object.keys(this).sort();
 
+            // unserialized options
             opts.emitter && (this.emitter = opts.emitter);
         }
 
@@ -26,12 +28,12 @@
 
         update(opts = {}) {
             // serializable toJSON() properties
-            this.type = opts.type;
-            this.name = opts.name;
-            this.pinPwm = Number(opts.pinPwm);
-            this.rhMax = opts.rhMax;
-            this.rhMin = opts.rhMin;
-            this.rhEvent = opts.rhEvent;
+            this.type = opts.type || this.type;
+            this.name = opts.name || this.name;
+            this.pinPwm = Number(opts.pinPwm || this.pinPwm);
+            this.rhMax = opts.rhMax || this.rhMax;
+            this.rhMin = opts.rhMin || this.rhMin;
+            this.rhEvent = opts.rhEvent || this.rhEvent;
             return this;
         }
 
@@ -69,7 +71,7 @@
         }
 
         toJSON() {
-            return this.jsonKeys.reduce((acc,k) => ((acc[k] = this[k]),acc), {});
+            return JSONKEYS.reduce((acc,k) => ((acc[k] = this[k]),acc), {});
         }
 
     } //// class Fan

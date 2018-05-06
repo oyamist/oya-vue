@@ -4,6 +4,7 @@
     const Sensor = require('./sensor');
     const Light = require('./light');
     const Switch = require('./switch');
+    const Fan = require('./fan');
 
     // OyaMist bioreactor configuration
     class OyaConf {
@@ -132,6 +133,8 @@
                     event: OyaConf.EVENT_CYCLE_MIST,
                 }));
             }
+            this.fan = this.fan || new Fan();
+            this.fan.update(opts.fan);
 
             this.tempUnit = opts.tempUnit || this.tempUnit || OyaConf.TEMP_FAHRENHEIT;
             this.mcuHat = opts.mcuHat || this.mcuHat || OyaConf.MCU_HAT_NONE.value;
@@ -169,6 +172,7 @@
                 chart: this.chart,
                 camera: this.camera,
                 heapReboot: this.heapReboot,
+                fan: this.fan,
             };
         }
 
