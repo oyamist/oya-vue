@@ -39,19 +39,20 @@
 
             this.mcuHat = opts.mcuHat || OyaConf.MCU_HAT_NONE.value;
 
-            if (this.vessels == null) {
-                if (opts.vessels) {
-                    this.vessels = opts.vessels.map((a,i) => OyaConf.createVesselConfig(i));
-                } else {
-                    this.vessels = [
-                        OyaConf.createVesselConfig(0),
-                        OyaConf.createVesselConfig(1),
-                    ];
+            { // legacy configuration supported multiple vessels
+                if (this.vessels == null) {
+                    if (opts.vessels) {
+                        this.vessels = [opts.vessels[0]].map((a,i) => OyaConf.createVesselConfig(i));
+                    } else {
+                        this.vessels = [
+                            OyaConf.createVesselConfig(0),
+                        ];
+                    }
                 }
+                opts.vessels && [opts.vessels[0]].forEach((delta, i) => {
+                    OyaVessel.applyDelta(this.vessels[i], delta);
+                });
             }
-            opts.vessels && opts.vessels.forEach((delta, i) => {
-                OyaVessel.applyDelta(this.vessels[i], delta);
-            });
 
             if (this.actuators == null && opts.actuators == null) {
                 this.actuators = [];
@@ -82,6 +83,7 @@
                     return new Actuator(a);
                 });
             }
+            this.actuators = this.actuators.filter(a=>a.vesselIndex == 0);
             if (opts.sensors) {
                 var oldSensors = this.sensors || [];
                 this.sensors = opts.sensors.map((newSensor,i) => {
@@ -104,6 +106,7 @@
                     this.sensors.push(new Sensor(sensorOpts));
                 }
             }
+            this.sensors = this.sensors.filter(s=>s.vesselIndex == 0);
             if (opts.lights) {
                 this.lights = opts.lights.map((l,i) => {
                     return new Light(l);

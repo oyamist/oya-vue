@@ -201,7 +201,7 @@
             var that = this;
             return new Promise((resolve, reject) => {
                 try {
-                    conf && conf.vessels.forEach((v,i) => {
+                    conf && [conf.vessels[0]].forEach((v,i) => {
                         OyaVessel.applyDelta(this.vessels[i], v);
                     });
                     that.oyaConf.update(conf);

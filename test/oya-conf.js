@@ -1,6 +1,8 @@
 (typeof describe === 'function') && describe("OyaConf", function() {
     const should = require("should");
     const winston = require('winston');
+    const path = require('path');
+    const fs = require('fs');
     const {
         OyaConf,
         OyaMist,
@@ -52,21 +54,6 @@
             new Actuator({usage:Actuator.USAGE_MIST}),
             new Actuator({usage:Actuator.USAGE_COOL}),
             new Actuator({usage:Actuator.USAGE_PRIME}),
-            new Actuator({
-                name: "Mist2",
-                usage:Actuator.USAGE_MIST,
-                vesselIndex: 1
-            }),
-            new Actuator({
-                name: "Cool2",
-                usage:Actuator.USAGE_COOL,
-                vesselIndex: 1
-            }),
-            new Actuator({
-                name: "Prime2",
-                usage:Actuator.USAGE_PRIME,
-                vesselIndex: 1
-            }),
         ],
         sensors: [
             new Sensor(Object.assign(Sensor.TYPE_NONE, {
@@ -77,15 +64,6 @@
             })),
             new Sensor(Object.assign(Sensor.TYPE_NONE, {
                 vesselIndex: 0,
-            })),
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 1,
-            })),
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 1,
-            })),
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 1,
             })),
         ],
         chart: {
@@ -381,6 +359,76 @@
         should(tempSensor).equal(oc.sensors[0]);
         var ecSensor = oc.sensorOfField('ecAmbient');
         should(ecSensor).equal(oc.sensors[1]);
+    });
+    it("TESTTESTupdate(conf) read legacy multi-vessel configuration", function() {
+        var confPath = path.join(__dirname, 'multi-vessel-conf.json');
+        var confJson = JSON.parse(fs.readFileSync(confPath));
+        var conf = new OyaConf(confJson);
+        var vessel = conf.vessels[0];
+        should(conf.vessels.length).equal(1); // TODO: vessels => vessel
+        should(vessel).properties({
+            "name": "Garage02 seedlings and clones",
+            "guid": "6fb75b96-c318-4760-8c97-a6e835eeb665",
+        });
+        should(vessel.cycles).properties({
+            "Cycle #1": {
+                "name": "Standard",
+                "key": "Cycle #1",
+                "desc": "Standard cycle for all phases of plant growth",
+                "emits": "event:mist",
+                "on": "20",
+                "off": "60",
+                "nextCycle": "Cycle #1"
+            },
+        });
+        should(conf.actuators[0]).properties( {
+            "name": "Mist",
+            "type": "actuator:spst:no",
+            "usage": "Mist",
+            "vesselIndex": 0,
+            "desc": "Mist roots",
+            "pin": 33,
+            "activate": "event:mist"
+        });
+        should(conf.sensors[1]).properties({
+            "address": 100,
+            "desc": "Atlas Scientific EZO™ EC with K1 conductivity probe",
+            "name": "EZO-EC-K1",
+            "type": "EZO-EC-K1",
+        });
+        should(conf.lights[0]).properties({
+            "cycleDays": 1,
+            "cycleOff": 11,
+            "cycleOn": 13,
+            "cycleStartDay": 0,
+            "cycleStartTime": "07:00",
+            "desc": "Turn on full spectrum lights",
+            "event": "event:Full light",
+            "name": "White light",
+            "pin": 32,
+            "spectrum": "Full spectrum",
+            "type": "Light:spst:no"
+        });
+        should(conf.switches[0]).properties({
+            "name": "Prime",
+            "type": "active:high",
+            "desc": "(Prime description)",
+            "pin": 37,
+            "event": "event:cycle-prime"
+        });
+        should(conf).properties({
+            "mcuHat": "mcu-hat:pmi-auto-hat",
+            "hostTimeout": 200,
+            "healthPoll": 60,
+            "chart": {
+                "ecStepSize": "10",
+                "tempStepSize": "5",
+                "humidityStepSize": 5,
+                "showRaw": false
+            },
+            "camera": "when-lit",
+            "heapReboot": 50000000,
+        });
     });
 
 });
