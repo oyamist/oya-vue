@@ -1,0 +1,599 @@
+{
+    "name": "test",
+    "type": "OyaConf",
+    "tempUnit": "F",
+    "vessels": [
+        {
+            "name": "Garage02 seedlings and clones",
+            "guid": "6fb75b96-c318-4760-8c97-a6e835eeb665",
+            "sensorExpRate": 0.01,
+            "type": "OyaVessel",
+            "enabled": true,
+            "startCycle": "Cycle #1",
+            "hotCycle": "Cycle #3",
+            "coolThreshold": 21.11111111111111,
+            "thresholdHysteresis": 0.99,
+            "maxCycles": 0,
+            "cycles": {
+                "Cycle #1": {
+                    "name": "Standard",
+                    "key": "Cycle #1",
+                    "desc": "Standard cycle for all phases of plant growth",
+                    "emits": "event:mist",
+                    "on": "20",
+                    "off": "60",
+                    "nextCycle": "Cycle #1"
+                },
+                "Cycle #2": {
+                    "name": "Prime",
+                    "key": "Cycle #2",
+                    "desc": "Circulate water to prime misting system",
+                    "emits": "event:mist",
+                    "on": 60,
+                    "off": 0,
+                    "nextCycle": "Cycle #1"
+                },
+                "Cycle #3": {
+                    "name": "Cool",
+                    "key": "Cycle #3",
+                    "desc": "Hot day evaporative cooling cycle with fan",
+                    "emits": "event:mist",
+                    "on": "20",
+                    "off": "30",
+                    "nextCycle": "Cycle #3"
+                },
+                "Cycle #4": {
+                    "name": "Conserve",
+                    "key": "Cycle #4",
+                    "desc": "Conservative misting cycle for mild conditions",
+                    "emits": "event:mist",
+                    "on": 10,
+                    "off": 120,
+                    "nextCycle": "Cycle #4"
+                }
+            }
+        },
+        {
+            "name": "vessel2",
+            "guid": "aa9bda52-b4eb-4e1b-b774-3c2ec9f0255b",
+            "sensorExpRate": 0.01,
+            "type": "OyaVessel",
+            "enabled": true,
+            "startCycle": "Cycle #1",
+            "hotCycle": "Cycle #3",
+            "coolThreshold": 21.11111111111111,
+            "thresholdHysteresis": 0.99,
+            "maxCycles": 0,
+            "cycles": {
+                "Cycle #1": {
+                    "name": "Standard",
+                    "key": "Cycle #1",
+                    "desc": "Standard cycle for all phases of plant growth",
+                    "emits": "event:mist",
+                    "on": 10,
+                    "off": 60,
+                    "nextCycle": "Cycle #1"
+                },
+                "Cycle #2": {
+                    "name": "Prime",
+                    "key": "Cycle #2",
+                    "desc": "Circulate water to prime misting system",
+                    "emits": "event:mist",
+                    "on": 60,
+                    "off": 0,
+                    "nextCycle": "Cycle #1"
+                },
+                "Cycle #3": {
+                    "name": "Cool",
+                    "key": "Cycle #3",
+                    "desc": "Hot day evaporative cooling cycle with fan",
+                    "emits": "event:mist",
+                    "on": 10,
+                    "off": 20,
+                    "nextCycle": "Cycle #3"
+                },
+                "Cycle #4": {
+                    "name": "Conserve",
+                    "key": "Cycle #4",
+                    "desc": "Conservative misting cycle for mild conditions",
+                    "emits": "event:mist",
+                    "on": 10,
+                    "off": 120,
+                    "nextCycle": "Cycle #4"
+                }
+            }
+        }
+    ],
+    "actuators": [
+        {
+            "name": "Mist",
+            "type": "actuator:spst:no",
+            "usage": "Mist",
+            "vesselIndex": 0,
+            "desc": "Mist roots",
+            "pin": 33,
+            "activate": "event:mist"
+        },
+        {
+            "name": "Cool",
+            "type": "actuator:spst:no",
+            "usage": "Cool",
+            "vesselIndex": 0,
+            "desc": "Cool roots",
+            "pin": -1,
+            "activate": "event:Cool"
+        },
+        {
+            "name": "Prime",
+            "type": "actuator:spst:no",
+            "usage": "Prime",
+            "vesselIndex": 0,
+            "desc": "Prime mist system ",
+            "pin": -1,
+            "activate": "event:Prime"
+        },
+        {
+            "name": "Mist2",
+            "type": "actuator:spst:no",
+            "usage": "Mist",
+            "vesselIndex": 1,
+            "desc": "Mist roots",
+            "pin": -1,
+            "activate": "event:mist"
+        },
+        {
+            "name": "Cool2",
+            "type": "actuator:spst:no",
+            "usage": "Cool",
+            "vesselIndex": 1,
+            "desc": "Cool roots",
+            "pin": -1,
+            "activate": "event:Cool"
+        },
+        {
+            "name": "Prime2",
+            "type": "actuator:spst:no",
+            "usage": "Prime",
+            "vesselIndex": 1,
+            "desc": "Prime mist system ",
+            "pin": -1,
+            "activate": "event:Prime"
+        }
+    ],
+    "sensors": [
+        {
+            "address": "28-05170274aaff",
+            "addresses": [
+                "28-05170274aaff"
+            ],
+            "cmdCalDry": null,
+            "comm": "1-wire",
+            "desc": "DS18B20 Temperature 1-Wire sensor",
+            "healthTimeout": 5,
+            "loc": "internal",
+            "maxReadErrors": 5,
+            "name": "DS18B20",
+            "readEC": null,
+            "readHumidity": null,
+            "readTemp": true,
+            "tempCal": {
+                "ann": null,
+                "data": [],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": null,
+                    "min": null
+                },
+                "hours": 24,
+                "name": "Calibration 2018-02-25",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": null,
+                    "min": null
+                },
+                "startDate": "2018-02-25T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "DS18B20",
+            "vesselIndex": 0
+        },
+        {
+            "address": 100,
+            "addresses": [
+                100
+            ],
+            "cmdCalDry": [
+                67,
+                97,
+                108,
+                44,
+                100,
+                114,
+                121
+            ],
+            "comm": "I²C",
+            "desc": "Atlas Scientific EZO™ EC with K1 conductivity probe",
+            "healthTimeout": 5,
+            "loc": "internal",
+            "maxReadErrors": 5,
+            "name": "EZO-EC-K1",
+            "readEC": true,
+            "readHumidity": null,
+            "readTemp": null,
+            "tempCal": {
+                "ann": {
+                    "type": "Sequential",
+                    "nIn": 1,
+                    "nOut": 1,
+                    "layers": [
+                        {
+                            "type": "MapLayer",
+                            "id": 0,
+                            "weights": {},
+                            "fmap": [
+                                "function anonymous(eIn\n/*``*/) {\nreturn  eIn[0]\n}",
+                                "function anonymous(eIn\n/*``*/) {\nreturn \"(\" + eIn[0]+\"^2)\"\n}",
+                                "function anonymous(eIn\n/*``*/) {\nreturn \"(\" + eIn[0]+\"^3)\"\n}",
+                                "function anonymous(eIn\n/*``*/) {\nreturn \"(\" + eIn[0]+\"^4)\"\n}",
+                                "function anonymous(eIn\n/*``*/) {\nreturn \"(\" + eIn[0]+\"^5)\"\n}"
+                            ]
+                        },
+                        {
+                            "type": "Layer",
+                            "id": 1,
+                            "nOut": 1,
+                            "activation": "identity"
+                        }
+                    ],
+                    "inStats": [
+                        {
+                            "max": 19.370707062146888,
+                            "min": 10.062565833333336,
+                            "mean": 14.716636447740113,
+                            "std": 3.046804411455526
+                        }
+                    ],
+                    "fNormIn": [
+                        "function anonymous(x\n/*``*/) {\nreturn (x - 14.716636447740111)*0.2148656698298643\n}"
+                    ],
+                    "weights": {
+                        "w1b0": 2256.559355553566,
+                        "w1r0c0": 224.86006507761934,
+                        "w1r0c1": 13.561826772171566,
+                        "w1r0c2": -10.428023433098259,
+                        "w1r0c3": -8.686533945509606,
+                        "w1r0c4": 13.15016188508739
+                    },
+                    "gradExpr": {
+                        "w1b0": "w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5",
+                        "w1r0c0": "x0 * (w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5)",
+                        "w1r0c1": "x0 ^ 2 * (w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5)",
+                        "w1r0c2": "x0 ^ 3 * (w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5)",
+                        "w1r0c3": "x0 ^ 4 * (w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5)",
+                        "w1r0c4": "x0 ^ 5 * (w1b0 - yt0 + w1r0c0 * x0 + w1r0c1 * x0 ^ 2 + w1r0c2 * x0 ^ 3 + w1r0c3 * x0 ^ 4 + w1r0c4 * x0 ^ 5)"
+                    },
+                    "costFunExpr": "((w1b0+w1r0c0*x0+w1r0c1*(x0^2)+w1r0c2*(x0^3)+w1r0c3*(x0^4)+w1r0c4*(x0^5)-yt0)^2)/2"
+                },
+                "data": [
+                    {
+                        "hr": "2018-03-03 1300",
+                        "ecInternal": 2487.4422222222224,
+                        "tempInternal": 19.370707062146888
+                    },
+                    {
+                        "hr": "2018-03-03 1200",
+                        "ecInternal": 2477.2745762711866,
+                        "tempInternal": 19.113952777777772
+                    },
+                    {
+                        "hr": "2018-03-03 1100",
+                        "ecInternal": 2423.468888888889,
+                        "tempInternal": 18.04326333333334
+                    },
+                    {
+                        "hr": "2018-03-03 1000",
+                        "ecInternal": 2376.2272222222227,
+                        "tempInternal": 17.175512222222224
+                    },
+                    {
+                        "hr": "2018-03-03 0900",
+                        "ecInternal": 2326.539166666666,
+                        "tempInternal": 16.195452222222226
+                    },
+                    {
+                        "hr": "2018-03-03 0800",
+                        "ecInternal": 2283.1355932203387,
+                        "tempInternal": 15.300798022598874
+                    },
+                    {
+                        "hr": "2018-03-03 0700",
+                        "ecInternal": 2244.1411111111106,
+                        "tempInternal": 14.514282777777781
+                    },
+                    {
+                        "hr": "2018-03-03 0600",
+                        "ecInternal": 2234.7827777777775,
+                        "tempInternal": 14.28040833333334
+                    },
+                    {
+                        "hr": "2018-03-03 0500",
+                        "ecInternal": 2228.8427777777774,
+                        "tempInternal": 14.10732333333334
+                    },
+                    {
+                        "hr": "2018-03-03 0400",
+                        "ecInternal": 2216.4655555555555,
+                        "tempInternal": 13.815092500000004
+                    },
+                    {
+                        "hr": "2018-03-03 0300",
+                        "ecInternal": 2196.4133333333343,
+                        "tempInternal": 13.379787222222228
+                    },
+                    {
+                        "hr": "2018-03-03 0200",
+                        "ecInternal": 2164.081073446328,
+                        "tempInternal": 12.726859604519777
+                    },
+                    {
+                        "hr": "2018-03-03 0100",
+                        "ecInternal": 2114.199444444445,
+                        "tempInternal": 11.734657222222229
+                    },
+                    {
+                        "hr": "2018-03-03 0000",
+                        "ecInternal": 2034.0386111111118,
+                        "tempInternal": 10.062565833333336
+                    }
+                ],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": 19.370707062146888,
+                    "min": 10.062565833333336
+                },
+                "hours": 24,
+                "name": "Flora 1:2:1 3/3",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": 2487.4422222222224,
+                    "min": 2034.0386111111118
+                },
+                "startDate": "2018-03-03T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "EZO-EC-K1",
+            "vesselIndex": 0
+        },
+        {
+            "address": 92,
+            "addresses": [
+                92
+            ],
+            "cmdCalDry": null,
+            "comm": "I²C",
+            "desc": "AM2315 Temperature/Humidity I2C sensor",
+            "healthTimeout": 5,
+            "loc": "canopy",
+            "maxReadErrors": 5,
+            "name": "AM2315",
+            "readEC": null,
+            "readHumidity": true,
+            "readTemp": true,
+            "tempCal": {
+                "ann": null,
+                "data": [],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": null,
+                    "min": null
+                },
+                "hours": 24,
+                "name": "Calibration 2018-02-25",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": null,
+                    "min": null
+                },
+                "startDate": "2018-02-25T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "AM2315",
+            "vesselIndex": 0
+        },
+        {
+            "address": "(NO DEVICE)",
+            "addresses": [
+                "(NO DEVICE)"
+            ],
+            "cmdCalDry": null,
+            "comm": null,
+            "desc": "No sensor",
+            "healthTimeout": 5,
+            "loc": "none",
+            "maxReadErrors": 5,
+            "name": "No sensor",
+            "readEC": null,
+            "readHumidity": null,
+            "readTemp": null,
+            "tempCal": {
+                "ann": null,
+                "data": [],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": null,
+                    "min": null
+                },
+                "hours": 24,
+                "name": "Calibration 2018-02-25",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": null,
+                    "min": null
+                },
+                "startDate": "2018-02-25T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "none",
+            "vesselIndex": 1
+        },
+        {
+            "address": "(NO DEVICE)",
+            "addresses": [
+                "(NO DEVICE)"
+            ],
+            "cmdCalDry": null,
+            "comm": null,
+            "desc": "No sensor",
+            "healthTimeout": 5,
+            "loc": "none",
+            "maxReadErrors": 5,
+            "name": "No sensor",
+            "readEC": null,
+            "readHumidity": null,
+            "readTemp": null,
+            "tempCal": {
+                "ann": null,
+                "data": [],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": null,
+                    "min": null
+                },
+                "hours": 24,
+                "name": "Calibration 2018-02-25",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": null,
+                    "min": null
+                },
+                "startDate": "2018-02-25T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "none",
+            "vesselIndex": 1
+        },
+        {
+            "address": "(NO DEVICE)",
+            "addresses": [
+                "(NO DEVICE)"
+            ],
+            "cmdCalDry": null,
+            "comm": null,
+            "desc": "No sensor",
+            "healthTimeout": 5,
+            "loc": "none",
+            "maxReadErrors": 5,
+            "name": "No sensor",
+            "readEC": null,
+            "readHumidity": null,
+            "readTemp": null,
+            "tempCal": {
+                "ann": null,
+                "data": [],
+                "desc": "",
+                "domain": {
+                    "field": "tempInternal",
+                    "max": null,
+                    "min": null
+                },
+                "hours": 24,
+                "name": "Calibration 2018-02-25",
+                "nominal": 100,
+                "range": {
+                    "field": "ecInternal",
+                    "max": null,
+                    "min": null
+                },
+                "startDate": "2018-02-25T08:00:00.000Z",
+                "unit": "%"
+            },
+            "type": "none",
+            "vesselIndex": 1
+        }
+    ],
+    "lights": [
+        {
+            "cycleDays": 1,
+            "cycleOff": 11,
+            "cycleOn": 13,
+            "cycleStartDay": 0,
+            "cycleStartTime": "07:00",
+            "desc": "Turn on full spectrum lights",
+            "event": "event:Full light",
+            "name": "White light",
+            "pin": 32,
+            "spectrum": "Full spectrum",
+            "type": "Light:spst:no"
+        },
+        {
+            "cycleDays": 1,
+            "cycleOff": 12,
+            "cycleOn": 12,
+            "cycleStartDay": 0,
+            "cycleStartTime": "06:00",
+            "desc": "Turn on blue lights",
+            "event": "event:Blue light",
+            "name": "Blue light",
+            "pin": -1,
+            "spectrum": "Blue spectrum",
+            "type": "Light:spst:no"
+        },
+        {
+            "cycleDays": 1,
+            "cycleOff": 12,
+            "cycleOn": 12,
+            "cycleStartDay": 0,
+            "cycleStartTime": "06:00",
+            "desc": "Turn on red lights",
+            "event": "event:Red light",
+            "name": "Red light",
+            "pin": -1,
+            "spectrum": "Red spectrum",
+            "type": "Light:spst:no"
+        }
+    ],
+    "switches": [
+        {
+            "name": "Prime",
+            "type": "active:high",
+            "desc": "(Prime description)",
+            "pin": 37,
+            "event": "event:cycle-prime"
+        },
+        {
+            "name": "Cool",
+            "type": "active:high",
+            "desc": "(Cool description)",
+            "pin": -1,
+            "event": "event:cycle-cool"
+        },
+        {
+            "name": "Mist",
+            "type": "active:high",
+            "desc": "(Mist description)",
+            "pin": -1,
+            "event": "event:cycle-mist"
+        }
+    ],
+    "mcuHat": "mcu-hat:pmi-auto-hat",
+    "hostTimeout": 200,
+    "healthPoll": 60,
+    "chart": {
+        "ecStepSize": "10",
+        "tempStepSize": "5",
+        "humidityStepSize": 5,
+        "showRaw": false
+    },
+    "camera": "when-lit",
+    "heapReboot": 50000000
+}
