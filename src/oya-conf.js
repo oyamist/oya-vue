@@ -40,50 +40,38 @@
             this.mcuHat = opts.mcuHat || OyaConf.MCU_HAT_NONE.value;
 
             { // legacy configuration supported multiple vessels
-                if (this.vessels == null) {
-                    if (opts.vessels) {
-                        this.vessels = [opts.vessels[0]].map((a,i) => OyaConf.createVesselConfig(i));
-                    } else {
-                        this.vessels = [
-                            OyaConf.createVesselConfig(0),
-                        ];
-                    }
+                if (this.vessel == null) {
+                    this.vessel = OyaConf.createVesselConfig(0);
                 }
                 opts.vessels && [opts.vessels[0]].forEach((delta, i) => {
-                    OyaVessel.applyDelta(this.vessels[i], delta);
+                    OyaVessel.applyDelta(this.vessel, delta);
                 });
             }
+            this.vessels = [this.vessel];
 
             if (this.actuators == null && opts.actuators == null) {
                 this.actuators = [];
-                for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
-                    var suffix = iVessel ? iVessel+1 : "";
-                    this.actuators.push(
-                        new Actuator({
-                            name: `${Actuator.USAGE_MIST}${suffix}`,
-                            usage: Actuator.USAGE_MIST,
-                            vesselIndex: iVessel,
-                    }));
-                    this.actuators.push(
-                        new Actuator({
-                            name: `${Actuator.USAGE_COOL}${suffix}`,
-                            usage: Actuator.USAGE_COOL,
-                            vesselIndex: iVessel,
-                    }));
-                    this.actuators.push(
-                        new Actuator({
-                            name: `${Actuator.USAGE_PRIME}${suffix}`,
-                            usage: Actuator.USAGE_PRIME,
-                            vesselIndex: iVessel,
-                    }));
-                }
+                this.actuators.push(
+                    new Actuator({
+                        name: `${Actuator.USAGE_MIST}`,
+                        usage: Actuator.USAGE_MIST,
+                }));
+                this.actuators.push(
+                    new Actuator({
+                        name: `${Actuator.USAGE_COOL}`,
+                        usage: Actuator.USAGE_COOL,
+                }));
+                this.actuators.push(
+                    new Actuator({
+                        name: `${Actuator.USAGE_PRIME}`,
+                        usage: Actuator.USAGE_PRIME,
+                }));
             }
             if (opts.actuators) {
                 this.actuators = opts.actuators.map((a,i) => {
                     return new Actuator(a);
                 });
             }
-            this.actuators = this.actuators.filter(a=>a.vesselIndex == 0);
             if (opts.sensors) {
                 var oldSensors = this.sensors || [];
                 this.sensors = opts.sensors.map((newSensor,i) => {
@@ -94,19 +82,14 @@
                 });
             } else if (this.sensors == null) {
                 this.sensors = [];
-                for(var iVessel = 0; iVessel < this.vessels.length; iVessel++) {
-                    var suffix = iVessel ? iVessel+1 : "";
-                    var sensorOpts = Object.assign(Sensor.TYPE_NONE, {
-                        vesselIndex: iVessel,
-                        i2cRead,
-                        i2cWrite,
-                    });
-                    this.sensors.push(new Sensor(sensorOpts));
-                    this.sensors.push(new Sensor(sensorOpts));
-                    this.sensors.push(new Sensor(sensorOpts));
-                }
+                var sensorOpts = Object.assign(Sensor.TYPE_NONE, {
+                    i2cRead,
+                    i2cWrite,
+                });
+                this.sensors.push(new Sensor(sensorOpts));
+                this.sensors.push(new Sensor(sensorOpts));
+                this.sensors.push(new Sensor(sensorOpts));
             }
-            this.sensors = this.sensors.filter(s=>s.vesselIndex == 0);
             if (opts.lights) {
                 this.lights = opts.lights.map((l,i) => {
                     return new Light(l);
