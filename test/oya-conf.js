@@ -95,11 +95,9 @@
     it("ctor takes configuration options", function() {
         var actuators = [
             new Actuator({
-                vesselIndex: 0,
                 usage: Actuator.USAGE_MIST,
             }),
             new Actuator({
-                vesselIndex: 0,
                 usage: Actuator.USAGE_COOL,
                 pin:3, 
             }),
@@ -385,7 +383,6 @@
             "name": "Mist",
             "type": "actuator:spst:no",
             "usage": "Mist",
-            "vesselIndex": 0,
             "desc": "Mist roots",
             "pin": 33,
             "activate": "event:mist"

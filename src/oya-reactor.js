@@ -105,13 +105,13 @@
                     name: `${name}-vessel${iv}`,
                 }, vconf, opts));
                 vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
-                    this.onActuator(OyaMist.EVENT_MIST, value, iv);
+                    this.onActuator(OyaMist.EVENT_MIST, value);
                 });
                 vessel.emitter.on(OyaMist.EVENT_COOL, (value) => {
-                    this.onActuator(OyaMist.EVENT_COOL, value, iv);
+                    this.onActuator(OyaMist.EVENT_COOL, value);
                 });
                 vessel.emitter.on(OyaMist.EVENT_PRIME, (value) => {
-                    this.onActuator(OyaMist.EVENT_PRIME, value, iv);
+                    this.onActuator(OyaMist.EVENT_PRIME, value);
                 });
                 return vessel;
             });
@@ -169,10 +169,10 @@
             };
         }
 
-        onActuator(event, value, vesselIndex) {
-            var vessel = this.vessels[vesselIndex];
+        onActuator(event, value) {
+            var vessel = this.vessel;
             this.oyaConf.actuators.map((a,ia) => {
-                if (event === a.activate && a.vesselIndex === vesselIndex) {
+                if (event === a.activate) {
                     if (a.pin === Actuator.NOPIN) {
                         winston.debug(`${vessel.name} onActuator ${event}:${value} ignored (no pin)`);
                     } else {
