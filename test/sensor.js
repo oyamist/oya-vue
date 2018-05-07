@@ -181,7 +181,6 @@
         should(sensor.loc).equal(OyaMist.LOC_CANOPY);
         should(sensor.comm).equal(Sensor.COMM_I2C);
         should(sensor.crc).equal(Sensor.CRC_MODBUS);
-        should(sensor.vesselIndex).equal(0);
     });
     it("crc8() computes 8-bit CRC", function() {
         var buf = Buffer.from([0xBE,0xEF]);
@@ -551,7 +550,6 @@
             'readTemp',
             'tempCal',
             'type',
-            'vesselIndex',
         ];
         should.deepEqual(sensor.serializableKeys, serializableKeys);
         should.deepEqual(Object.keys(json).sort(), [
@@ -569,7 +567,6 @@
             'readTemp',
             'tempCal',
             'type',
-            'vesselIndex',
 
         ]);
     });

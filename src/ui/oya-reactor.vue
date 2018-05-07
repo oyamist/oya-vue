@@ -6,7 +6,6 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
-        <rb-about-item name="vesselIndex" value="0" slot="prop">
             index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
@@ -31,7 +30,7 @@
                         <v-list v-show="vessel" dense subheader>
                             <v-list-tile v-for="(actuator,i) in actuators" :key="actuator.name+i" 
                                 @click="actuator.pin >= 0 && clickActuator(actuator)"
-                                v-show="actuator.vesselIndex === vesselIndex && actuator.pin >= 0"
+                                v-show="actuator.pin >= 0"
                                 >
                                 <v-list-tile-action >
                                 </v-list-tile-action >
@@ -108,7 +107,7 @@
                 <div slot="header">General</div>
                 <v-card>
                     <v-card-text>
-                        <v-text-field v-model='apiModelCopy.vessels[vesselIndex].name' 
+                        <v-text-field v-model='apiModelCopy.vessels[0].name' 
                             label="Name" class="input-group--focused" />
                         <v-select v-bind:items="mcuHatItems" 
                             v-model='apiModelCopy.mcuHat' 
@@ -245,7 +244,7 @@
                 <v-card>
                     <v-card-text>
                         <rb-dialog-row label="All Sensors">
-                            <v-text-field v-model='apiModelCopy.vessels[vesselIndex].sensorExpRate' 
+                            <v-text-field v-model='apiModelCopy.vessels[0].sensorExpRate' 
                             type="number"
                             :label="`Trending sensitivity (exponential smoothing rate)`" class="input-group" />
                         </rb-dialog-row>
@@ -316,9 +315,6 @@ export default {
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),
     ],
     props: {
-        vesselIndex: {
-            default: 0,
-        },
     },
     data: function() {
         return {
@@ -531,9 +527,9 @@ export default {
                     return null;
                 }
                 console.log("get cool",
-                    this.apiModelCopy.vessels[this.vesselIndex]
+                    this.apiModelCopy.vessels[0]
                 );
-                var value = this.apiModelCopy.vessels[this.vesselIndex].coolThreshold;
+                var value = this.apiModelCopy.vessels[0].coolThreshold;
                 if (this.apiModelCopy.tempUnit === 'F') {
                     value = value * 1.8 + 32;
                 }
@@ -545,7 +541,7 @@ export default {
                         value = (value - 32)/1.8;
                     }
                     console.log("set cool", value);
-                    this.apiModelCopy.vessels[this.vesselIndex].coolThreshold = value;
+                    this.apiModelCopy.vessels[0].coolThreshold = value;
                 }
             },
         },
@@ -653,25 +649,22 @@ export default {
         },
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
-            return vessels && vessels[this.vesselIndex];
+            return vessels && vessels[0];
         },
         mutableSwitches( ){
             return this.apiModelCopy && this.apiModelCopy.switches;
         },
         mutableActuators( ){
-            return this.apiModelCopy && this.apiModelCopy.actuators.filter(a => 
-                a.vesselIndex === this.vesselIndex);
+            return this.apiModelCopy && this.apiModelCopy.actuators;
         },
         mutableLights( ){
             return this.apiModelCopy && this.apiModelCopy.lights;
         },
         mutableSensors( ){
-            return this.apiModelCopy && this.apiModelCopy.sensors.filter(a => 
-                a.vesselIndex === this.vesselIndex);
+            return this.apiModelCopy && this.apiModelCopy.sensors;
         },
         actuators( ){
-            return this.apiModel && this.apiModel.actuators.filter(a => 
-                a.vesselIndex === this.vesselIndex);
+            return this.apiModel && this.apiModel.actuators;
         },
         name() {
             return this.vessel && this.vessel.name;
@@ -692,7 +685,7 @@ export default {
         },
         editCycles() {
             var cycleNames = Object.keys(this.vessel.cycles).sort();
-            var vessel = this.apiModelCopy.vessels[this.vesselIndex];
+            var vessel = this.apiModelCopy.vessels[0];
             return cycleNames.map(name => {
                 return {
                     name: name,

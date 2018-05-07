@@ -56,15 +56,9 @@
             new Actuator({usage:Actuator.USAGE_PRIME}),
         ],
         sensors: [
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 0,
-            })),
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 0,
-            })),
-            new Sensor(Object.assign(Sensor.TYPE_NONE, {
-                vesselIndex: 0,
-            })),
+            new Sensor(Object.assign(Sensor.TYPE_NONE)),
+            new Sensor(Object.assign(Sensor.TYPE_NONE)),
+            new Sensor(Object.assign(Sensor.TYPE_NONE)),
         ],
         chart: {
             ecStepSize: 10,

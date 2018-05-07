@@ -6,8 +6,6 @@
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
-        <rb-about-item name="vesselIndex" value="0" slot="prop">
-            index (0-based) of vessel for component</rb-about-item>
     </rb-about>
 
     <div class="pt-4 pb-4 oya-dashboard">
@@ -48,9 +46,6 @@ export default {
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),
     ],
     props: {
-        vesselIndex: {
-            default: 0,
-        },
     },
     data: function() {
         return {
@@ -100,7 +95,7 @@ export default {
         },
         vessel() {
             var vessels = this.apiModel && this.apiModel.vessels;
-            return vessels && vessels[this.vesselIndex];
+            return vessels && vessels[0];
         },
         name() {
             return this.vessel && this.vessel.name;

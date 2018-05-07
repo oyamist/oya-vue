@@ -42,7 +42,6 @@
             this.readEC = opts.readEC == null ? typeProps.readEC : opts.readEC;
             this.tempCal = new Calibration(opts.tempCal);
             this.type = type;
-            this.vesselIndex = opts.vesselIndex == null ? 0 : Number(opts.vesselIndex);
             // END serializable toJSON() properties
             SERIALIZABLE_KEYS = SERIALIZABLE_KEYS || Object.keys(this).sort();
 

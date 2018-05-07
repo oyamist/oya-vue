@@ -74,7 +74,6 @@
                 new Actuator({
                     usage: Actuator.USAGE_MIST,
                     pin: 2,
-                    vesselIndex: 0,
                 }),
                 new Actuator({
                     usage: Actuator.USAGE_COOL,
@@ -744,7 +743,6 @@
                     actuators: [{
                         usage: Actuator.USAGE_MIST,
                         pin: 2,
-                        vesselIndex: 0,
                     }],
                 });
                 var pinstate = {};
