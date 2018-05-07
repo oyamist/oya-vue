@@ -100,22 +100,18 @@
             this.emitter.on(OyaConf.EVENT_CYCLE_PRIME, value => {
                 value && this.vessel.setCycle(OyaMist.CYCLE_PRIME);
             });
-            this.vessels = this.oyaConf.vessels.map((vconf,iv) => {
-                var vessel = new OyaVessel(Object.assign({
-                    name: `${name}-vessel${iv}`,
-                }, vconf, opts));
-                vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
-                    this.onActuator(OyaMist.EVENT_MIST, value);
-                });
-                vessel.emitter.on(OyaMist.EVENT_COOL, (value) => {
-                    this.onActuator(OyaMist.EVENT_COOL, value);
-                });
-                vessel.emitter.on(OyaMist.EVENT_PRIME, (value) => {
-                    this.onActuator(OyaMist.EVENT_PRIME, value);
-                });
-                return vessel;
+            var vessel = this.vessel = new OyaVessel(Object.assign({
+                    name: `${name}-vessel0`,
+            }, this.oyaConf.vessel, opts));
+            vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
+                this.onActuator(OyaMist.EVENT_MIST, value);
             });
-            this.vessel = this.vessels[0];
+            vessel.emitter.on(OyaMist.EVENT_COOL, (value) => {
+                this.onActuator(OyaMist.EVENT_COOL, value);
+            });
+            vessel.emitter.on(OyaMist.EVENT_PRIME, (value) => {
+                this.onActuator(OyaMist.EVENT_PRIME, value);
+            });
             this.autoActivate = opts.autoActivate == null ? true : opts.autoActivate;
             var that = this;
             this.restart = opts.restart || OyaReactor.restart;
@@ -201,9 +197,13 @@
             var that = this;
             return new Promise((resolve, reject) => {
                 try {
-                    conf && [conf.vessels[0]].forEach((v,i) => {
-                        OyaVessel.applyDelta(this.vessels[i], v);
-                    });
+                    if (conf) {
+                        if (conf.vessel) {
+                            OyaVessel.applyDelta(this.vessel, conf.vessel);
+                        } else if (conf.vessels) { // legacy fonf
+                            OyaVessel.applyDelta(this.vessel, conf.vessels[0]);
+                        };
+                    }
                     that.oyaConf.update(conf);
                     resolve( that.oyaConf) ;
 

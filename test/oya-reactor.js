@@ -62,7 +62,7 @@
                 yield app.locals.asyncOnReady.push(async);
             }
             winston.info("test suite initialized");
-            testReactor().vessels[0].dbfacade = testdb;
+            testReactor().vessel.dbfacade = testdb;
             var result = yield testdb.open().then(r=>async.next(null)).catch(e=>async.next(e));
             done(result);
         }();
@@ -101,27 +101,27 @@
         // test MIST
         relayValue = null;
         relayPin = null;
-        should(reactor.vessels[0].state.Mist).equal(false);
-        reactor.vessels[0].emitter.emit(OyaMist.EVENT_MIST, true);
-        should(reactor.vessels[0].state.Mist).equal(true);
+        should(reactor.vessel.state.Mist).equal(false);
+        reactor.vessel.emitter.emit(OyaMist.EVENT_MIST, true);
+        should(reactor.vessel.state.Mist).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(2);
 
         // test COOL
         relayValue = null;
         relayPin = null;
-        should(reactor.vessels[0].state.Cool).equal(false);
-        reactor.vessels[0].emitter.emit(OyaMist.EVENT_COOL, true);
-        should(reactor.vessels[0].state.Cool).equal(true);
+        should(reactor.vessel.state.Cool).equal(false);
+        reactor.vessel.emitter.emit(OyaMist.EVENT_COOL, true);
+        should(reactor.vessel.state.Cool).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(3);
 
         // test PRIME
         relayValue = null;
         relayPin = null;
-        should(reactor.vessels[0].state.Prime).equal(false);
-        reactor.vessels[0].emitter.emit(OyaMist.EVENT_PRIME, true);
-        should(reactor.vessels[0].state.Prime).equal(true);
+        should(reactor.vessel.state.Prime).equal(false);
+        reactor.vessel.emitter.emit(OyaMist.EVENT_PRIME, true);
+        should(reactor.vessel.state.Prime).equal(true);
         should(relayValue).equal(true);
         should(relayPin).equal(4);
     });
@@ -573,9 +573,9 @@
                     should.deepEqual(apiModel, Object.assign({},newConf,{
                         rbHash: rbh.hash(newConf),
                     }));
-                    should(testReactor().vessels[0].name).equal('UnitTest #1');
-                    should(testReactor().vessels[0].cycles[OyaMist.CYCLE_STANDARD].on).equal(3);
-                    should(testReactor().vessels[0].coolThreshold).equal(81);
+                    should(testReactor().vessel.name).equal('UnitTest #1');
+                    should(testReactor().vessel.cycles[OyaMist.CYCLE_STANDARD].on).equal(3);
+                    should(testReactor().vessel.coolThreshold).equal(81);
                     should.ok(apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -591,7 +591,7 @@
             try {
                 var app = testInit();
 
-                var vessel = testReactor().vessels[0];
+                var vessel = testReactor().vessel;
                 vessel.activate(false);
                 should(vessel.state.Mist).equal(false);
 
@@ -644,7 +644,7 @@
         var async = function* () {
             try {
                 var app = testInit();
-                var vessel = testReactor().vessels[0];
+                var vessel = testReactor().vessel;
                 vessel.activate(false);
                 should(vessel.state.tempInternal.value).equal(null);
                 should(vessel.state.humidityInternal.value).equal(null);
@@ -786,7 +786,7 @@
                 }
                 var app = testInit();
 
-                var vessel = testReactor().vessels[0];
+                var vessel = testReactor().vessel;
                 vessel.activate(false);
                 should(vessel.state.active).equal(false);
 
@@ -975,7 +975,7 @@
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
-        testReactor().vessels.forEach(vessel => vessel.activate(false));
+        testReactor().vessel.activate(false);
         app.locals.rbServer.close();
         winston.info("end test suite");
     });
