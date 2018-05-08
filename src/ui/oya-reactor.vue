@@ -107,7 +107,7 @@
                 <div slot="header">General</div>
                 <v-card>
                     <v-card-text>
-                        <v-text-field v-model='apiModelCopy.vessels[0].name' 
+                        <v-text-field v-model='apiModelCopy.vessel.name' 
                             label="Name" class="input-group--focused" />
                         <v-select v-bind:items="mcuHatItems" 
                             v-model='apiModelCopy.mcuHat' 
@@ -244,7 +244,7 @@
                 <v-card>
                     <v-card-text>
                         <rb-dialog-row label="All Sensors">
-                            <v-text-field v-model='apiModelCopy.vessels[0].sensorExpRate' 
+                            <v-text-field v-model='apiModelCopy.vessel.sensorExpRate' 
                             type="number"
                             :label="`Trending sensitivity (exponential smoothing rate)`" class="input-group" />
                         </rb-dialog-row>
@@ -527,9 +527,9 @@ export default {
                     return null;
                 }
                 console.log("get cool",
-                    this.apiModelCopy.vessels[0]
+                    this.apiModelCopy.vessel
                 );
-                var value = this.apiModelCopy.vessels[0].coolThreshold;
+                var value = this.apiModelCopy.vessel.coolThreshold;
                 if (this.apiModelCopy.tempUnit === 'F') {
                     value = value * 1.8 + 32;
                 }
@@ -541,7 +541,7 @@ export default {
                         value = (value - 32)/1.8;
                     }
                     console.log("set cool", value);
-                    this.apiModelCopy.vessels[0].coolThreshold = value;
+                    this.apiModelCopy.vessel.coolThreshold = value;
                 }
             },
         },
@@ -648,8 +648,7 @@ export default {
             },
         },
         vessel() {
-            var vessels = this.apiModel && this.apiModel.vessels;
-            return vessels && vessels[0];
+            return this.apiModel && this.apiModel.vessel;
         },
         mutableSwitches( ){
             return this.apiModelCopy && this.apiModelCopy.switches;
@@ -685,7 +684,7 @@ export default {
         },
         editCycles() {
             var cycleNames = Object.keys(this.vessel.cycles).sort();
-            var vessel = this.apiModelCopy.vessels[0];
+            var vessel = this.apiModelCopy.vessel;
             return cycleNames.map(name => {
                 return {
                     name: name,

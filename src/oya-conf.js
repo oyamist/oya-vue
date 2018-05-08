@@ -44,7 +44,6 @@
                 opts.vessels && OyaVessel.applyDelta(this.vessel, opts.vessels[0]);
                 opts.vessel && OyaVessel.applyDelta(this.vessel, opts.vessel);
             }
-            this.vessels = [this.vessel];
 
             if (this.actuators == null && opts.actuators == null) {
                 this.actuators = [];

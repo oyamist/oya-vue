@@ -94,8 +94,7 @@ export default {
             return bg.length ? `background: ${bg.join(',')};` : '';
         },
         vessel() {
-            var vessels = this.apiModel && this.apiModel.vessels;
-            return vessels && vessels[0];
+            return this.apiModel && this.apiModel.vessel;
         },
         name() {
             return this.vessel && this.vessel.name;
