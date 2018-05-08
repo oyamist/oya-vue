@@ -23,14 +23,9 @@
         healthPoll: 60,
         heapReboot: 60*1000*1000,
         mcuHat: 'mcu-hat:none',
-        vessels: [
-            OyaConf.createVesselConfig(0,{
-                guid: 'testguid0',
-            }),
-            //OyaConf.createVesselConfig(1, {
-                //guid: 'testguid1',
-            //}),
-        ],
+        vessel: OyaConf.createVesselConfig(0,{
+            guid: 'testguid0',
+        }),
         lights: [
             new Light(Light.LIGHT_FULL),
             new Light(Light.LIGHT_BLUE),
@@ -72,15 +67,15 @@
 
     it("TESTTESTtoJSON() serializes configuration", function() {
         var conf = new OyaConf({
-            vessels: [{
+            vessel: {
                 guid: 'testguid0',
-            }],
+            },
         });
         var json = JSON.parse(JSON.stringify(conf));
 
         var conf2 = new OyaConf(json);
         should.deepEqual(conf2, conf);
-        should(conf2.vessels[0].guid).equal('testguid0');
+        should(conf2.vessel.guid).equal('testguid0');
     });
     it("ctor creates default configuration", function() {
         var oc = new OyaConf();
@@ -103,25 +98,24 @@
         var opts = {
             name: 'foo',
             tempUnit: 'C',
-            vessels: [
-                OyaConf.createVesselConfig(0, {
-                    name: 'test1',
-                    guid: 'test1guid',
-                    type: 'new-type',
-                    startCycle: OyaMist.CYCLE_COOL,
-                    hotCycle: OyaMist.CYCLE_COOL,
-                    enabled: false,
-                    coolThreshold: 72,
-                    cycles: {
-                        [OyaMist.CYCLE_COOL]: {
-                            desc: 'fans are cool',
-                            emits: OyaMist.EVENT_COOL,
-                            on: 10,
-                            off: 23,
-                            nextCycle: OyaMist.CYCLE_COOL,
-                        }
-                    },
-            })],
+            vessel: OyaConf.createVesselConfig(0, {
+                name: 'test1',
+                guid: 'test1guid',
+                type: 'new-type',
+                startCycle: OyaMist.CYCLE_COOL,
+                hotCycle: OyaMist.CYCLE_COOL,
+                enabled: false,
+                coolThreshold: 72,
+                cycles: {
+                    [OyaMist.CYCLE_COOL]: {
+                        desc: 'fans are cool',
+                        emits: OyaMist.EVENT_COOL,
+                        on: 10,
+                        off: 23,
+                        nextCycle: OyaMist.CYCLE_COOL,
+                    }
+                },
+            }),
             actuators,
         }
         var updatedVessel = OyaConf.createVesselConfig();
@@ -149,9 +143,7 @@
             healthPoll: 60,
             heapReboot: 60*1000*1000,
             mcuHat: 'mcu-hat:none',
-            vessels: [
-                updatedVessel,
-            ],
+            vessel: updatedVessel,
             actuators,
             lights: defaultConf.lights,
             switches: defaultConf.switches,
@@ -239,7 +231,7 @@
     });
     it("TESTTESTupdate(opts) updates configuration ", function() {
         var oc = new OyaConf();
-        var vessel0 = oc.vessels[0];
+        var vessel0 = oc.vessel;
         var actuators = [
             new Actuator({
                 usage: Actuator.USAGE_MIST,
@@ -257,7 +249,7 @@
             startCycle: OyaMist.CYCLE_COOL,
             hotCycle: OyaMist.CYCLE_STANDARD,
             tempUnit: 'C',
-            vessels: [{
+            vessel: {
                 name: 'test1',
                 guid: 'test1guid',
                 type: 'new-type',
@@ -271,13 +263,13 @@
                         off: 23,
                     }
                 },
-            }],
+            },
             actuators,
         });
 
 
         // vessels are not changed by update
-        should.equal(vessel0, oc.vessels[0]);
+        should.equal(vessel0, oc.vessel);
 
         var updatedVessel = OyaConf.createVesselConfig(1);
         updatedVessel.name = 'test1';
@@ -299,9 +291,9 @@
         };
 
         // vessels are not changed by update
-        should.equal(vessel0, oc.vessels[0]);
+        should.equal(vessel0, oc.vessel);
         should(vessel0.guid).equal('test1guid');
-        ocv0 = oc.vessels[0];
+        ocv0 = oc.vessel;
         should(oc.toJSON()).properties( {
             name: 'foo',
             type: 'OyaConf',
@@ -318,7 +310,7 @@
         should.deepEqual(oc.toJSON().chart, defaultConf.chart);
         should.deepEqual(oc.toJSON().camera, defaultConf.camera);
         should.deepEqual(oc.toJSON().fan, defaultConf.fan);
-        should.deepEqual(oc.toJSON().vessels[0], updatedVessel);
+        should.deepEqual(oc.toJSON().vessel, updatedVessel);
 
     });
     it("update(opts) retains sensor instances", function() {
@@ -356,8 +348,7 @@
         var confPath = path.join(__dirname, 'multi-vessel-conf.json');
         var confJson = JSON.parse(fs.readFileSync(confPath));
         var conf = new OyaConf(confJson);
-        var vessel = conf.vessels[0];
-        should(conf.vessels.length).equal(1); // TODO: vessels => vessel
+        var vessel = conf.vessel;
         should(vessel).properties({
             "name": "Garage02 seedlings and clones",
             "guid": "6fb75b96-c318-4760-8c97-a6e835eeb665",

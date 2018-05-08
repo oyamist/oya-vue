@@ -40,12 +40,9 @@
             this.mcuHat = opts.mcuHat || OyaConf.MCU_HAT_NONE.value;
 
             { // legacy configuration supported multiple vessels
-                if (this.vessel == null) {
-                    this.vessel = OyaConf.createVesselConfig(0);
-                }
-                opts.vessels && [opts.vessels[0]].forEach((delta, i) => {
-                    OyaVessel.applyDelta(this.vessel, delta);
-                });
+                this.vessel = this.vessel || OyaConf.createVesselConfig(0);
+                opts.vessels && OyaVessel.applyDelta(this.vessel, opts.vessels[0]);
+                opts.vessel && OyaVessel.applyDelta(this.vessel, opts.vessel);
             }
             this.vessels = [this.vessel];
 
@@ -147,7 +144,7 @@
                 name: this.name,
                 type: "OyaConf",
                 tempUnit: this.tempUnit,
-                vessels: this.vessels,
+                vessel: this.vessel,
                 actuators: this.actuators,
                 sensors: this.sensors,
                 lights: this.lights,

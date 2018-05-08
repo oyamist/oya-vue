@@ -504,7 +504,7 @@
         }();
         async.next();
     });
-    it("GET /oya-conf returns OyaMist apiModel", function(done) {
+    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -518,7 +518,7 @@
                         type: 'OyaConf',
                         tempUnit: 'F',
                     });
-                    should(apiModel.vessels[0].cycles).properties([
+                    should(apiModel.vessel.cycles).properties([
                         OyaMist.CYCLE_COOL,
                         OyaMist.CYCLE_STANDARD,
                         OyaMist.CYCLE_PRIME,
@@ -560,16 +560,16 @@
                     apiModel: newConf,
                 };
                 newConf.name = 'OyaMist01';
-                newConf.vessels[0].coolThreshold = 81;
-                newConf.vessels[0].name = 'UnitTest #1';
-                newConf.vessels[0].cycles[OyaMist.CYCLE_STANDARD].on = 3;
+                newConf.vessel.coolThreshold = 81;
+                newConf.vessel.name = 'UnitTest #1';
+                newConf.vessel.cycles[OyaMist.CYCLE_STANDARD].on = 3;
                 var response = yield supertest(app).put("/test/oya-conf").send(putData).expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;
                     should.ok(apiModel);
                     apiModel.type.should.equal("OyaConf");
                     apiModel.name.should.equal("OyaMist01");
-                    apiModel.vessels[0].coolThreshold.should.equal(81);
+                    apiModel.vessel.coolThreshold.should.equal(81);
                     should.deepEqual(apiModel, Object.assign({},newConf,{
                         rbHash: rbh.hash(newConf),
                     }));
