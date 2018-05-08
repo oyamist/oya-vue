@@ -65,7 +65,7 @@
     };
     winston.level = 'warn';
 
-    it("TESTTESTtoJSON() serializes configuration", function() {
+    it("toJSON() serializes configuration", function() {
         var conf = new OyaConf({
             vessel: {
                 guid: 'testguid0',
@@ -229,7 +229,7 @@
             cycles: defaultCycles,
         });
     });
-    it("TESTTESTupdate(opts) updates configuration ", function() {
+    it("update(opts) updates configuration ", function() {
         var oc = new OyaConf();
         var vessel0 = oc.vessel;
         var actuators = [
@@ -344,7 +344,7 @@
         var ecSensor = oc.sensorOfField('ecAmbient');
         should(ecSensor).equal(oc.sensors[1]);
     });
-    it("TESTTESTupdate(conf) read legacy multi-vessel configuration", function() {
+    it("update(conf) read legacy multi-vessel configuration", function() {
         var confPath = path.join(__dirname, 'multi-vessel-conf.json');
         var confJson = JSON.parse(fs.readFileSync(confPath));
         var conf = new OyaConf(confJson);
