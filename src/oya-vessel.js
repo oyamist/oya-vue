@@ -108,8 +108,8 @@
             this.emitter.on(OyaMist.EVENT_PRIME, (value) => {
                 this._state.Prime = value;
             });
-            this.emitter.on(OyaMist.EVENT_ACTIVATE, (self, event) => {
-                winston.debug(this.summary, event);
+            this.emitter.on(OyaMist.EVENT_ACTIVATE, value => {
+                //this.onActivate(value);
             });
             this.emitter.on(OyaMist.SENSE_TEMP_INTERNAL, (v) => 
                 this.onTemp(v,'tempInternal',OyaMist.SENSE_TEMP_INTERNAL));
@@ -277,30 +277,27 @@
                 : this._state[field].avg1 * expRate + (1 - expRate) * this._state[field].avg2;
         }
 
-        activate(value=true) {
+        onActivate(value=true) {
+            value = !!value;
             if (this.isActive === value) {
-                winston.debug(`OyaVessel.activate() vessel:${this.name} redundant activate ignored`);
-            } else if (value === true) {
-                winston.debug(`OyaVessel.activate(true) vessel:${this.name} `);
-                this._state.active = value;
+                winston.debug(`OyaVessel.onActivate() vessel:${this.name} redundant onActivate ignored`);
+                return this;
+            } 
+            
+            this._state.active = value;
+            if (value === true) {
+                winston.debug(`OyaVessel.onActivate(true) vessel:${this.name} `);
                 this._state.cycleNumber = 0;
-                this.emitter.emit(OyaMist.EVENT_ACTIVATE, value);
                 updatePhase(this, true);
-            } else if (value === false) {
-                winston.debug(`OyaVessel.activate(false) vessel:${this.name} `);
-                this._state.active = value;
+            } else {
+                winston.debug(`OyaVessel.onActivate(false) vessel:${this.name} `);
                 this._state.countdown = 0;
                 this._state.countstart = 0;
                 this._phaseTimeout != null && clearTimeout(this._phaseTimeout);
                 this._phaseTimeout = null;
-                this.emitter.emit(OyaMist.EVENT_ACTIVATE, value);
                 this.emitter.emit(OyaMist.EVENT_MIST, false);
                 this.emitter.emit(OyaMist.EVENT_COOL, false);
                 this.emitter.emit(OyaMist.EVENT_PRIME, false);
-            } else {
-                var err = new Error(`${this.name} OyaVessel.activate expects a boolean`);
-                winston.warn(err.stack);
-                throw err;
             }
             return this;
         }
@@ -321,9 +318,9 @@
                 winston.info(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle}`);
             }
             if (this.isActive) {
-                this.activate(false);
+                this.onActivate(false);
                 this._state.cycle = value;
-                this.activate(true);
+                this.onActivate(true);
             } else {
                 this._state.cycle = value;
             }
@@ -357,7 +354,7 @@
                 self._state.cycleNumber++;
             }
             if (self.maxCycles && self._state.cycleNumber > self.maxCycles) {
-                self.activate(false);
+                self.onActivate(false);
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
                 self._state.countstart = self._state.countdown;
@@ -377,7 +374,7 @@
             if (OyaVessel.DEFAULT_CYCLES[cycle.off]) {
                 self.setCycle(cycle.off);
             } else {
-            var msOff = Math.max(0,Number(cycle.off) * 1000);
+                var msOff = Math.max(0,Number(cycle.off) * 1000);
                 self._phaseTimeout = setTimeout(() => {
                     self._phaseTimeout = null;
                     if (self.cycle === self.nextCycle) {
