@@ -344,8 +344,8 @@
                 var result = this.putApiModel(req, res, next);
                 if (this.vessel.isActive) {
                     winston.debug("OyaReactor.putOyaConf() re-activating...");
-                    this.onActivate(false);
-                    setTimeout(() => this.onActivate(true), 500);
+                    this.activate(false);
+                    setTimeout(() => this.activate(true), 500);
                 }
             } catch (e) {
                 winston.error(e.stack);
@@ -585,6 +585,7 @@
                     api: 'oya-reactor',
                     lights: this.lights,
                     health: this.health(),
+                    fan: this.oyaConf.fan.pwm,
                 });
                 ['ecInternal','ecAmbient','ecCanopy'].forEach(field => {
                     var ecSensor = this.oyaConf.sensorOfField(field);

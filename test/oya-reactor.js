@@ -189,6 +189,7 @@
                         "ecAmbient",
                         "ecCanopy",
                         "ecInternal",
+                        "fan",
                         "health",
                         "humidityAmbient",
                         "humidityCanopy",

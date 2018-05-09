@@ -21,6 +21,10 @@
             </div>
             <oya-light :service='service' v-if="showLightCycle"/>
             <oya-progress :service='service' v-if="showPumpCycle"/>
+            <div class="oya-fan">
+                <img src="/assets/fan-ccby-sika-danh.png" height="20px">
+                <div class="pl-1" >{{(rbService.fan*100).toFixed(0)}}%</div>
+            </div>
             <div >
                 <v-switch v-show="rbService.active"
                     value input-value="true"
@@ -134,6 +138,11 @@ export default {
     border-left: 1px solid #fff;
     border-right: 3px solid #ccc;
     border-bottom: 3px solid #ccc;
+}
+.oya-fan {
+    display: flex;
+    flex-wrap: row nowrap;
+    align-items: center;
 }
 .oya-dashboard {
     background: linear-gradient(to bottom, #ccc, #ddd);
