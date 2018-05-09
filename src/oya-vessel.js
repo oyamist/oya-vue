@@ -96,7 +96,7 @@
                 winston.error("Unrecoverable error. Exiting with error code: 5=EIO");
                 process.exit(-5); // EIO
             });
-            this.emitter = new EventEmitter(),
+            this.emitter = opts.emitter || new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
             this.emitter.on(OyaMist.EVENT_MIST, (value) => {

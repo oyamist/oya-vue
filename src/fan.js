@@ -14,6 +14,7 @@
 
             // unserialized options
             opts.emitter && (this.emitter = opts.emitter);
+            this.onActivate(false);
         }
 
         get emitter() {
@@ -24,13 +25,30 @@
             this._emitter.on(this.rhEvent, value => {
                 this.onRelativeHumidity(value, this.pinPWM);
             });
+            this._emitter.on(OyaMist.EVENT_ACTIVATE, value => this.onActivate(value));
+        }
+
+        onActivate(value) {
+            this.emitPwm(value ? this.pwmDefault : 0);
+            this._isActive = !!value;
+            return this;
+        }
+
+        get isActive() {
+            return this._isActive;
         }
 
         update(opts = {}) {
             // serializable toJSON() properties
             this.type = opts.type || this.type;
             this.name = opts.name || this.name;
-            this.pinPwm = Number(opts.pinPwm || this.pinPwm);
+            this.pinPwm = Number(opts.pinPwm) || this.pinPwm || -1;
+            this.pinPwm = opts.pinPwm != null
+                ? Number(opts.pinPwm)
+                : (this.pinPwm != null ? this.pinPwm : -1);
+            this.pwmDefault = opts.pwmDefault != null 
+                ? Number(opts.pwmDefault)
+                : this.pwmDefault || 0;
             this.rhMax = opts.rhMax || this.rhMax;
             this.rhMin = opts.rhMin || this.rhMin;
             this.rhEvent = opts.rhEvent || this.rhEvent;
@@ -45,6 +63,7 @@
                 name: "Raspberry Pi PWM Fan",
                 type: Fan.TYPE_PWM,
                 pinPwm: 12,
+                pwmDefault: 0.8,
             });
         }
         static get FAN_NONE() {
@@ -52,6 +71,7 @@
                 name: "(no fan)",
                 type: Fan.TYPE_NONE,
                 pinPwm: -1,
+                pwmDefault: 0,
                 rhMin: 0.5,
                 rhMax: 0.7,
                 rhEvent: OyaMist.SENSE_HUMIDITY_CANOPY,
@@ -61,12 +81,16 @@
             return Fan.FAN_NONE;
         }
 
-        onRelativeHumidity(value) {
-            if (this.type === Fan.TYPE_PWM) {
-                var pwm = (value - this.rhMin)/(this.rhMax-this.rhMin);
-                this.pwm =  Math.max(0, Math.min(pwm, 1));
+        emitPwm(pwm) {
+            this.emitter && this.emitter.emit(OyaMist.EVENT_FAN_PWM, pwm, this.pinPwm)
+            this.pwm = pwm;
+        }
 
-                this.emitter && this.emitter.emit(OyaMist.EVENT_FAN_PWM, this.pwm, this.pinPwm)
+        onRelativeHumidity(value) {
+            if (this.isActive && this.type === Fan.TYPE_PWM) {
+                var pwm = (value - this.rhMin)/(this.rhMax-this.rhMin);
+                pwm =  Math.max(0, Math.min(pwm, 1));
+                this.emitPwm(pwm);
             }
         }
 

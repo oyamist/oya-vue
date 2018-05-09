@@ -1,132 +1,177 @@
 <template>
 
 <div>
-    <rb-about v-if="about" :name="componentName">
-        <p> OyaReactor status and configuration
-        </p>
-        <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
-            index (0-based) of vessel for component</rb-about-item>
-    </rb-about>
+<rb-about v-if="about" :name="componentName">
+    <p> OyaReactor status and configuration
+    </p>
+    <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
+    <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
+        index (0-based) of vessel for component</rb-about-item>
+</rb-about>
 
-    <div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
-        <v-card flat >
-            <v-card-text class="text-xs-center" style="position:relative">
-                <div v-if="showPumpCycle"
-                    style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
-                    <div style="min-width: 20em">
-                        <div v-if="curCycle " class="pl-3">
-                            <v-select
-                              v-bind:items="cycles"
-                              v-model="curCycle"
-                              label="Active cycle"
-                              item-text="name"
-                              item-value="key"
-                              return-object
-                              :hint="`${curCycle.desc}`"
-                              persistent-hint
-                             ></v-select>
-                        </div>
-                        <v-list v-show="vessel" dense subheader>
-                            <v-list-tile v-for="(actuator,i) in actuators" :key="actuator.name+i" 
-                                @click="actuator.pin >= 0 && clickActuator(actuator)"
-                                v-show="actuator.pin >= 0"
-                                >
-                                <v-list-tile-action >
-                                </v-list-tile-action >
-                                <v-list-tile-content>
-                                    <v-list-tile-title v-show="actuator.pin >= 0">
-                                        {{actuator.name}}
-                                    </v-list-tile-title>
-                                </v-list-tile-content>
-                                <v-list-tile-action v-show='rbService[actuator.name]' >
-                                    <v-switch value input-value="true" color="blue darken-2" ></v-switch>
-                                </v-list-tile-action>
-                                <v-list-tile-action v-show='!rbService[actuator.name]' >
-                                    <v-switch ></v-switch>
-                                </v-list-tile-action>
-                            </v-list-tile>
-                        </v-list>
+<div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
+    <v-card flat >
+        <v-card-text class="text-xs-center" style="position:relative">
+            <div v-if="showPumpCycle"
+                style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
+                <div style="min-width: 20em">
+                    <div v-if="curCycle " class="pl-3">
+                        <v-select
+                          v-bind:items="cycles"
+                          v-model="curCycle"
+                          label="Active cycle"
+                          item-text="name"
+                          item-value="key"
+                          return-object
+                          :hint="`${curCycle.desc}`"
+                          persistent-hint
+                         ></v-select>
                     </div>
+                    <v-list v-show="vessel" dense subheader>
+                        <v-list-tile v-for="(actuator,i) in actuators" :key="actuator.name+i" 
+                            @click="actuator.pin >= 0 && clickActuator(actuator)"
+                            v-show="actuator.pin >= 0"
+                            >
+                            <v-list-tile-action >
+                            </v-list-tile-action >
+                            <v-list-tile-content>
+                                <v-list-tile-title v-show="actuator.pin >= 0">
+                                    {{actuator.name}}
+                                </v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-list-tile-action v-show='rbService[actuator.name]' >
+                                <v-switch value input-value="true" color="blue darken-2" ></v-switch>
+                            </v-list-tile-action>
+                            <v-list-tile-action v-show='!rbService[actuator.name]' >
+                                <v-switch ></v-switch>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                    </v-list>
                 </div>
-                <v-btn color="primary" @click="clickSettings">Settings</v-btn>
-                <v-btn color="primary" @click="clickUpdate">Update</v-btn>
-                <v-btn color="error" @click="clickRestart">Restart</v-btn>
-                <v-dialog persistent v-model="updateToggle">
-                    <v-card>
-                        <v-card-title>Update application and restart system?</v-card-title>
-                        <v-card-actions >
-                            <v-btn color="error" :disabled="alertUpdate" @click="confirmUpdate">Update</v-btn>
-                            <v-btn @click="cancelUpdate">Cancel</v-btn>
-                        </v-card-actions>
-                        <v-alert type=warning v-show="alertUpdate && !updateStatus && !updateComplete" 
-                            color="orange">
-                            <div v-show="!updateStatus"> Update in progress:{{updateSeconds}} ...  </div>
-                        </v-alert>
-                        <v-alert type=error v-show="updateStatus">
-                            <div v-show="updateStatus"> STATUS: {{updateStatus}} </div>
-                        </v-alert>
-                        <v-alert type=success v-show="updateComplete" color="green darken-3">
-                            <div v-show="updateComplete"> 
-                                <div v-for="line in updateComplete">
-                                    {{line}}
-                                </div>
-                            </div>
-                        </v-alert>
-                    </v-card>
-                </v-dialog>
-                <v-dialog persistent v-model="restartToggle">
-                    <v-card>
-                        <v-card-title>Restart system?</v-card-title>
-                        <v-card-actions >
-                            <v-btn color="error" :disabled="alertRestarting" @click="confirmRestart">Restart</v-btn>
-                            <v-btn @click="cancelRestart">Cancel</v-btn>
-                        </v-card-actions>
-                        <v-alert type=warning v-show="alertRestarting" color="orange">
-                            <div > {{restartStatus}} {{updateSeconds}} ...  </div>
-                        </v-alert>
-                    </v-card>
-                </v-dialog>
-            </v-card-text>
-            <v-system-bar v-if='httpErr' class='error' dark>
-                <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
-            </v-system-bar>
-        </v-card>
-    </div>
-    <rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
-        <div slot="title">Bioreactor Settings</div>
-        <v-footer fixed dark v-show="alertRestart() ">
-            <div style="width:100%">
-                <v-alert type=warning color="orange " v-show="alertRestart()">
-                    NOTE: Pin configuration changes require system restart
-                </v-alert>
             </div>
-        </v-footer>
-        <v-expansion-panel >
-            <v-expansion-panel-content>
-                <div slot="header">General</div>
+            <v-btn color="primary" @click="clickSettings">Settings</v-btn>
+            <v-btn color="primary" @click="clickUpdate">Update</v-btn>
+            <v-btn color="error" @click="clickRestart">Restart</v-btn>
+            <v-dialog persistent v-model="updateToggle">
+                <v-card>
+                    <v-card-title>Update application and restart system?</v-card-title>
+                    <v-card-actions >
+                        <v-btn color="error" :disabled="alertUpdate" @click="confirmUpdate">Update</v-btn>
+                        <v-btn @click="cancelUpdate">Cancel</v-btn>
+                    </v-card-actions>
+                    <v-alert type=warning v-show="alertUpdate && !updateStatus && !updateComplete" 
+                        color="orange">
+                        <div v-show="!updateStatus"> Update in progress:{{updateSeconds}} ...  </div>
+                    </v-alert>
+                    <v-alert type=error v-show="updateStatus">
+                        <div v-show="updateStatus"> STATUS: {{updateStatus}} </div>
+                    </v-alert>
+                    <v-alert type=success v-show="updateComplete" color="green darken-3">
+                        <div v-show="updateComplete"> 
+                            <div v-for="line in updateComplete">
+                                {{line}}
+                            </div>
+                        </div>
+                    </v-alert>
+                </v-card>
+            </v-dialog>
+            <v-dialog persistent v-model="restartToggle">
+                <v-card>
+                    <v-card-title>Restart system?</v-card-title>
+                    <v-card-actions >
+                        <v-btn color="error" :disabled="alertRestarting" @click="confirmRestart">Restart</v-btn>
+                        <v-btn @click="cancelRestart">Cancel</v-btn>
+                    </v-card-actions>
+                    <v-alert type=warning v-show="alertRestarting" color="orange">
+                        <div > {{restartStatus}} {{updateSeconds}} ...  </div>
+                    </v-alert>
+                </v-card>
+            </v-dialog>
+        </v-card-text>
+        <v-system-bar v-if='httpErr' class='error' dark>
+            <span >{{httpErr.response.data.error || httpErr.response.statusText}}</span>
+        </v-system-bar>
+    </v-card>
+</div>
+<rb-api-dialog :apiSvc="apiSvc" v-if="apiModelCopy && apiModelCopy.rbHash">
+    <div slot="title">Bioreactor Settings</div>
+    <v-footer fixed dark v-show="alertRestart() ">
+        <div style="width:100%">
+            <v-alert type=warning color="orange " v-show="alertRestart()">
+                NOTE: Pin configuration changes require system restart
+            </v-alert>
+        </div>
+    </v-footer>
+    <v-expansion-panel >
+        <v-expansion-panel-content>
+            <div slot="header">General</div>
+            <v-card>
+                <v-card-text>
+                    <v-text-field v-model='apiModelCopy.vessel.name' 
+                        label="Name" class="input-group--focused" />
+                    <v-select v-bind:items="mcuHatItems" 
+                        v-model='apiModelCopy.mcuHat' 
+                        label="MCU hardware extension hats"
+                        class="input-group"
+                        ></v-select>
+                    <v-select v-bind:items="cameraItems" 
+                        v-model='apiModelCopy.camera' 
+                        label="Camera"
+                        class="input-group"
+                        ></v-select>
+                    <v-select v-bind:items="tempItems" 
+                        v-model='apiModelCopy.tempUnit' 
+                        label="Temperature unit"
+                        class="input-group"
+                        ></v-select>
+                    <v-text-field v-model='apiModelCopy.hostTimeout'
+                        type="number"
+                        :label="`Network host HTTP timeout (ms)`" class="input-group" />
+                </v-card-text>
+            </v-card>
+        </v-expansion-panel-content>
+        <v-expansion-panel-content>
+            <div slot="header">Fan</div>
                 <v-card>
                     <v-card-text>
-                        <v-text-field v-model='apiModelCopy.vessel.name' 
-                            label="Name" class="input-group--focused" />
-                        <v-select v-bind:items="mcuHatItems" 
-                            v-model='apiModelCopy.mcuHat' 
-                            label="MCU hardware extension hats"
-                            class="input-group"
-                            ></v-select>
-                        <v-select v-bind:items="cameraItems" 
-                            v-model='apiModelCopy.camera' 
-                            label="Camera"
-                            class="input-group"
-                            ></v-select>
-                        <v-select v-bind:items="tempItems" 
-                            v-model='apiModelCopy.tempUnit' 
-                            label="Temperature unit"
-                            class="input-group"
-                            ></v-select>
-                        <v-text-field v-model='apiModelCopy.hostTimeout'
-                            type="number"
-                            :label="`Network host HTTP timeout (ms)`" class="input-group" />
+                        <rb-dialog-row label="Configuration">
+                            <v-select v-bind:items="fanTypeItems" 
+                                v-model='mutableFan.type'
+                                label="Fan Type"
+                                class="input-group"
+                                ></v-select>
+                            <v-text-field type="number" v-model="mutableFan.pwmDefault"
+                                required :rules="zeroOneRules(mutableFan.pwmDefault)"
+                                :disabled="mutableFan.type === 'fan:none'"
+                                hint="Enter number between 0 and 1"
+                                step="0.1"
+                                label="Default speed" class="input-group" />
+                            <v-text-field type="number" v-model="mutableFan.pinPwm"
+                                :disabled="mutableFan.type === 'fan:none'"
+                                required :rules="pinRules(mutableFan.pinPwm)"
+                                hint="Raspberry Pi PWM pin is normally 12"
+                                label="MCU PWM Pin" class="input-group" />
+                        </rb-dialog-row>
+                        <rb-dialog-row label="Humidity Control">
+                            <v-select v-bind:items="rhEventItems" 
+                                :disabled="mutableFan.type === 'fan:none' "
+                                v-model='mutableFan.rhEvent'
+                                label="Humidity Event"
+                                class="input-group"
+                                ></v-select>
+                            <v-text-field type="number" v-model="mutableFan.rhMin"
+                                required :rules="zeroOneRules(mutableFan.rhMin)"
+                                step="0.05"
+                                :disabled="mutableFan.type === 'fan:none' || mutableFan.rhEvent === 'sense: none'"
+                                hint="Enter number between 0 and 1"
+                                label="Minimum Relative Humidity" class="input-group" />
+                            <v-text-field type="number" v-model="mutableFan.rhMax"
+                                required :rules="zeroOneRules(mutableFan.rhMax)"
+                                :disabled="mutableFan.type === 'fan:none' || mutableFan.rhEvent === 'sense: none'"
+                                step="0.05"
+                                hint="Enter number between 0 and 1"
+                                label="Maximum Relative Humidity" class="input-group" />
+                        </rb-dialog-row>
                     </v-card-text>
                 </v-card>
             </v-expansion-panel-content>
@@ -382,10 +427,24 @@ export default {
                 }
             });
         },
+        zeroOneRules(value) {
+            return [
+                () => !!value || 'This field is required',
+                () => !!value && Number(value)>=0 || 'Expected positive number',
+                () => !!value && Number(value)<=1 || 'Expected number less than 1',
+            ];
+        },
+        percentRules(value) {
+            return [
+                () => !!value || 'This field is required',
+                () => !!value && Number(value)>=0 || 'Expected positive number',
+                () => !!value && Number(value)<=100 || 'Expected number less than 100',
+            ];
+        },
         nonNegRules(value) {
             return [
                 () => !!value || 'This field is required',
-                () => !!value && Number(value)>=0 || 'Expected postiive number',
+                () => !!value && Number(value)>=0 || 'Expected positive number',
             ];
         },
         hhmmRules(value) {
@@ -554,6 +613,30 @@ export default {
                 value: 'active:low',
             }];
         },
+        fanTypeItems() {
+            return [{
+                text: 'PWM fan',
+                value: "fan:pwm",
+            },{
+                text: 'No fan',
+                value: "fan:none",
+            }]
+        },
+        rhEventItems() {
+            return [{
+                text: '(no humidity control)',
+                value: "sense: none",
+            },{
+                text: 'Ambient humidity',
+                value: "sense: humidity-ambient",
+            },{
+                text: 'Canopy humidity',
+                value: "sense: humidity-canopy",
+            },{
+                text: 'Reservoir humidity',
+                value: "sense: humidity-internal",
+            }];
+        },
         switchEventItems() {
             return [{
                 text: 'Prime misting system',
@@ -649,6 +732,9 @@ export default {
         },
         vessel() {
             return this.apiModel && this.apiModel.vessel;
+        },
+        mutableFan() {
+            return this.apiModelCopy && this.apiModelCopy.fan;
         },
         mutableSwitches( ){
             return this.apiModelCopy && this.apiModelCopy.switches;

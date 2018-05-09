@@ -82,6 +82,7 @@
             };
             this.diffUpsert = new DiffUpsert();
             this.emitter = opts.emitter || new EventEmitter();
+            this.oyaConf.fan.emitter = this.emitter;
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.onLight(Light.SPECTRUM_FULL, value, 'white');
             });
@@ -101,7 +102,8 @@
                 value && this.vessel.setCycle(OyaMist.CYCLE_PRIME);
             });
             var vessel = this.vessel = new OyaVessel(Object.assign({
-                    name: `${name}-vessel0`,
+                name: `${name}-vessel0`,
+                emitter: this.emitter,
             }, this.oyaConf.vessel, opts));
             vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
                 this.onActuator(OyaMist.EVENT_MIST, value);

@@ -20,6 +20,7 @@
         Actuator,
         DbReport,
         DbSqlite3,
+        Fan,
         Light,
         OyaConf,
         OyaMist,
@@ -972,6 +973,25 @@
             camera: OyaConf.CAMERA_ALWAYS_ON,
         })
         reactor.onApiModelLoaded(model);
+    });
+    it ("TESTTESTcontructor emitter is common to all components", function(done) {
+        var async = function*() { try {
+            var emitter = new EventEmitter();
+            var event = null;
+            emitter.on(OyaMist.EVENT_FAN_PWM, (pwm,pin) => {
+                event = { pwm, pin };
+            });
+            var oya = new OyaReactor('testFan', {
+                emitter,
+                fan: Fan.FAN_RASPBERRY_PI,
+            });
+            should(oya.emitter).equal(emitter);
+            should(oya.vessel.emitter).equal(emitter);
+            should(oya.oyaConf.fan.emitter).equal(emitter);
+            should.deepEqual(event, null);
+            done();
+        } catch(e){done(e);} }();
+        async.next();
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
