@@ -177,13 +177,13 @@
     it ("isActive property is initially false", function() {
         var vessel = createTestVessel({name:'test2b', maxCycles:1});
         should(vessel.isActive).equal(false);
-        vessel.onActivate();
+        vessel.activate();
         should(vessel.isActive).equal(true);
         var vessel2 = new OyaVessel({
             name: 'test2c',
             maxCycles: 1,
         });
-        vessel.onActivate(false);
+        vessel.activate(false);
         should(vessel.isActive).equal(false);
     });
     it ("state.Mist is true when cycle is active and the phase is on", function(done) {
@@ -191,7 +191,7 @@
             try {
                 var vessel = createTestVessel({name:'test3a', maxCycles:2});
                 should(vessel.state.Mist).equal(false);
-                vessel.onActivate();
+                vessel.activate();
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
                 should(vessel.state.Mist).equal(true);
@@ -234,7 +234,7 @@
             try {
                 var vessel = createTestVessel({name:'test5a', maxCycles:2});
                 should(vessel.state.Mist).equal(false);
-                vessel.onActivate();
+                vessel.activate();
                 should(vessel.state.cycleNumber).equal(1);
                 should(vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
                 should(vessel.state.Mist).equal(true);
@@ -329,7 +329,7 @@
                 }));
 
                 // activation turns stuff on
-                vessel.onActivate();
+                vessel.activate();
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     cycle: OyaMist.CYCLE_STANDARD,
                     Mist: true,
@@ -425,7 +425,7 @@
                 }));
 
                 // activation turns stuff on
-                vessel.onActivate();
+                vessel.activate();
                 should.deepEqual(vessel.state, Object.assign(sensorDefaults(), testInvariant, {
                     Mist: true,
                     nextCycle: OyaMist.CYCLE_STANDARD,

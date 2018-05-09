@@ -593,7 +593,7 @@
                 var app = testInit();
 
                 var vessel = testReactor().vessel;
-                vessel.onActivate(false);
+                vessel.activate(false);
                 should(vessel.state.Mist).equal(false);
 
                 // turn on Mist
@@ -646,7 +646,7 @@
             try {
                 var app = testInit();
                 var vessel = testReactor().vessel;
-                vessel.onActivate(false);
+                vessel.activate(false);
                 should(vessel.state.tempInternal.value).equal(null);
                 should(vessel.state.humidityInternal.value).equal(null);
                 should(vessel.state.ecInternal.value).equal(null);
@@ -788,7 +788,7 @@
                 var app = testInit();
 
                 var vessel = testReactor().vessel;
-                vessel.onActivate(false);
+                vessel.activate(false);
                 should(vessel.state.active).equal(false);
 
                 // activate vessel
@@ -1003,7 +1003,7 @@
     });
     it ("TESTTEST finalize test suite", function() {
         winston.level = level;
-        testReactor().vessel.onActivate(false);
+        testReactor().activate(false);
         app.locals.rbServer.close();
         winston.info("end test suite");
     });

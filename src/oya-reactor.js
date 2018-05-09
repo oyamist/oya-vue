@@ -455,7 +455,7 @@
         }
 
         onActivate(value=true) {
-            this.vessel.onActivate(value); // TODO remove
+            this.vessel.activate(value); // TODO remove
             if (this.stopLight) {
                 this.stopLight.forEach(stop => stop());
                 this.stopLight = null;

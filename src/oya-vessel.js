@@ -108,9 +108,6 @@
             this.emitter.on(OyaMist.EVENT_PRIME, (value) => {
                 this._state.Prime = value;
             });
-            this.emitter.on(OyaMist.EVENT_ACTIVATE, value => {
-                //this.onActivate(value);
-            });
             this.emitter.on(OyaMist.SENSE_TEMP_INTERNAL, (v) => 
                 this.onTemp(v,'tempInternal',OyaMist.SENSE_TEMP_INTERNAL));
             this.emitter.on(OyaMist.SENSE_TEMP_CANOPY, (v) => 
@@ -277,20 +274,20 @@
                 : this._state[field].avg1 * expRate + (1 - expRate) * this._state[field].avg2;
         }
 
-        onActivate(value=true) {
+        activate(value=true) {
             value = !!value;
             if (this.isActive === value) {
-                winston.debug(`OyaVessel.onActivate() vessel:${this.name} redundant onActivate ignored`);
+                winston.debug(`OyaVessel.activate() vessel:${this.name} redundant activate ignored`);
                 return this;
             } 
             
             this._state.active = value;
             if (value === true) {
-                winston.debug(`OyaVessel.onActivate(true) vessel:${this.name} `);
+                winston.debug(`OyaVessel.activate(true) vessel:${this.name} `);
                 this._state.cycleNumber = 0;
                 updatePhase(this, true);
             } else {
-                winston.debug(`OyaVessel.onActivate(false) vessel:${this.name} `);
+                winston.debug(`OyaVessel.activate(false) vessel:${this.name} `);
                 this._state.countdown = 0;
                 this._state.countstart = 0;
                 this._phaseTimeout != null && clearTimeout(this._phaseTimeout);
@@ -318,9 +315,9 @@
                 winston.info(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle}`);
             }
             if (this.isActive) {
-                this.onActivate(false);
+                this.activate(false);
                 this._state.cycle = value;
-                this.onActivate(true);
+                this.activate(true);
             } else {
                 this._state.cycle = value;
             }
@@ -354,7 +351,7 @@
                 self._state.cycleNumber++;
             }
             if (self.maxCycles && self._state.cycleNumber > self.maxCycles) {
-                self.onActivate(false);
+                self.activate(false);
             } else { 
                 self._state.countdown = Math.trunc(cycle.on);
                 self._state.countstart = self._state.countdown;
