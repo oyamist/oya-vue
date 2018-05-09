@@ -82,6 +82,9 @@
             };
             this.diffUpsert = new DiffUpsert();
             this.emitter = opts.emitter || new EventEmitter();
+            this.emitter.on(OyaMist.EVENT_ACTIVATE, (value) => {
+                this.onActivate(value);
+            });
             this.oyaConf.fan.emitter = this.emitter;
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.onLight(Light.SPECTRUM_FULL, value, 'white');
@@ -186,7 +189,7 @@
             // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
             // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
-            this.activate(!!this.autoActivate);
+            this.onActivate(!!this.autoActivate);
             if (apiModel.camera === OyaConf.CAMERA_NONE) {
                 winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} `);
             } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
@@ -341,8 +344,8 @@
                 var result = this.putApiModel(req, res, next);
                 if (this.vessel.isActive) {
                     winston.debug("OyaReactor.putOyaConf() re-activating...");
-                    this.activate(false);
-                    setTimeout(() => this.activate(true), 500);
+                    this.onActivate(false);
+                    setTimeout(() => this.onActivate(true), 500);
                 }
             } catch (e) {
                 winston.error(e.stack);
@@ -448,6 +451,10 @@
         }
 
         activate(value=true) {
+            this.emitter.emit(OyaMist.EVENT_ACTIVATE, value);
+        }
+
+        onActivate(value=true) {
             this.vessel.activate(value);
             if (this.stopLight) {
                 this.stopLight.forEach(stop => stop());
@@ -522,7 +529,7 @@
             var result = {};
             if (req.body.hasOwnProperty('activate')) {
                 winston.info(`OyaReactor.postReactor() activate:${req.body.activate}`);
-                result.activate = this.activate(req.body.activate);
+                result.activate = this.onActivate(req.body.activate);
             } else if (req.body.hasOwnProperty('cycle')) {
                 this.vessel.setCycle(req.body.cycle);
                 winston.info(`OyaReactor.postReactor() cycle:${req.body.cycle}`);

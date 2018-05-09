@@ -128,7 +128,7 @@
     });
     it("EVENT_CYCLE_MIST sets next cycle to standard", function() {
         var reactor = new OyaReactor();
-        reactor.activate(true);
+        reactor.onActivate(true);
         should(reactor.vessel.isActive).equal(true);
         reactor.vessel.setCycle(OyaMist.CYCLE_COOL);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_COOL);
@@ -143,7 +143,7 @@
     });
     it("EVENT_CYCLE_COOL sets next cycle to cool", function() {
         var reactor = new OyaReactor();
-        reactor.activate(true);
+        reactor.onActivate(true);
         should(reactor.vessel.isActive).equal(true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
@@ -157,7 +157,7 @@
     });
     it("EVENT_CYCLE_PRIME sets next cycle to prime", function() {
         var reactor = new OyaReactor();
-        reactor.activate(true);
+        reactor.onActivate(true);
         should(reactor.vessel.isActive).equal(true);
         should(reactor.vessel.cycle).equal(OyaMist.CYCLE_STANDARD);
 
@@ -234,7 +234,7 @@
         should.deepEqual(reactor.health(), {
             active: false,
         });
-        reactor.activate();
+        reactor.onActivate();
         should.deepEqual(reactor.health(), {
             active: true,
         });
@@ -262,7 +262,7 @@
         });
         done();
     });
-    it("GET /identity returns reactor identity", function(done) {
+    it("TESTTESTGET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -753,7 +753,7 @@
                 await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
 
                 // activate turns things on
-                reactor.activate();
+                reactor.onActivate();
                 await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
                 should.deepEqual(pinstate, {
                     2: true,
@@ -763,7 +763,7 @@
                 should(reactor.getState().lights.white.active).equal(true);
 
                 // deactivate turns things off
-                reactor.activate(false);
+                reactor.onActivate(false);
                 await new Promise((resolve,reject) => setTimeout(()=>resolve(1),EVENT_WAIT));
                 should.deepEqual(pinstate, {
                     2: false,
@@ -988,7 +988,15 @@
             should(oya.emitter).equal(emitter);
             should(oya.vessel.emitter).equal(emitter);
             should(oya.oyaConf.fan.emitter).equal(emitter);
-            should.deepEqual(event, null);
+            should.deepEqual(event, null); // binding emitter has no side effects
+
+            // Initialize may trigger events
+            var r = yield oya.initialize().then(r=>async.next(r)).catch(e=>done(e));
+            should.deepEqual(event, {
+                pin: 12,
+                pwm: 0.8,
+            });
+
             done();
         } catch(e){done(e);} }();
         async.next();
