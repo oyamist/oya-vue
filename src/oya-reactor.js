@@ -59,13 +59,6 @@
             });
             this.apiFile = opts.apiFile || `${srcPkg.name}.${this.name}`;
             this.oyaConf = new OyaConf(opts);
-            RbSingleton.emitter.on("heapMax", heapStat => {
-                var heapReboot = this.oyaConf.heapReboot;
-                if (heapStat.total_heap_size > heapReboot) {
-                    winston.warn(`Memory heap exceeds heapReboot threshold (${heapReboot}. Restarting server...`);
-                    this.restart();
-                }
-            });
             this.lights = {
                 white: {
                     active: false,
