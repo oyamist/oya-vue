@@ -2,6 +2,7 @@ import OyaChart from "./src/ui/oya-chart.vue";
 import OyaChartPanel from "./src/ui/oya-chart-panel.vue";
 import OyaHealth from "./src/ui/oya-health.vue";
 import OyaLight from "./src/ui/oya-light.vue";
+import OyaFan from "./src/ui/oya-fan.vue";
 import OyaNetwork from "./src/ui/oya-network.vue";
 import OyaPlant from "./src/ui/oya-plant.vue";
 import OyaProgress from "./src/ui/oya-progress.vue";
@@ -12,6 +13,7 @@ var components = {
     OyaChart,
     OyaChartPanel,
     OyaHealth,
+    OyaFan,
     OyaLight,
     OyaNetwork,
     OyaPlant,

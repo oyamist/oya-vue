@@ -83,7 +83,7 @@
                     <div>Choose measurement unit.</div>
                     <v-select class="pl-3" v-bind:items="nutrientUnits()" 
                         v-model="ecUnit"></v-select>
-                    <div v-if="ecUnit!=='%'">
+                    <div >
                         Enter nominal measurement value to display for calibration solution
                         <v-text-field type="number" v-model="ecNominal" class="input-group pl-3" />
                     </div>
@@ -234,7 +234,7 @@ export default {
         },
         nutrientUnits() {
             return [{
-                text: "Nutrients available (100%)",
+                text: "Nutrients available (e.g., 100%)",
                 value: "%",
             },{
                 text: "parts/million (ppm)",
