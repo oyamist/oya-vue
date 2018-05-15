@@ -22,14 +22,18 @@
         }
         set emitter(value){
             this._emitter = value;
+            winston.info(`Fan.emitter on:${this.rhEvent}`);
             this._emitter.on(this.rhEvent, value => {
                 this.onRelativeHumidity(value, this.pinPWM);
             });
+            winston.info(`Fan.emitter on:${OyaMist.EVENT_ACTIVATE}`);
             this._emitter.on(OyaMist.EVENT_ACTIVATE, value => this.onActivate(value));
         }
 
         onActivate(value) {
-            this.emitPwm(value ? this.pwmDefault : 0);
+            var pwm = (value ? this.pwmDefault : 0);
+            winston.info(`Fan.onActivate(${value}) emitPwm:${pwm}`);
+            this.emitPwm(pwm);
             this._isActive = !!value;
             return this;
         }
@@ -82,7 +86,11 @@
         }
 
         emitPwm(pwm) {
-            this.emitter && this.emitter.emit(OyaMist.EVENT_FAN_PWM, pwm, this.pinPwm)
+            if (this.emitter) {
+                this.emitter.emit(OyaMist.EVENT_FAN_PWM, pwm, this.pinPwm)
+            } else {
+                winston.info(`Fan.emitPwm(${pwm}) ignored (no emitter)`);
+            }
             this.pwm = pwm;
         }
 

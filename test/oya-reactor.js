@@ -1,4 +1,6 @@
 (typeof describe === 'function') && describe("OyaReactor", function() {
+    const winston = require('winston');
+    winston.level = 'warn';
     const should = require("should");
     const srcPkg = require("../package.json");
     const rb = require('rest-bundle');
@@ -14,7 +16,6 @@
     }
     const app = require("../scripts/server.js"); // access cached instance 
     const EventEmitter = require("events");
-    const winston = require('winston');
     const path = require('path');
     const {
         Actuator,
@@ -263,7 +264,7 @@
         });
         done();
     });
-    it("TESTTESTGET /identity returns reactor identity", function(done) {
+    it("GET /identity returns reactor identity", function(done) {
         var async = function* () {
             try {
                 var app = testInit();
@@ -506,7 +507,7 @@
         }();
         async.next();
     });
-    it("TESTTESTGET /oya-conf returns OyaMist apiModel", function(done) {
+    it("GET /oya-conf returns OyaMist apiModel", function(done) {
         var async = function* () {
             try {
                 if (fs.existsSync(APIMODEL_PATH)) {
@@ -548,10 +549,12 @@
                         test: "bad-data",
                     }
                 }
-                var response = yield supertest(app).put("/test/oya-conf").send(badData).expect((res) => {
-                    res.statusCode.should.equal(400); // BAD REQUEST (no rbHash)
-                }).end((e,r) => e ? async.throw(e) : async.next(r));
-                var curConf = response.body.data.apiModel;
+                winston.warn(`Expected error (BEGIN)`);
+                var res = yield supertest(app).put("/test/oya-conf").send(badData)
+                    .end((e,r) => e ? done(e) : async.next(r));
+                winston.warn(`Expected error (END)`);
+                res.statusCode.should.equal(400); // BAD REQUEST (no rbHash)
+                var curConf = res.body.data.apiModel;
                 should(curConf).properties({
                     type: "OyaConf",
                 });
@@ -616,9 +619,10 @@
                     name: "invalid-actuator",
                     value: true,
                 }
-                winston.warn("The following warning is expected");
+                winston.warn("Expected error (BEGIN)");
                 var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
+                winston.warn("Expected error (END)");
                 should(res.statusCode).equal(500);
                 should(res.body.error).match(/unknown activator/);
 
@@ -626,9 +630,10 @@
                 var command = {
                     name: "Mist",
                 }
-                winston.warn("The following warning is expected");
+                winston.warn("Expected error (BEGIN)");
                 var res = yield supertest(app).post("/test/actuator").send(command)
                     .end((e,r) => e ? async.throw(e) : async.next(r));
+                winston.warn("Expected error (END)");
                 should(res.statusCode).equal(500);
                 should(res.body.error).match(/no value provided/);
                 should(vessel.state.Mist).equal(true);
@@ -904,7 +909,7 @@
         }();
         async.next();
     });
-    it ("TESTTESTgetState() returns temperature compensated EC value", function(done) {
+    it ("getState() returns temperature compensated EC value", function(done) {
         var async = function*() { try {
             var reactor = new OyaReactor("test_getState", { 
                 apiModelDir: 'test',

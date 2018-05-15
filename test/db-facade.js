@@ -29,8 +29,10 @@
                     logPeriod: 2, // log every 2 events
                 });
                 dbl.stmts.length.should.equal(0);
+                winston.warn('Expected error (BEGIN)');
                 var r = yield dbl.logSensor("test", "testevt", 10, testDate)
-                    .then(r=>async.throw(new Error("expected catch()"))).catch(e=>async.next(e));
+                    .then(r=>done(new Error("expected catch()"))).catch(e=>async.next(e));
+                winston.warn('Expected error (END)');
                 should.deepEqual(r, DbFacade.ERROR_NOT_OPEN);
                 var r = yield dbl.open().then(r=>async.next(r)).catch(e=>async.throw(e));
 

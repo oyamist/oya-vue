@@ -99,31 +99,43 @@
             this.emitter = opts.emitter || new EventEmitter(),
             this._phaseTimeout = false;
             this._state.cycleNumber = 0;
+            winston.info(`OyaVessel.ctor() on:${OyaMist.EVENT_MIST}`);
             this.emitter.on(OyaMist.EVENT_MIST, (value) => {
                 this._state.Mist = value;
             });
+            winston.info(`OyaVessel.ctor() on:${OyaMist.EVENT_COOL}`);
             this.emitter.on(OyaMist.EVENT_COOL, (value) => {
                 this._state.Cool = value;
             });
+            winston.info(`OyaVessel.ctor() on:${OyaMist.EVENT_PRIME}`);
             this.emitter.on(OyaMist.EVENT_PRIME, (value) => {
                 this._state.Prime = value;
             });
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_TEMP_INTERNAL}`);
             this.emitter.on(OyaMist.SENSE_TEMP_INTERNAL, (v) => 
                 this.onTemp(v,'tempInternal',OyaMist.SENSE_TEMP_INTERNAL));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_TEMP_CANOPY}`);
             this.emitter.on(OyaMist.SENSE_TEMP_CANOPY, (v) => 
                 this.onTemp(v,'tempCanopy',OyaMist.SENSE_TEMP_CANOPY));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_TEMP_AMBIENT}`);
             this.emitter.on(OyaMist.SENSE_TEMP_AMBIENT, (v) => 
                 this.onTemp(v,'tempAmbient',OyaMist.SENSE_TEMP_AMBIENT));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_HUMIDITY_INTERNAL}`);
             this.emitter.on(OyaMist.SENSE_HUMIDITY_INTERNAL, (v) => 
                 this.onHumidity(v,'humidityInternal', OyaMist.SENSE_HUMIDITY_INTERNAL));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_HUMIDITY_AMBIENT}`);
             this.emitter.on(OyaMist.SENSE_HUMIDITY_AMBIENT, (v) => 
                 this.onHumidity(v,'humidityAmbient', OyaMist.SENSE_HUMIDITY_AMBIENT));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_HUMIDITY_CANOPY}`);
             this.emitter.on(OyaMist.SENSE_HUMIDITY_CANOPY, (v) => 
                 this.onHumidity(v,'humidityCanopy', OyaMist.SENSE_HUMIDITY_CANOPY));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_EC_INTERNAL}`);
             this.emitter.on(OyaMist.SENSE_EC_INTERNAL, (v) => 
                 this.onEC(v,'ecInternal', OyaMist.SENSE_EC_INTERNAL));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_EC_CANOPY}`);
             this.emitter.on(OyaMist.SENSE_EC_CANOPY, (v) => 
                 this.onEC(v,'ecCanopy', OyaMist.SENSE_EC_CANOPY));
+            winston.info(`OyaVessel.ctor() on:${OyaMist.SENSE_EC_AMBIENT}`);
             this.emitter.on(OyaMist.SENSE_EC_AMBIENT, (v) => 
                 this.onEC(v,'ecAmbient', OyaMist.SENSE_EC_AMBIENT));
             this._countdownId = setInterval(() => {

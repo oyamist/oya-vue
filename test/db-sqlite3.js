@@ -1,5 +1,6 @@
 (typeof describe === 'function') && describe("DbSqlite3", function() {
     const winston = require('winston');
+    winston.level = 'warn';
     const should = require("should");
     const testDate = new Date(2017,2,8,1,2,3); // local time
     const testDate2 = new Date(2017,2,8,1,3,4); // local time
@@ -28,15 +29,17 @@
             done();
         })();
     });
-    it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
+    it("TESTTESTlogSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
             try {
                 var dbfacade = new DbSqlite3(dbopts);
                 const stmtCount = `select count(*) c from sensordata as sd where sd.evt='testevt'`;
 
                 // open() must be called before use
+                winston.warn('Expected error (BEGIN)');
                 var r = yield dbfacade.logSensor("test", "testevt", 12.34, testDate)
-                    .then(r=>async.throw(new Error("expected catch()"))).catch(e=>async.next(e));
+                    .then(r=>done(new Error("expected catch()"))).catch(e=>async.next(e));
+                winston.warn('Expected error (END)');
                 should.deepEqual(r, DbFacade.ERROR_NOT_OPEN);
                 should(dbfacade.db).equal(undefined);
                 var r = yield dbfacade.open().then(r=>async.next(r)).catch(e=>async.throw(e));

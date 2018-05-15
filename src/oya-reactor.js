@@ -75,25 +75,33 @@
             };
             this.diffUpsert = new DiffUpsert();
             this.emitter = opts.emitter || new EventEmitter();
+
+            winston.info(`OyaReactor.ctor() on:${OyaMist.EVENT_ACTIVATE}`);
             this.emitter.on(OyaMist.EVENT_ACTIVATE, (value) => {
                 this.onActivate(value);
             });
+            winston.info(`OyaReactor.ctor() on:${Light.EVENT_LIGHT_FULL}`);
             this.oyaConf.fan.emitter = this.emitter;
             this.emitter.on(Light.EVENT_LIGHT_FULL, value => {
                 this.onLight(Light.SPECTRUM_FULL, value, 'white');
             });
+            winston.info(`OyaReactor.ctor() on:${Light.EVENT_LIGHT_BLUE}`);
             this.emitter.on(Light.EVENT_LIGHT_BLUE, value => {
                 this.onLight(Light.SPECTRUM_BLUE, value, 'blue');
             });
+            winston.info(`OyaReactor.ctor() on:${Light.EVENT_LIGHT_RED}`);
             this.emitter.on(Light.EVENT_LIGHT_RED, value => {
                 this.onLight(Light.SPECTRUM_RED, value, 'red');
             });
+            winston.info(`OyaReactor.ctor() on:${OyaConf.EVENT_CYCLE_MIST}`);
             this.emitter.on(OyaConf.EVENT_CYCLE_MIST, value => {
                 value && this.vessel.setCycle(OyaMist.CYCLE_STANDARD);
             });
+            winston.info(`OyaReactor.ctor() on:${OyaConf.EVENT_CYCLE_COOL}`);
             this.emitter.on(OyaConf.EVENT_CYCLE_COOL, value => {
                 value && this.vessel.setCycle(OyaMist.CYCLE_COOL);
             });
+            winston.info(`OyaReactor.ctor() on:${OyaConf.EVENT_CYCLE_PRIME}`);
             this.emitter.on(OyaConf.EVENT_CYCLE_PRIME, value => {
                 value && this.vessel.setCycle(OyaMist.CYCLE_PRIME);
             });
@@ -101,12 +109,15 @@
                 name: `${name}-vessel0`,
                 emitter: this.emitter,
             }, this.oyaConf.vessel, opts));
+            winston.info(`OyaReactor.ctor() on:${OyaMist.EVENT_MIST}`);
             vessel.emitter.on(OyaMist.EVENT_MIST, (value) => {
                 this.onActuator(OyaMist.EVENT_MIST, value);
             });
+            winston.info(`OyaReactor.ctor() on:${OyaMist.EVENT_COOL}`);
             vessel.emitter.on(OyaMist.EVENT_COOL, (value) => {
                 this.onActuator(OyaMist.EVENT_COOL, value);
             });
+            winston.info(`OyaReactor.ctor() on:${OyaMist.EVENT_PRIME}`);
             vessel.emitter.on(OyaMist.EVENT_PRIME, (value) => {
                 this.onActuator(OyaMist.EVENT_PRIME, value);
             });

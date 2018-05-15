@@ -1,6 +1,7 @@
 (typeof describe === 'function') && describe("OyaVessel", function() {
     const should = require("should");
     const winston = require('winston');
+    winston.level = 'warn';
     const {
         DbFacade,
         OyaConf,

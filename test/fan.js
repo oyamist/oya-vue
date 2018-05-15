@@ -1,5 +1,6 @@
 (typeof describe === 'function') && describe("Fan", function() {
     const winston = require('winston');
+    winston.level = 'warn';
     const should = require("should");
     const Fan = require("../index").Fan;
     const OyaMist = require("../index").OyaMist;
@@ -14,7 +15,7 @@
         should(fan).properties(Fan.FAN_RASPBERRY_PI);
         should(fan.rhEvent).equal(OyaMist.SENSE_HUMIDITY_CANOPY);
     });
-    it("TESTTESTupdate(opts) applies serializable options", () => {
+    it("update(opts) applies serializable options", () => {
         var fan = new Fan();
         should(fan.update(Fan.FAN_RASPBERRY_PI)).properties(Fan.FAN_RASPBERRY_PI);
         should(fan.update()).properties(Fan.FAN_RASPBERRY_PI);
