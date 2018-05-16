@@ -135,22 +135,24 @@
             36, // Pimoroni Automation Hat relay 3
         ]};
 
-        initialize() {
-            var promise = super.initialize();
-            promise.then(apiModel => {
-                var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
-                // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
-                // been extended. Difference will persist until model is saved
-                winston.info(`OyaReactor-${this.name}.initialize() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
-                this.activate(!!this.autoActivate);
-                if (apiModel.camera === OyaConf.CAMERA_NONE) {
-                    winston.info(`OyaReactor.initialize() camera:${apiModel.camera} `);
-                } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
-                    winston.info(`OyaReactor.initialize() camera:${apiModel.camera} activating...`);
-                    this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
-                }
-            });
-            return promise;
+        onApiModelLoaded(apiModel) {
+            var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
+            // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
+            // been extended. Difference will persist until model is saved
+            winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
+            if (apiModel.camera === OyaConf.CAMERA_NONE) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} `);
+            } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
+                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} activating...`);
+                this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
+            }
+        }
+
+        onInitializeEvents(emitter, apiModel) {
+            // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
+            // been extended. Difference will persist until model is saved
+            winston.info(`OyaReactor-${this.name}.onInitializeEvents() autoActivate:${this.autoActivate} `);
+            this.activate(!!this.autoActivate);
         }
 
         onLight(spectrum, value, key) {
@@ -186,20 +188,6 @@
                     }
                 }
             });
-        }
-
-        onApiModelLoaded(apiModel) {
-            var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
-            // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
-            // been extended. Difference will persist until model is saved
-            winston.info(`OyaReactor-${this.name}.onApiModelLoaded() rbHash:${rbHash} autoActivate:${this.autoActivate} `);
-            this.onActivate(!!this.autoActivate);
-            if (apiModel.camera === OyaConf.CAMERA_NONE) {
-                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} `);
-            } else if (apiModel.camera === OyaConf.CAMERA_ALWAYS_ON) {
-                winston.info(`OyaReactor.onApiModelLoaded() camera:${apiModel.camera} activating...`);
-                this.emitter.emit(VmcBundle.EVT_CAMERA_ACTIVATE, true);
-            }
         }
 
         updateConf(conf) {

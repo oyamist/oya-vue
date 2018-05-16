@@ -1,6 +1,6 @@
 {
   "name": "oya-vue",
-  "version": "0.39.3",
+  "version": "0.39.4",
   "description": "Vue/Vuetify RestBundle for OyaMist bioreactor controller",
   "main": "index.js",
   "directories": {
@@ -13,12 +13,12 @@
     "memwatch-next": "^0.3.0",
     "netmask": "^1.0.6",
     "oya-ann": "^0.1.1",
-    "rest-bundle": "^0.34.3",
+    "rest-bundle": "^0.35.2",
     "rimraf": "^2.6.1",
     "sqlite3": "^3.1.13",
     "uuid": "^3.1.0",
     "vue-chartjs": "^3.0.2",
-    "vue-motion-cam": "^0.7.10"
+    "vue-motion-cam": "^0.7.12"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
@@ -35,9 +35,9 @@
     "concurrently": "^3.2.0",
     "cross-env": "^3.0.0",
     "css-loader": "^0.28.0",
-    "mocha": "^3.2.0",
+    "mocha": "^5.1.1",
     "should": "^11.2.0",
-    "supertest": "^3.0.0",
+    "supertest": "^3.1.0",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.2.0"
   },
@@ -52,7 +52,7 @@
     "start": "node --max_old_space_size=300 scripts/server.js oyamist",
     "test": "npm run test:verbose",
     "test:test": "mocha -w -R min --inline-diffs -g TEST",
-    "test:verbose": "mocha --inline-diffs",
+    "test:verbose": "mocha --inline-diffs --exit",
     "test:watch": "mocha -w --inline-diffs"
   },
   "repository": {

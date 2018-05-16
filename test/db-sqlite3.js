@@ -29,7 +29,7 @@
             done();
         })();
     });
-    it("TESTTESTlogSensor(vname,evt,value,date) logs sensor data", function(done) {
+    it("logSensor(vname,evt,value,date) logs sensor data", function(done) {
         var async = function*() {
             try {
                 var dbfacade = new DbSqlite3(dbopts);

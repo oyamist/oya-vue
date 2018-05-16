@@ -35,7 +35,7 @@
             should(fan2.hasOwnProperty(key)).equal(false);
         });
     });
-    it("TESTTESTactivate(value) enables fan", () => {
+    it("activate(value) enables fan", () => {
         // New fans are inactive
         var fan = new Fan(Fan.FAN_RASPBERRY_PI);
         should(fan.isActive).equal(false);
@@ -67,7 +67,7 @@
         should(fan.isActive).equal(false);
         should(fan.pwm).equal(0);
     });
-    it("TESTTESTonRelativeHumidity(value) should emit pwm fan event", () => {
+    it("onRelativeHumidity(value) should emit pwm fan event", () => {
         var fan = new Fan(Fan.FAN_RASPBERRY_PI);
 
         var event = null;
@@ -149,7 +149,7 @@
         should(event).equal(null);
         should(fan.pwm).equal(0);
     });
-    it("TESTTESTFan is serializable", () => {
+    it("Fan is serializable", () => {
         var fan = new Fan(Fan.FAN_RASPBERRY_PI);
         var json = JSON.parse(JSON.stringify(fan));
         should.deepEqual(Object.keys(json).sort(), [
@@ -177,7 +177,7 @@
             rhEvent: OyaMist.SENSE_HUMIDITY_CANOPY,
         });
     });
-    it("TESTTESTFan is serializable", () => {
+    it("Fan is serializable", () => {
     });
 
 })

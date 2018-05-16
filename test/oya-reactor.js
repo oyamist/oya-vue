@@ -58,7 +58,7 @@
         return app.locals.restBundles.filter(rb => rb.name==='test')[0];
     }
 
-    it("TESTTESTInitialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
+    it("Initialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
         var async = function*() {
             if (null == testReactor()) {
                 yield app.locals.asyncOnReady.push(async);
@@ -980,7 +980,7 @@
         })
         reactor.onApiModelLoaded(model);
     });
-    it ("TESTTESTcontructor emitter is common to all components", function(done) {
+    it ("constructor emitter is common to all components", function(done) {
         var async = function*() { try {
             var emitter = new EventEmitter();
             var event = null;
