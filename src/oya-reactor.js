@@ -136,6 +136,7 @@
         ]};
 
         onApiModelLoaded(apiModel) {
+            super.onApiModelLoaded(apiModel);
             var rbHash = apiModel && new RbHash().hash(JSON.parse(JSON.stringify(apiModel)));
             // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
             // been extended. Difference will persist until model is saved
@@ -149,6 +150,7 @@
         }
 
         onInitializeEvents(emitter, apiModel) {
+            super.onInitializeEvents(emitter, apiModel);
             // NOTE: rbHash of updated apiModel will differ from saved if apiModel has 
             // been extended. Difference will persist until model is saved
             winston.info(`OyaReactor-${this.name}.onInitializeEvents() autoActivate:${this.autoActivate} `);
