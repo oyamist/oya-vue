@@ -1,6 +1,6 @@
 <template>
 
-<v-app id="dev-app" >
+<v-app id="sample-app" >
    <v-navigation-drawer temporary absolute v-model="drawer" enable-resize-watcher app>
       <v-list dense>
         <div v-for="(item,i) in sidebarMain" :key="i">
@@ -65,7 +65,7 @@
         <v-toolbar-title class="grey--text text--lighten-1">
             <div style="display:flex; flex-flow:column; ">
                 <span class="mr-2" >{{package.name}} {{package.version}}</span>
-                <span class="caption">developer application</span>
+                <span class="caption">sample application</span>
             </div>
         </v-toolbar-title>
         <v-spacer/>
@@ -88,7 +88,7 @@ import rbvue from "rest-bundle/index-vue";
 import appvue from "../../index-vue";
 
 export default {
-    name: 'dev',
+    name: 'sample-app',
     props: {
         service: {
             default: "oyamist",

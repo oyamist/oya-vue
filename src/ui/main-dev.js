@@ -7,7 +7,7 @@ import VueAxios from 'vue-axios';
 import rbvue from 'rest-bundle/index-vue';
 import vmc from 'vue-motion-cam/index-vue';
 
-import Dev from './Dev.vue';
+import SampleApp from './sample-app.vue';
 import Home from './Home.vue';
 import appvue from "../../index-vue";
 require('./stylus/main.styl')
@@ -41,10 +41,10 @@ const store = new Vuex.Store({
 });
 
 new Vue({
-    el: '#dev',
+    el: '#sample-app',
     router,
     store,
-    render: h => h(Dev),
+    render: h => h(SampleApp),
     components: {
         Home,
     },
