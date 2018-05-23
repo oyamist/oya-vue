@@ -15,16 +15,15 @@
         </div>
         <vmc-camera v-if="camera" service="vmc"></vmc-camera>
         <div class="oya-plant-controls">
-            <div class="title text-xs-center">
+            <!--div class="pt-1 title text-xs-center">
                 {{name}}
-                <div class='caption oya-guid' >{{guid}}</div>
-            </div>
+            </div-->
             <div class="oya-gauges">
                 <oya-light :service='service' v-if="showLightCycle"/>
                 <oya-progress :service='service' v-if="showPumpCycle"/>
                 <oya-fan :service='service'/>
             </div>
-            <div >
+            <div style="margin-bottom: -1em">
                 <v-switch v-show="rbService.active"
                     value input-value="true"
                     color="light-green darken-1"
@@ -71,6 +70,10 @@ export default {
         },
     },
     computed: {
+        host() {
+            var host = location.host;
+            return host.match(/:4000/) ? 'localhost:8080' : host;
+        },
         camera() {
             var rb = this.$store.state.restBundle;
             var service = rb && rb[this.service];
@@ -102,9 +105,6 @@ export default {
         name() {
             return this.vessel && this.vessel.name;
         },
-        guid() {
-            return this.vessel && this.vessel.guid;
-        },
         showLightCycle() {
             return this.apiModel && this.apiModel.lights.reduce((a,l) => a || l.pin>=0,false);
         },
@@ -130,19 +130,16 @@ export default {
 </script>
 <style> 
 .oya-plant-img {
-    xpadding: 1em;
-    xpadding-left: 2em;
-    xpadding-right: 2em;
     border-radius: 1em;
     border-left: 1px solid #fff;
     border-right: 3px solid #ccc;
     border-bottom: 3px solid #ccc;
 }
 .oya-plant {
-    xbackground: linear-gradient(to bottom, #ccc, #ddd);
     display:flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
+    align-items: center;
 }
 .oya-gauges {
     display:flex;
@@ -150,17 +147,10 @@ export default {
     align-items: center;
 }
 .oya-plant-controls {
-    padding: 1em;
-    padding-top: 2em;
     display:flex;
     flex-flow: column nowrap;
     justify-content: space-around;
     align-items:center;
-}
-.oya-guid {
-    color: #ccc;
-}
-div:hover>div.oya-guid {
-    color: black;
+    height: 13em;
 }
 </style>

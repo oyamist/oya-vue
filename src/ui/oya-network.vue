@@ -94,6 +94,13 @@ export default {
             ];
         },
     },
+    created() {
+        console.log('created()', this.service);
+        this.restBundleResource(); // load apiModel
+        //this.rbDispatch("apiLoad").then(r => {
+            //console.log("OyaChartPanel apiLoad", r);
+        //});
+    },
     mounted() {
         this.refresh();
     },

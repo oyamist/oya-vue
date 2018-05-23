@@ -8,7 +8,7 @@ import rbvue from 'rest-bundle/index-vue';
 import vmc from 'vue-motion-cam/index-vue';
 
 import SampleApp from './sample-app.vue';
-import Home from './Home.vue';
+import OyaDashboard from './oya-dashboard.vue';
 import OyaNetwork from './oya-network.vue';
 import OyaDeveloper from './oya-developer.vue';
 import OyaChartPanel from './oya-chart-panel.vue';
@@ -28,7 +28,10 @@ var routes = [{
         redirect: "/home"
     },{
         path: '/home',
-        component: Home,
+        redirect: "/dashboard"
+    },{
+        path: '/dashboard',
+        component: OyaDashboard,
     },{
         path: '/charts',
         component: OyaChartPanel,
@@ -60,7 +63,7 @@ new Vue({
     },
     render: h => h(SampleApp),
     components: {
-        Home,
+        OyaDashboard,
         OyaChartPanel,
     },
 })

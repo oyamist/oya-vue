@@ -82,7 +82,7 @@
 </template> 
 <script>
 
-import Home from './Home.vue';
+import OyaDashboard from './oya-dashboard.vue';
 import OyaNetwork from './oya-network.vue';
 import OyaDeveloper from './oya-developer.vue';
 import OyaChartPanel from './oya-chart-panel.vue';
@@ -102,8 +102,8 @@ export default {
             drawer: false,
             sidebarMain: [{
                 icon: "question_answer",
-                title: "Dashboard",
-                href: "/home",
+                title: "Home",
+                href: "/dashboard",
             },{
                 icon: "show_chart",
                 title: "Charts",
@@ -132,7 +132,7 @@ export default {
     computed: {
     },
     components: {
-        Home,
+        OyaDashboard,
         OyaChartPanel,
         OyaNetwork,
         OyaDeveloper,

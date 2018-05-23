@@ -834,6 +834,6 @@ export default {
     flex-direction: row;
     justify-content: space-around;
     align-items:flex-start;
-    background: #ddd !important;
+    background: #eee !important;
 }
 </style>

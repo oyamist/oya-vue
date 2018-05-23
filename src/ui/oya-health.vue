@@ -9,11 +9,12 @@
         <rb-about-item name="host" value="(localhost)" slot="prop">Computer hostname or address</rb-about-item>
     </rb-about>
 
-    <div>
-        <span v-for="(h,i) in health" :key="i" 
-            :title="h.text" :class="h.class">
+    <div :class="healthClass" @click="showDetail=!showDetail">
+        <div v-for="(h,i) in health" :key="i" 
+            :title="   h.text   " :class="h.class">
             {{h.symbol}}
-        </span>
+            <div class="oya-health-detail" v-show="showDetail">{{h.text}}</div>
+        </div>
     </div>
 
 
@@ -49,12 +50,15 @@ export default {
     ],
     props: {
         host: null,
+        vertical: false,
+        showVessel: false,
     },
     data: function() {
         return {
             health: [ 
                 healthWaiting ,
             ],
+            showDetail: false,
         }
     },
     methods: {
@@ -73,7 +77,8 @@ export default {
                     var keys = Object.keys(health).sort();
                     this.health = keys.reduce((a,k) => {
                         var v = health[k];
-                        var text = `${res.data.vessel} ${k}: `;
+                        var vessel = this.showVessel ? `${res.data.vessel} ` : '';
+                        var text = `${vessel}${k}: `;
                         if (v === true) {
                             var h = healthGood;
                             text += `ok`;
@@ -110,6 +115,12 @@ export default {
         },
     },
     computed: {
+        healthClass() {
+            return 'oya-health ' + 
+                (this.vertical || this.showDetail 
+                    ? 'oya-health-vertical' 
+                    : 'oya-health-horizontal');
+        },
     },
     components: {
     },
@@ -134,5 +145,18 @@ export default {
 }
 .health-unavailable {
     color: gray;
+}
+.oya-health {
+    display: flex;
+}
+.oya-health-vertical {
+    flex-flow: column;
+}
+.oya-health-horizontal {
+    flex-flow: row;
+}
+.oya-health-detail {
+    color: black;
+    width: 13em;
 }
 </style>
