@@ -71,9 +71,8 @@
         <v-spacer/>
         <rb-web-socket/>
     </v-toolbar>
-    <v-content class="oya-content">
-        <oya-plant :service="service"></oya-plant>
-        <v-container fluid style="padding-right:1em">
+    <v-content >
+        <v-container fluid class="oya-content">
             <router-view> </router-view>
         </v-container>
     </v-content>
@@ -84,6 +83,9 @@
 <script>
 
 import Home from './Home.vue';
+import OyaNetwork from './oya-network.vue';
+import OyaDeveloper from './oya-developer.vue';
+import OyaChartPanel from './oya-chart-panel.vue';
 import rbvue from "rest-bundle/index-vue";
 import appvue from "../../index-vue";
 
@@ -100,8 +102,20 @@ export default {
             drawer: false,
             sidebarMain: [{
                 icon: "question_answer",
-                title: "Home",
+                title: "Dashboard",
                 href: "/home",
+            },{
+                icon: "show_chart",
+                title: "Charts",
+                href: "/charts",
+            },{
+                icon: "network_check",
+                title: "Network",
+                href: "/network",
+            },{
+                icon: "build",
+                title: "Developer",
+                href: "/developer",
             }],
             sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
             sidebarAppRest: rbvue.methods.aboutSidebar(appvue.components),
@@ -119,12 +133,15 @@ export default {
     },
     components: {
         Home,
+        OyaChartPanel,
+        OyaNetwork,
+        OyaDeveloper,
     },
 }
 
 </script>
 <style> 
 .oya-content {
-    background: #ddd;
+    padding: 0px;
 }
 </style>

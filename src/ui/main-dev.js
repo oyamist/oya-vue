@@ -9,6 +9,9 @@ import vmc from 'vue-motion-cam/index-vue';
 
 import SampleApp from './sample-app.vue';
 import Home from './Home.vue';
+import OyaNetwork from './oya-network.vue';
+import OyaDeveloper from './oya-developer.vue';
+import OyaChartPanel from './oya-chart-panel.vue';
 import appvue from "../../index-vue";
 require('./stylus/main.styl')
 
@@ -23,10 +26,18 @@ Vue.use(appvue);
 var routes = [{
         path: '/',
         redirect: "/home"
-    },
-    {
+    },{
         path: '/home',
-        component: Home
+        component: Home,
+    },{
+        path: '/charts',
+        component: OyaChartPanel,
+    },{
+        path: '/network',
+        component: OyaNetwork,
+    },{
+        path: '/developer',
+        component: OyaDeveloper,
     },
 ];
 routes = routes.concat(rbvue.methods.aboutRoutes());
@@ -44,8 +55,12 @@ new Vue({
     el: '#sample-app',
     router,
     store,
+    data: {
+        service: 'oyamist-hello',
+    },
     render: h => h(SampleApp),
     components: {
         Home,
+        OyaChartPanel,
     },
 })

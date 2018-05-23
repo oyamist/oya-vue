@@ -27,6 +27,10 @@
             ></line-chart>
         </div>
     </div>
+    <div v-else class="oya-chart-no-data">
+        <div style="width: 15em">{{sensorLabels[sensorProp]}}</div>
+        <div>no data</div>
+    </div>
 </div>
 
 </template>
@@ -107,6 +111,7 @@ export default {
                 reportDate.toISOString(),
             ].join('/');
             var that = this;
+            console.debug(`refresh()`, url);
             this.$http.get(url).then(res=>{
                 var resData = res.data;
                 that.linechartData.datasets = that.responseDatasets(resData, opts);
@@ -220,5 +225,14 @@ export default {
 .oya-chart {
     padding: 0.2em;
     text-align: center;
+}
+.oya-chart-no-data {
+    padding-left: 4em;
+    display: flex;
+    color: #ddd;
+    text-align: left;
+}
+.oya-chart-no-data:hover {
+    color: #000;
 }
 </style>

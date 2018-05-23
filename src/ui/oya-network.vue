@@ -12,7 +12,7 @@
 
     <v-card>
         <v-card-title primary-title>
-            <h3> Network hosts: {{service}}</h3>
+            <div class="title"> Network hosts: {{service}}</div>
         </v-card-title>
         <v-data-table v-bind:headers="headers" :items="hosts" hide-actions class="elevation-1" >
             <template slot="items" slot-scope="hosts">
@@ -66,9 +66,9 @@ export default {
     },
     methods: {
         refresh(opts={}) {
-            console.log('refreshing', this.queryService);
             var url = [this.restOrigin(), this.service, 'net', 'hosts', 
                 this.queryService || this.service].join('/');
+            console.log('refreshing', this.queryService, url);
             this.$http.get(url).then(res=>{
                 this.hosts = res.data;
             }).catch(e=>{

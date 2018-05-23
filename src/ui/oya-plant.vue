@@ -8,13 +8,13 @@
         <rb-about-item name="service" value="oyamist" slot="prop">RestBundle name</rb-about-item>
     </rb-about>
 
-    <div class="pt-4 pb-4 oya-dashboard">
-        <div v-if="!camera" class="oya-plant " :style="plantStyle">
+    <div class="pt-4 pb-4 oya-plant">
+        <div v-if="!camera" class="oya-plant-img " :style="plantStyle">
             <img v-show="rbService.active" src="/assets/mist-off.svg" height=200px/>
             <img v-show="!rbService.active" src="/assets/inactive.svg" height=200px/>
         </div>
         <vmc-camera v-if="camera" service="vmc"></vmc-camera>
-        <div class="oya-dashboard-controls">
+        <div class="oya-plant-controls">
             <div class="title text-xs-center">
                 {{name}}
                 <div class='caption oya-guid' >{{guid}}</div>
@@ -129,17 +129,17 @@ export default {
 
 </script>
 <style> 
-.oya-plant {
-    padding: 1em;
-    padding-left: 2em;
-    padding-right: 2em;
+.oya-plant-img {
+    xpadding: 1em;
+    xpadding-left: 2em;
+    xpadding-right: 2em;
     border-radius: 1em;
     border-left: 1px solid #fff;
     border-right: 3px solid #ccc;
     border-bottom: 3px solid #ccc;
 }
-.oya-dashboard {
-    background: linear-gradient(to bottom, #ccc, #ddd);
+.oya-plant {
+    xbackground: linear-gradient(to bottom, #ccc, #ddd);
     display:flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
@@ -149,7 +149,7 @@ export default {
     flex-flow: row wrap;
     align-items: center;
 }
-.oya-dashboard-controls {
+.oya-plant-controls {
     padding: 1em;
     padding-top: 2em;
     display:flex;

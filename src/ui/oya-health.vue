@@ -66,6 +66,7 @@ export default {
             } else {
                 var url = [this.restOrigin(), this.service, 'identity'].join('/');
             }
+            console.log(`refresh() http GET:`, url);
             this.$http.get(url).then(res=>{
                 var health = res.data && res.data.health;
                 if (health) {

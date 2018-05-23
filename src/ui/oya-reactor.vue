@@ -9,8 +9,8 @@
         index (0-based) of vessel for component</rb-about-item>
 </rb-about>
 
-<div class="pl-2" style="display:flex; flex-wrap: wrap; flex-direction: row; justify-content: space-around; align-items:flex-start;">
-    <v-card flat >
+<div class="pl-2 oya-reactor">
+    <v-card flat class="oya-reactor">
         <v-card-text class="text-xs-center" style="position:relative">
             <div v-if="showPumpCycle"
                 style="display:flex; flex-direction: row; justify-content:space-around; flex-wrap: wrap; cursor: default">
@@ -794,6 +794,7 @@ export default {
         });
         var url = [this.restOrigin(), this.service, 'sensor/types'].join('/');
         this.sensorTypes = [];
+        console.log(`created() http GET #1`, url);
         this.$http.get(url).then(r => {
             this.sensorTypes = r.data;
         }).catch(e => {
@@ -801,12 +802,14 @@ export default {
         });
         var url = [this.restOrigin(), this.service, 'sensor/locations'].join('/');
         this.sensorLocations = [];
+        console.log(`created() http GET #2`, url);
         this.$http.get(url).then(r => {
             this.sensorLocations = r.data;
         }).catch(e => {
             console.error("error", e);
         });
         var url = [this.restOrigin(), this.service, 'mcu/hats'].join('/');
+        console.log(`created() http GET #3`, url);
         this.$http.get(url).then(r => {
             this.mcuHatItems = r.data;
         }).catch(e => {
@@ -824,5 +827,13 @@ export default {
     font-size: xx-small;
 }
 .oya-desc:hover {
+}
+.oya-reactor {
+    display:flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items:flex-start;
+    background: #ddd !important;
 }
 </style>

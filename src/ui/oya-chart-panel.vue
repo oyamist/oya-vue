@@ -1,11 +1,13 @@
 <template>
 
-    <div>
-        <div class="pt-3 pl-5 pr-4 oya-chart-panel-header">
+    <v-card>
+        <div class='oya-chart-header'>
+            <div class="pl-3 pr-3 pb-2 title" >Charts</div>
             <v-menu lazy :close-on-content-click="false" v-model="reportDateMenu"
                  transition="scale-transition" offset-y  
                  :nudge-right="40" max-width="290px" min-width="290px" >
-                <v-text-field slot="activator" label="Chart End Date" readonly
+                <v-text-field slot="activator" readonly
+                    hint="Chart end date"
                     @blur="date = parseDate(dateFormatted)"
                     v-model="dateFormatted" >
                 </v-text-field>
@@ -20,19 +22,18 @@
                   </template>
                 </v-date-picker>
             </v-menu>
-            <div>
-                <v-menu offset-y>
-                  <v-btn slot=activator icon><v-icon>settings</v-icon></v-btn>
-                  <v-list>
-                    <v-list-tile @click="clickSettings">
-                      <v-list-tile-title>Edit Chart Settings</v-list-tile-title>
-                    </v-list-tile>
-                    <v-list-tile @click="calDialog=true">
-                      <v-list-tile-title>Calibrate nutrient sensor</v-list-tile-title>
-                    </v-list-tile>
-                  </v-list>
-                </v-menu>
-            </div>
+            <div style="flex-grow:1">&nbsp;</div>
+            <v-menu offset-y >
+              <v-btn slot=activator class='pb-3' icon><v-icon>settings</v-icon></v-btn>
+              <v-list>
+                <v-list-tile @click="clickSettings">
+                  <v-list-tile-title>Edit Chart Settings</v-list-tile-title>
+                </v-list-tile>
+                <v-list-tile @click="calDialog=true">
+                  <v-list-tile-title>Calibrate nutrient sensor</v-list-tile-title>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
         </div>
         <div v-if="this.rbService['oya-conf'].apiModel">
             <oya-chart palette="red" sensorProp="tempInternal" :date="date" 
@@ -151,7 +152,7 @@
                 </v-card-text>
             </v-card>
         </rb-api-dialog>
-    </div>
+    </v-card>
 
 </template><script>
 
@@ -187,6 +188,9 @@ export default {
         }
     },
     props: {
+        service: {
+            default: 'oyamist',
+        },
     },
     computed: {
         ecSensor() {
@@ -194,7 +198,7 @@ export default {
             var apiModel = oyaConf && oyaConf.apiModel;
             var sensors = apiModel && apiModel.sensors;
             return sensors && sensors.filter(s=>s.readEC)[0];
-        }
+        },
     },
     methods: {
         calibrate(field) {
@@ -275,6 +279,13 @@ export default {
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         },
     },
+    created() {
+        console.log('created()', this.service);
+        this.restBundleResource(); // load apiModel
+        this.rbDispatch("apiLoad").then(r => {
+            console.log("OyaChartPanel apiLoad", r);
+        });
+    },
     mounted() {
         var now = new Date();
         var reportDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -295,10 +306,10 @@ export default {
     },
 }
 </script><style>
-.oya-chart-panel-header {
+.oya-chart-header {
     display: flex;
-    flex-flow: wrap; 
+    flex-flow: row nowrap; 
     justify-content: space-between;
-    align-items:center;
+    align-items: center;
 }
 </style>
