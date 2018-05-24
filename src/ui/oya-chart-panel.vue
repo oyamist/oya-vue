@@ -1,8 +1,8 @@
 <template>
 
-    <v-card>
+    <div class='oya-chart-container'>
         <div class='oya-chart-header'>
-            <div class="pl-3 pr-3 pb-2 title" >Charts</div>
+            <div class="pr-2 pb-2 title" >Charts</div>
             <v-menu lazy :close-on-content-click="false" v-model="reportDateMenu"
                  transition="scale-transition" offset-y  
                  :nudge-right="40" max-width="290px" min-width="290px" >
@@ -152,7 +152,7 @@
                 </v-card-text>
             </v-card>
         </rb-api-dialog>
-    </v-card>
+    </div>
 
 </template><script>
 
@@ -306,6 +306,12 @@ export default {
     },
 }
 </script><style>
+.oya-chart-container {
+    margin-top: -12px;
+    margin-left: 2px;
+    margin-right: -8px;
+    padding-top: 0;
+}
 .oya-chart-header {
     display: flex;
     flex-flow: row nowrap; 

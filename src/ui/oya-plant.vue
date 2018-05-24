@@ -143,8 +143,10 @@ export default {
 }
 .oya-gauges {
     display:flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     align-items: center;
+    justify-content: space-between;
+    width: 150px;
 }
 .oya-plant-controls {
     display:flex;

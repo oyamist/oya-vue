@@ -2,8 +2,8 @@
 
 <div>
     <div class="oya-dashboard">
-        <div class="pr-3 pt-3 oya-dashboard-header">
-            <div class="pl-3 pt-2 title">{{title}}</div>
+        <div class="pr-2 pt-1 oya-dashboard-header">
+            <div class="pl-2 title">{{title}}</div>
             <oya-health service="oyamist" width="20em"/>
             <v-icon @click="showAdvanced=!showAdvanced">settings</v-icon>
         </div>
@@ -11,7 +11,6 @@
         <div style="flex-grow:1">&nbsp;</div>
         <oya-reactor service="oyamist" v-show="showAdvanced"></oya-reactor>
     </div>
-    <div class="oya-dashboard-footer">&nbsp;</div>
 </div>
 
 </template><script>
@@ -48,11 +47,6 @@ export default {
     display: flex;
     flex-flow: column;
     justify-content: space-between;
-    background: linear-gradient(#ddd,#eee);
-}
-.oya-dashboard-footer {
-    background: linear-gradient(#eee,#fff);
-    height: 20em;
 }
 .oya-dashboard-header {
     display: flex;

@@ -13,14 +13,14 @@
             v-bind:rotate="-90"
             v-show="rbService.Mist"
             size="40"
-            class="blue--text text--darken-1">
+            class="oya-progress-on">
             {{rbService.countdown}}
         </v-progress-circular>
         <v-progress-circular v-bind:value="cycleProgress" 
             v-bind:rotate="-90"
             size="40"
             v-show="!rbService.Mist"
-            class="light-green--text text--darken-2">
+            class="oya-progress-off">
             {{rbService.countdown}}
         </v-progress-circular>
     </div>
@@ -58,6 +58,20 @@ export default {
 </script>
 <style> 
 .oya-progress {
-    padding: 0.5em;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    padding: 0;
+    margin: 0;
+    line-height: 9px;
+}
+.oya-progress-on {
+    border-radius: 20px;
+    background-color: #1e88e5;
+    color: white;
+}
+.oya-progress-off {
+    border-radius: 20px;
+    background-color: #689f38;
+    color: white;
 }
 </style>

@@ -16,38 +16,17 @@
             </v-list-tile-action>
           </v-list-tile>
         </div>
-        <v-list-group value="sidebarRestBundle">
+        <v-list-group v-model="showDeveloper">
             <v-list-tile slot="item">
-              <v-list-tile-action> <v-icon >help</v-icon> </v-list-tile-action>
+              <v-list-tile-action> <v-icon >build</v-icon> </v-list-tile-action>
               <v-list-tile-content>
-                <v-list-tile-title>rest-bundle</v-list-tile-title>
+                <v-list-tile-title>Developer</v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div v-for="(item,i) in sidebarRestBundle" :key="i">
-              <v-list-tile exact :to="item.href">
-                <v-list-tile-content>
-                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                </v-list-tile-content>
-                <v-list-tile-action>
-                    <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
-                </v-list-tile-action>
-              </v-list-tile>
-            </div>
-        </v-list-group>
-        <v-list-group value="sidebarAppRest">
-            <v-list-tile slot="item">
-              <v-list-tile-action> <v-icon >help</v-icon> </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{package.name}}</v-list-tile-title>
-              </v-list-tile-content>
-              <v-list-tile-action>
-                <v-icon dark>keyboard_arrow_down</v-icon>
-              </v-list-tile-action>
-            </v-list-tile>
-            <div v-for="(item,i) in sidebarAppRest" :key="i">
+            <div v-for="(item,i) in sidebarDeveloper" :key="i">
               <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -63,9 +42,9 @@
     <v-toolbar app fixed flat class="black" >
         <v-toolbar-side-icon dark @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-toolbar-title class="grey--text text--lighten-1">
-            <div style="display:flex; flex-flow:column; ">
-                <span class="mr-2" >{{package.name}} {{package.version}}</span>
-                <span class="caption">sample application</span>
+            <div class="mr-2 app-title" title="sample application">
+                <div class="app-subtitle">sample application</div>
+                {{package.name}} {{package.version}}
             </div>
         </v-toolbar-title>
         <v-spacer/>
@@ -112,14 +91,14 @@ export default {
                 icon: "network_check",
                 title: "Network",
                 href: "/network",
-            },{
+            }], 
+            showDeveloper: false,
+            sidebarDeveloper: [{
                 icon: "build",
-                title: "Developer",
+                title: "Client state",
                 href: "/developer",
-            }],
-            sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
-            sidebarAppRest: rbvue.methods.aboutSidebar(appvue.components),
-        }
+           }].concat(rbvue.methods.aboutSidebar(appvue.components)),
+       };
     },
     methods: {
         productionUrl(path) {
@@ -142,6 +121,14 @@ export default {
 </script>
 <style> 
 .oya-content {
-    padding: 0px;
+}
+.app-title {
+    position: relative;
+    padding-bottom: 0.5em;
+}
+.app-subtitle {
+    position: absolute;
+    bottom: 0px;
+    font-size: 10px;
 }
 </style>

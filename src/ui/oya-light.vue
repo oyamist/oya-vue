@@ -9,6 +9,7 @@
     </rb-about>
 
     <div class="oya-light-container" v-if="rbService.active" >
+        <div class="oya-light-indicator">▼</div>
         <v-tooltip left v-if="rbService.lights && lightActive">
             <div class="oya-light oya-light-on" slot="activator">
                 <v-progress-circular v-bind:value="cycleLight" 
@@ -125,10 +126,19 @@ export default {
 
 </script>
 <style> 
+.oya-light-indicator {
+    position: absolute;
+    color: #689f38;
+    top: -1.2em;
+    left: 13px;
+}
 .oya-light-container {
-    padding: 0.5em;
+    position: relative;
     display: flex;
     flex-flow: row wrap;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    align-items: center;
 }
 .oya-light {
     border-radius: 20px;

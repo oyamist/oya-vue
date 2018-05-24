@@ -64,10 +64,11 @@ export default {
 </script>
 <style> 
 .oya-fan-container {
-    padding: 0.5em;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 24px;
 }
 .oya-fan {
     border-radius: 20px;

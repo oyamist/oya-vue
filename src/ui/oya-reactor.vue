@@ -34,24 +34,24 @@
                             >
                             <v-list-tile-action >
                             </v-list-tile-action >
-                            <v-list-tile-content>
-                                <v-list-tile-title v-show="actuator.pin >= 0">
-                                    {{actuator.name}}
-                                </v-list-tile-title>
-                            </v-list-tile-content>
                             <v-list-tile-action v-show='rbService[actuator.name]' >
                                 <v-switch value input-value="true" color="blue darken-2" ></v-switch>
                             </v-list-tile-action>
                             <v-list-tile-action v-show='!rbService[actuator.name]' >
                                 <v-switch ></v-switch>
                             </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title v-show="actuator.pin >= 0" class="text-xs-left">
+                                    {{actuator.name}}
+                                </v-list-tile-title>
+                            </v-list-tile-content>
                         </v-list-tile>
                     </v-list>
                 </div>
             </div>
-            <v-btn color="primary" @click="clickSettings">Settings</v-btn>
-            <v-btn color="primary" @click="clickUpdate">Update</v-btn>
-            <v-btn color="error" @click="clickRestart">Restart</v-btn>
+            <v-btn flat color="primary" @click="clickSettings">Settings</v-btn>
+            <v-btn flat @click="clickUpdate">Update</v-btn>
+            <v-btn flat @click="clickRestart">Restart</v-btn>
             <v-dialog persistent v-model="updateToggle">
                 <v-card>
                     <v-card-title>Update application and restart system?</v-card-title>
@@ -350,9 +350,6 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
-import OyaChart from "./oya-chart.vue";
-import OyaSensor from "./oya-sensor.vue";
-import OyaProgress from "./oya-progress.vue";
 
 export default {
     mixins: [ 
@@ -782,9 +779,6 @@ export default {
     components: {
         RbApiDialog,
         RbDialogRow,
-        OyaChart,
-        OyaSensor,
-        OyaProgress,
     },
     created() {
         this.restBundleResource();
@@ -834,6 +828,5 @@ export default {
     flex-direction: row;
     justify-content: space-around;
     align-items:flex-start;
-    background: #eee !important;
 }
 </style>

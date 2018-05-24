@@ -11,9 +11,10 @@
 
     <div :class="healthClass" @click="showDetail=!showDetail">
         <div v-for="(h,i) in health" :key="i" 
-            :title="   h.text   " :class="h.class">
+            class="oya-health-symbol"
+            :title="h.text" :class="h.class">
             {{h.symbol}}
-            <div class="oya-health-detail" v-show="showDetail">{{h.text}}</div>
+            <span class="oya-health-detail" v-show="showDetail">{{h.text}}</span>
         </div>
     </div>
 
@@ -127,11 +128,16 @@ export default {
     created() {
     },
     mounted() {
-        this.onApiModelLoaded('oya-conf').then(apiModel=>{
-            this.refresh();
-            var healthPoll = (apiModel.healthPoll || 60) * 1000;
-            setInterval(() => this.refresh(), healthPoll);
-        });
+        var that = this;
+        var daemon = () => {
+            var restBundle = this.$store.state.restBundle;
+            var oyaConf = restBundle && restBundle.oyamist && restBundle.oyamist['oya-conf'];
+            var apiModel = oyaConf && oyaConf.apiModel;
+            that.refresh();
+            var healthPoll = (apiModel && apiModel.healthPoll || 30) * 1000;
+            setTimeout(() => daemon(), healthPoll);
+        };
+        daemon();
     },
 }
 
@@ -154,6 +160,11 @@ export default {
 }
 .oya-health-horizontal {
     flex-flow: row;
+}
+.oya-health-symbol {
+    font-size: 85%;
+    padding-left: 1px;
+    padding-right: 1px;
 }
 .oya-health-detail {
     color: black;

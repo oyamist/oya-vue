@@ -15,6 +15,5 @@ export default {
 
 </script><style>
 .oya-content {
-    background: #ddd;
 }
 </style>
