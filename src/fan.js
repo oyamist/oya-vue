@@ -1,6 +1,4 @@
 (function(exports) {
-    const OyaVessel = require('./oya-vessel');
-    const EventEmitter = require('events');
     const winston = require('winston');
     const OyaMist = require('./oyamist');
     var JSONKEYS = null;

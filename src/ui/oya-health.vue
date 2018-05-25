@@ -13,7 +13,8 @@
         <div v-for="(h,i) in health" :key="i" 
             class="oya-health-symbol"
             :title="h.text" :class="h.class">
-            {{h.symbol}}
+            <v-icon v-if="h.icon" :color='h.color'>{{h.icon}}</v-icon>
+            <div :style="`display:inline-block;padding-top:${h.paddingTop}`" v-else>{{h.symbol}}</div>
             <span class="oya-health-detail" v-show="showDetail">{{h.text}}</span>
         </div>
     </div>
@@ -29,19 +30,21 @@ import rbvue from "rest-bundle/index-vue";
 
 const healthGood = {
     class: 'health-good',
-    symbol: "\u2714",
+    symbol: "\u25cf", // \u2714
+    paddingTop: '0em',
 };
 const healthBad = {
     class: 'health-bad',
-    symbol: "\u274c",
+    symbol: '\u25c8',
+    paddingTop: '0.107em',
 };
 const healthUnavailable = {
     class: 'health-unavailable',
-    symbol: "\u2205",
+    icon: 'help_outline',
 };
 const healthWaiting = {
     text: 'Waiting for server...',
-    symbol: '\u22ef',
+    icon: 'hourglass_full',
 };
 
 export default {
@@ -144,7 +147,7 @@ export default {
 </script>
 <style> 
 .health-good {
-    color: green;
+    color: #0e0;
 }
 .health-bad {
     color: red;

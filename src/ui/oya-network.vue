@@ -64,17 +64,15 @@ export default {
     },
     data: function() {
         return {
-            hosts: [{
-                name: 'oyamist',
-            }],
+            hosts: [],
             search: '',
         }
     },
     methods: {
         refresh(opts={}) {
-            var url = [this.restOrigin(), this.service, 'net', 'hosts', 
-                this.queryService || this.service].join('/');
-            console.log('refreshing', this.queryService, url);
+            var service = this.queryService || this.service;
+            var url = [this.restOrigin(), this.service, 'net', 'hosts', service].join('/');
+            console.log('refreshing', service, url);
             this.$http.get(url).then(res=>{
                 this.hosts = res.data;
             }).catch(e=>{

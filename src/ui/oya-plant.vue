@@ -19,9 +19,9 @@
                 {{name}}
             </div-->
             <div class="oya-gauges">
-                <oya-light :service='service' v-if="showLightCycle"/>
-                <oya-progress :service='service' v-if="showPumpCycle"/>
-                <oya-fan :service='service'/>
+                <div class="oya-gauge" v-if='showLightCycle'><oya-light :service='service' /></div>
+                <div class="oya-gauge" v-if="showPumpCycle"><oya-progress :service='service' /></div>
+                <div class="oya-gauge" v-if="showFan"><oya-fan :service='service' /></div>
             </div>
             <div style="margin-bottom: -1em">
                 <v-switch v-show="rbService.active"
@@ -105,6 +105,9 @@ export default {
         name() {
             return this.vessel && this.vessel.name;
         },
+        showFan() {
+            return this.apiModel && this.apiModel.fan.type !== "fan:none"; // Fan.TYPE_NONE
+        },
         showLightCycle() {
             return this.apiModel && this.apiModel.lights.reduce((a,l) => a || l.pin>=0,false);
         },
@@ -146,7 +149,13 @@ export default {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: space-between;
-    width: 150px;
+}
+.oya-gauge {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    height: 21px;
+    vertical-align: bottom;
+    border-bottom: 1px solid #eee;
 }
 .oya-plant-controls {
     display:flex;
