@@ -10,7 +10,7 @@
 </template><script>
 
 export default {
-    name: 'introduction',
+    name: 'oya-developer',
 }
 
 </script><style>

@@ -352,6 +352,7 @@ const RbApiDialog = rbvue.components.RbApiDialog;
 const RbDialogRow = rbvue.components.RbDialogRow;
 
 export default {
+    name: 'oya-reactor',
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
         rbvue.mixins.RbApiMixin.createMixin("oya-conf"),

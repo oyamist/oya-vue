@@ -49,6 +49,7 @@ import Vue from 'vue';
 import rbvue from "rest-bundle/index-vue";
 
 export default {
+    name: 'oya-network',
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
         rbvue.mixins.RbServiceMixin,
