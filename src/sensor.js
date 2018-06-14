@@ -548,6 +548,7 @@
         }
 
         clear() {
+            this.passFail.clear();
             this.readErrors = null;
             this.fault = null;
         }

@@ -75,6 +75,13 @@
     });
     it("TESTTESTclear() removes all trial results", () => {
         var pf = new PassFail();
+
+        // clear() with no trials
+        pf.clear();
+        should(pf.passRate()).NaN();
+        should(pf.trials.length).equal(0);
+
+        // clear() with trials
         pf.add(true);
         pf.add(false);
         should(pf.passRate()).equal(1/2);
