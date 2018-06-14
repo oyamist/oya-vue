@@ -4,6 +4,10 @@
     class PassFail {
         constructor(opts={}) {
             this.nTrials = opts.nTrials || 100;
+            this.clear();
+        }
+
+        clear() {
             this.trials = [];
         }
 

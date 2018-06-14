@@ -22,7 +22,7 @@
             trials: [],
         });
     });
-    it("TESTTESTaddTrial(result) adds a trial result", () => {
+    it("TESTTESTadd(result) adds a trial result", () => {
         var pf = new PassFail();
 
         pf.add(true);
@@ -72,5 +72,14 @@
 
         // most recent 3
         should(pf.passRate(3)).equal(2/3); // f,f,f,t,t
+    });
+    it("TESTTESTclear() removes all trial results", () => {
+        var pf = new PassFail();
+        pf.add(true);
+        pf.add(false);
+        should(pf.passRate()).equal(1/2);
+        pf.clear();
+        should(pf.passRate()).NaN();
+        should(pf.trials.length).equal(0);
     });
 })
