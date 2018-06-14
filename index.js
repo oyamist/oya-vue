@@ -10,6 +10,7 @@ module.exports = {
     OyaNet: require('./src/oya-net'),
     OyaReactor: require("./src/oya-reactor"),
     OyaVessel: require("./src/oya-vessel"),
+    PassFail: require('./src/pass-fail'),
     Sensor: require("./src/sensor"),
     Solution: require('./src/solution'),
     Switch: require('./src/switch'),

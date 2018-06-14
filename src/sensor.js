@@ -4,6 +4,7 @@
     const Calibration = require("./calibration");
     const OyaAnn = require('oya-ann');
     const SystemFacade = require("./system-facade");
+    const PassFail = require('./pass-fail');
 
     var SERIALIZABLE_KEYS;
 
@@ -70,6 +71,7 @@
             this.i2cWrite = opts.i2cWrite || ((i2cAddr, dataBuf) => {
                 throw new Error("no I2C driver");
             });
+            this.passFail = new PassFail();
 
             // internal properties
             this.clear();
