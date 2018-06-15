@@ -28,6 +28,7 @@
         static get SENSE_EC_INTERNAL() { return "sense: ec-internal"; }
         static get SENSE_EC_CANOPY() { return "sense: ec-canopy"; }
         static get SENSE_EC_AMBIENT() { return "sense: ec-ambient"; }
+        static get SENSE_FAULT() { return "sense: fault"; }
         static get NUTRIENT_UNIT() {
             return {
                 EC: "microSiemens",

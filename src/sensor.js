@@ -1,5 +1,6 @@
 (function(exports) {
     const winston = require("winston");
+    const EventEmitter = require('events');
     const OyaMist = require("./oyamist");
     const Calibration = require("./calibration");
     const OyaAnn = require('oya-ann');
@@ -64,7 +65,10 @@
             // unserialized custom properties
             this.readDelay = Number(opts.readDelay) || typeProps.readDelay;
             this.lastRead = opts.lastRead;
-            this.emitter = opts.emitter;
+            this.emitter = opts.emitter || new EventEmitter();
+            this.emitter.on(OyaMist.SENSE_FAULT, e => {
+                winston.info(e.stack);
+            });
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
             });
@@ -83,6 +87,22 @@
 
         get serializableKeys() {
             return SERIALIZABLE_KEYS;
+        }
+
+        get fault() {
+            return this._fault;
+        }
+
+        set fault(value) {
+            if (value === this._fault) {
+                return value;
+            }
+            if (value instanceof Error) {
+                if (this._fault == null || this._fault.message !== value.message) {
+                    this.emitter && this.emitter.emit(OyaMist.SENSE_FAULT, value);
+                }
+            }
+            return (this._fault = value);
         }
 
         isFieldSource(field) {
@@ -496,26 +516,34 @@
                                 this.passFail.add(false);
                                 if (++this.readErrors >= this.maxReadErrors) { // consecutive errors
                                     this.fault = new Error(`Sensor-${this.key}.read() `+
-                                        `too many consecutive errors (possible sensor outage) [E1]`);
+                                        `too many consecutive errors (possible sensor outage) @897ae`);
                                 }
                                 reject(e);
                             }
                         }, this.readDelay || 0);
                     } else if (this.comm === Sensor.COMM_W1) {
                         SystemFacade.oneWireRead(this.address, this.type).then(r => {
-                            if (r.temp && this.readTemp) {
+                            var readTemp = r.temp && this.readTemp;
+                            var readHumidity = this.humidity && this.readHumidity;
+                            if (readTemp) {
                                 r.temp = r.temp * this.tempScale + this.tempOffset;
                                 this.data.temp = r.temp;
                                 this.emitMap(r.temp, Sensor.EVENT_TEMP_MAP);
                             }
-                            if (r.humidity && this.readHumidity) {
+                            if (readHumidity) {
                                 r.humidity = r.humidity * this.humidityScale + this.humidityOffset;
                                 this.data.humidity = r.humidity;
                                 this.emitMap(r.humidity, Sensor.EVENT_HUMIDITY_MAP);
                             }
                             this.lastRead = new Date();
+                            this.fault = null;
+                            this.passFail.add(true);
                             resolve(r);
-                        }).catch(e=>reject(e));
+                        }).catch(e=>{
+                            this.fault = e;
+                            this.passFail.add(false);
+                            reject(e);
+                        });
                     } else {
                         reject(new Error(`read() not supported for sensor:${this.name} comm:${this.comm}`));
                     }

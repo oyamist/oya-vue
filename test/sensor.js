@@ -329,6 +329,7 @@
                 var i2cOut = [];
                 var msRead = null;
                 var readDelay = 15;
+                var faults = [];
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
                     loc: OyaMist.LOC_INTERNAL,
@@ -343,6 +344,11 @@
                     },
                 }));
 
+                // client can respond to sensor fault message change
+                sensor.emitter.on(OyaMist.SENSE_FAULT, e => {
+                    faults.push(e);
+                });
+
                 // read() returns a promise that resolves to the data read
                 var msNow = Date.now();
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
@@ -356,6 +362,7 @@
                 should(data.timestamp - Date.now()).approximately(0,8);
                 should.deepEqual(data, sensor.data);
                 should(sensor.passFail.passRate()).equal(1);
+                should.deepEqual(faults, []);
 
                 // read() rejects bad data 5x then doesn't read anymore
                 should(sensor.readErrors).equal(0);
@@ -368,6 +375,8 @@
                 should(sensor.readErrors).equal(1);
                 should(sensor.fault.message).match(/possible sensor outage/);
                 should(sensor.passFail.passRate()).equal(1/2);
+                var fault = sensor.fault;
+                should.deepEqual(faults, [fault]);
 
                 // fault is cleared on successful read
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
@@ -375,6 +384,7 @@
                 should(sensor.fault).equal(null);
                 should.deepEqual(data, sensor.data);
                 should(sensor.passFail.passRate()).equal(2/3);
+                should.deepEqual(faults, [fault]);
 
                 // readErrors is set to zero on success
                 sensor.clear();  // clear fault and permit reading
@@ -382,6 +392,13 @@
                 should(sensor.readErrors).equal(0);
                 should(data.temp).approximately(19.5, 0.01);
                 should(sensor.passFail.passRate()).equal(1/1);
+
+                // clients can also set fault property of sensor
+                var etest = new Error("Client generated error");
+                sensor.fault = etest;
+                should.deepEqual(faults, [fault, etest]);
+                sensor.fault = etest; // ignore duplicate
+                should.deepEqual(faults, [fault, etest]);
 
                 done();
             } catch(err) {
