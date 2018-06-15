@@ -478,9 +478,6 @@
         }
 
         read() {
-            if (this.fault) {
-                return Promise.reject(this.fault);
-            }
             return new Promise((resolve, reject) => {
                 try {
                     if (this.comm === Sensor.COMM_I2C) {
@@ -492,10 +489,14 @@
                                 var data = this.parseData(buf);
                                 this.readErrors = 0;
                                 this.lastRead = new Date();
+                                this.fault = null;
+                                this.passFail.add(true);
                                 resolve(data);
                             } catch(e) {
-                                if (++this.readErrors >= this.maxReadErrors) {
-                                    this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E1]`);
+                                this.passFail.add(false);
+                                if (++this.readErrors >= this.maxReadErrors) { // consecutive errors
+                                    this.fault = new Error(`Sensor-${this.key}.read() `+
+                                        `too many consecutive errors (possible sensor outage) [E1]`);
                                 }
                                 reject(e);
                             }

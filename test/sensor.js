@@ -320,7 +320,7 @@
         });
         should.deepEqual(sensor.data, data); // last good data
     });
-    it("read() returns a promise resolved with data read", function(done) {
+    it("TESTTESTread() returns a promise resolved with data read", function(done) {
         var async = function*() {
             try {
                 // The AM2315 sensor is an i2c sensor. 
@@ -355,6 +355,7 @@
                 should(data.humidity).approximately(.323, 0.0001);
                 should(data.timestamp - Date.now()).approximately(0,8);
                 should.deepEqual(data, sensor.data);
+                should(sensor.passFail.passRate()).equal(1);
 
                 // read() rejects bad data 5x then doesn't read anymore
                 should(sensor.readErrors).equal(0);
@@ -365,19 +366,22 @@
                 should(data).instanceOf(Error);
                 should(data.message).match(/CRC/);
                 should(sensor.readErrors).equal(1);
-                should(sensor.fault.message).match(/too many errors/);
+                should(sensor.fault.message).match(/possible sensor outage/);
+                should(sensor.passFail.passRate()).equal(1/2);
 
-                // read is disabled if fault is not null
+                // fault is cleared on successful read
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
-                var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
-                    .catch(e=>async.next(e));
-                should(data).equal(sensor.fault);
+                var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
+                should(sensor.fault).equal(null);
+                should.deepEqual(data, sensor.data);
+                should(sensor.passFail.passRate()).equal(2/3);
 
                 // readErrors is set to zero on success
                 sensor.clear();  // clear fault and permit reading
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
                 should(sensor.readErrors).equal(0);
                 should(data.temp).approximately(19.5, 0.01);
+                should(sensor.passFail.passRate()).equal(1/1);
 
                 done();
             } catch(err) {
