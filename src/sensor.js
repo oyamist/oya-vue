@@ -67,9 +67,13 @@
             this.emitter = opts.emitter || new EventEmitter();
             var that = this;
             this.emitter.on(OyaMist.SENSE_FAULT, e => {
-                winston.info(`Sensor-${that.name}.on(SENSE_FAULT)`,
-                    `${that.passFail}`, 
-                    `error:${e.message}`);
+                if (e) {
+                    winston.info(`Sensor-${that.name}.on(SENSE_FAULT)`,
+                        `${that.passFail}`, 
+                        `error:${e.message}`);
+                } else {
+                    winston.info(`Sensor-${that.name} OK`);
+                }
             });
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
@@ -97,15 +101,13 @@
 
         set fault(value) {
             if (value === this._fault) {
-                return value;
+                return value; // ignore duplicate faults
             }
-            if (value instanceof Error) {
-                if (this._fault && this._fault.message === value.message) {
-                    // ignore duplicate faults
-                } else {
-                    this.emitter && this.emitter.emit(OyaMist.SENSE_FAULT, value);
-                }
+            if (value && this._fault && this._fault.message === value.message) {
+                return value; // ignore duplicate faults
             }
+            winston.info(`DEBUG: emitter:${!!this.emitter} fault:`, value && value.message);
+            this.emitter && this.emitter.emit(OyaMist.SENSE_FAULT, value);
             return (this._fault = value);
         }
 

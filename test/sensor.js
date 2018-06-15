@@ -381,7 +381,7 @@
                 should(sensor.fault).equal(null);
                 should.deepEqual(data, sensor.data);
                 should(sensor.passFail.passRate()).equal(2/3);
-                should.deepEqual(faults, [fault]);
+                should.deepEqual(faults, [fault, null]);
 
                 // fault is cleared on success
                 sensor.clear();  // clear fault and permit reading
@@ -393,9 +393,9 @@
                 // clients can also set fault property of sensor
                 var etest = new Error("Client generated error");
                 sensor.fault = etest;
-                should.deepEqual(faults, [fault, etest]);
+                should.deepEqual(faults, [fault, null, etest]);
                 sensor.fault = etest; // ignore duplicate
-                should.deepEqual(faults, [fault, etest]);
+                should.deepEqual(faults, [fault, null, etest]);
 
                 done();
             } catch(err) {
