@@ -20,6 +20,7 @@
         should(pf50).properties({
             nTrials: 50,
             trials: [],
+            name: 'pass/fail',
         });
     });
     it("TESTTESTadd(result) adds a trial result", () => {
@@ -88,5 +89,17 @@
         pf.clear();
         should(pf.passRate()).NaN();
         should(pf.trials.length).equal(0);
+    });
+    it("TESTTESTtoString() returns string summary", () => {
+        var pf = new PassFail({
+            name: 'passRate',
+        });
+        should(pf.toString()).equal(`passRate:0/0`);
+        pf.add(true);
+        should(pf.toString()).equal(`passRate:1/1`);
+        pf.add(true);
+        should(pf.toString()).equal(`passRate:2/2`);
+        pf.add(false);
+        should(pf.toString()).equal(`passRate:2/3`);
     });
 })

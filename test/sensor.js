@@ -138,15 +138,14 @@
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     loc: OyaMist.LOC_CANOPY,
                     healthTimeout,
-                    maxReadErrors: 2,
                 }));
                 try { var promise = await sensor.read(); } catch(e) { /* ignore */ }
                 should.deepEqual(sensor.health(), {
-                    "AM2315@canopy": "Sensor is completely unresponsive",
+                    "AM2315@canopy": "no I2C driver",
                 });
                 try { var promise = await sensor.read(); } catch(e) { /* ignore */ }
                 should.deepEqual(sensor.health(), {
-                    "AM2315@canopy": "Sensor AM2315@canopy disabled (too many errors) [E2]",
+                    "AM2315@canopy": "no I2C driver",
                 });
                 done();
             } catch(e) {
@@ -333,7 +332,6 @@
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_AM2315, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
                     loc: OyaMist.LOC_INTERNAL,
-                    maxReadErrors: 1,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
                         testData.copy(buf);
@@ -345,6 +343,7 @@
                 }));
 
                 // client can respond to sensor fault message change
+                should(OyaMist.SENSE_FAULT).equal('sense: fault');
                 sensor.emitter.on(OyaMist.SENSE_FAULT, e => {
                     faults.push(e);
                 });
@@ -365,15 +364,13 @@
                 should.deepEqual(faults, []);
 
                 // read() rejects bad data 5x then doesn't read anymore
-                should(sensor.readErrors).equal(0);
                 should(sensor.fault).equal(null);
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x90]); // bad crc
                 var data = yield sensor.read().then(r=>async.throw(new Error("never happen")))
                     .catch(e=>async.next(e));
                 should(data).instanceOf(Error);
                 should(data.message).match(/CRC/);
-                should(sensor.readErrors).equal(1);
-                should(sensor.fault.message).match(/possible sensor outage/);
+                should(sensor.fault.message).match(/AM2315 bad CRC/);
                 should(sensor.passFail.passRate()).equal(1/2);
                 var fault = sensor.fault;
                 should.deepEqual(faults, [fault]);
@@ -386,10 +383,10 @@
                 should(sensor.passFail.passRate()).equal(2/3);
                 should.deepEqual(faults, [fault]);
 
-                // readErrors is set to zero on success
+                // fault is cleared on success
                 sensor.clear();  // clear fault and permit reading
                 var data = yield sensor.read().then(r=>async.next(r)).catch(e=>async.throw(e));
-                should(sensor.readErrors).equal(0);
+                should(sensor.fault).Null();
                 should(data.temp).approximately(19.5, 0.01);
                 should(sensor.passFail.passRate()).equal(1/1);
 
@@ -437,7 +434,6 @@
                 var sensor = new Sensor(Object.assign(Sensor.TYPE_EZO_EC_K1, {
                     readDelay, // some sensors such as SHT31-DIS have a read delay
                     loc: OyaMist.LOC_INTERNAL,
-                    maxReadErrors: 1,
                     i2cRead: (addr, buf) => {
                         msRead = Date.now();
                         testData.copy(buf);
@@ -564,7 +560,6 @@
             'desc',
             'healthTimeout',
             'loc',
-            'maxReadErrors',
             'name',
             'readEC',
             'readHumidity',
@@ -581,7 +576,6 @@
             'desc',
             'healthTimeout',
             'loc',
-            'maxReadErrors',
             'name',
             'readEC',
             'readHumidity',

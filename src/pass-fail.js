@@ -3,6 +3,7 @@
 
     class PassFail {
         constructor(opts={}) {
+            this.name = opts.name || 'pass/fail';
             this.nTrials = opts.nTrials || 100;
             this.clear();
         }
@@ -39,6 +40,12 @@
                 fail: 0,
             });
             return acc.pass / (acc.pass + acc.fail);
+        }
+
+        toString() {
+            var n = this.trials && this.trials.length || 0;
+            var pass = n === 0 ? 0 : this.passRate() * n;
+            return `${this.name}:${pass}/${n}`;
         }
 
 

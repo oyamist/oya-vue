@@ -37,7 +37,6 @@
             this.desc = opts.desc || typeProps.desc || 'generic sensor';
             this.healthTimeout = Number(opts.healthTimeout) || 5; 
             this.loc = opts.loc || OyaMist.LOC_NONE;
-            this.maxReadErrors = opts.maxReadErrors == null ? 5 : Number(opts.maxReadErrors);
             this.name = opts.name || typeProps.name;
             this.readHumidity = opts.readHumidity == null ? typeProps.readHumidity : opts.readHumidity;
             this.readTemp = opts.readTemp == null ? typeProps.readTemp : opts.readTemp;
@@ -67,7 +66,9 @@
             this.lastRead = opts.lastRead;
             this.emitter = opts.emitter || new EventEmitter();
             this.emitter.on(OyaMist.SENSE_FAULT, e => {
-                winston.info(e.stack);
+                winston.info(`Sensor-${this.name}.on(SENSE_FAULT)`,
+                    `${this.passFail.toString()}`, 
+                    `error:${e.message}`);
             });
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
@@ -98,7 +99,9 @@
                 return value;
             }
             if (value instanceof Error) {
-                if (this._fault == null || this._fault.message !== value.message) {
+                if (this._fault && this._fault.message === value.message) {
+                    // ignore duplicate faults
+                } else {
                     this.emitter && this.emitter.emit(OyaMist.SENSE_FAULT, value);
                 }
             }
@@ -507,17 +510,13 @@
                             try {
                                 this.i2cRead(this.address, buf);
                                 var data = this.parseData(buf);
-                                this.readErrors = 0;
                                 this.lastRead = new Date();
                                 this.fault = null;
                                 this.passFail.add(true);
                                 resolve(data);
                             } catch(e) {
                                 this.passFail.add(false);
-                                if (++this.readErrors >= this.maxReadErrors) { // consecutive errors
-                                    this.fault = new Error(`Sensor-${this.key}.read() `+
-                                        `too many consecutive errors (possible sensor outage) @897ae`);
-                                }
+                                this.fault = e;
                                 reject(e);
                             }
                         }, this.readDelay || 0);
@@ -548,9 +547,7 @@
                         reject(new Error(`read() not supported for sensor:${this.name} comm:${this.comm}`));
                     }
                 } catch (e) {
-                    if (++this.readErrors >= this.maxReadErrors) {
-                        this.fault = new Error(`Sensor ${this.key} disabled (too many errors) [E2]`);
-                    }
+                    this.fault = e;
                     reject(e);
                 }
             });
@@ -578,7 +575,6 @@
 
         clear() {
             this.passFail.clear();
-            this.readErrors = null;
             this.fault = null;
         }
 
