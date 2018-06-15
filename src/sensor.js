@@ -65,9 +65,10 @@
             this.readDelay = Number(opts.readDelay) || typeProps.readDelay;
             this.lastRead = opts.lastRead;
             this.emitter = opts.emitter || new EventEmitter();
+            var that = this;
             this.emitter.on(OyaMist.SENSE_FAULT, e => {
-                winston.info(`Sensor-${this.name}.on(SENSE_FAULT)`,
-                    `${this.passFail.toString()}`, 
+                winston.info(`Sensor-${that.name}.on(SENSE_FAULT)`,
+                    `${that.passFail}`, 
                     `error:${e.message}`);
             });
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
