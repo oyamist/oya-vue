@@ -65,16 +65,6 @@
             this.readDelay = Number(opts.readDelay) || typeProps.readDelay;
             this.lastRead = opts.lastRead;
             this.emitter = opts.emitter || new EventEmitter();
-            var that = this;
-            this.emitter.on(OyaMist.SENSE_FAULT, e => {
-                if (e) {
-                    winston.info(`Sensor-${that.name}.on(SENSE_FAULT)`,
-                        `${that.passFail}`, 
-                        `error:${e.message}`);
-                } else {
-                    winston.info(`Sensor-${that.name} OK`);
-                }
-            });
             this.i2cRead = opts.i2cRead || ((i2cAddr, dataBuf) => { 
                 throw new Error("no I2C driver");
             });
@@ -106,7 +96,8 @@
             if (value && this._fault && this._fault.message === value.message) {
                 return value; // ignore duplicate faults
             }
-            winston.info(`DEBUG: emitter:${!!this.emitter} fault:`, value && value.message);
+            var msg = value ? value.message : 'OK';
+            winston.info(`Sensor-${this.name}.fault:${msg} ${this.passFail}`);
             this.emitter && this.emitter.emit(OyaMist.SENSE_FAULT, value);
             return (this._fault = value);
         }
@@ -487,7 +478,7 @@
 
         calibrateDry() {
             if (!this.cmdCalDry) {
-                throw new Error("Sensor.calibrateDry() ${this.name} cannot be dry calibrated");
+                throw new Error(`Sensor.calibrateDry() ${this.name} cannot be dry calibrated`);
             }
             this.write(this.cmdCalDry);
         }
@@ -499,7 +490,7 @@
                 }
                 this.i2cWrite(this.address, Buffer.from(cmd));
             } else {
-                throw new Error("Could not write sensor. Unknown communication protocol ${this.comm}");
+                throw new Error(`Could not write sensor. Unknown communication protocol ${this.comm}`);
             }
         }
 

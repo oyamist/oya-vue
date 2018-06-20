@@ -319,7 +319,7 @@
         });
         should.deepEqual(sensor.data, data); // last good data
     });
-    it("TESTTESTread() returns a promise resolved with data read", function(done) {
+    it("read() returns a promise resolved with data read", function(done) {
         var async = function*() {
             try {
                 // The AM2315 sensor is an i2c sensor. 
@@ -504,7 +504,7 @@
         }();
         async.next();
     });
-    it("update(sensor, ...opts) updates sensor properties", function() {
+    it("TESTTESTupdate(sensor, ...opts) updates sensor properties", function() {
         var a = {};
         should(a.x === null).equal(false);
         should(a.x == null).equal(true);
@@ -513,20 +513,24 @@
         should(JSON.stringify(a)).equal('{}');
 
         var sensor = new Sensor();
+        var emitter = sensor.emitter;
 
         // update does not change sensor
         var sensorExpected = sensor.toJSON();
         should(Sensor.update(sensor)).equal(sensor);
         should.deepEqual(sensor.toJSON(), sensorExpected);
+        should(sensor.emitter).equal(emitter);
 
         // sensor can change type
         var sensor = new Sensor(Sensor.TYPE_SHT31_DIS);
+        var emitter = sensor.emitter;
         var sensorExpected = new Sensor(Sensor.TYPE_DS18B20);
         should(Sensor.update(sensor, {
             type: Sensor.TYPE_DS18B20.type
         })).equal(sensor);
         should.deepEqual(sensor, sensorExpected);
         should.deepEqual(sensor.addresses, ["28-MOCK1", "28-MOCK2"]);
+        should(sensor.emitter).equal(emitter);
 
         // changing sensor type does not affect critical properties
         var date = new Date();
@@ -534,6 +538,7 @@
             loc: OyaMist.LOC_CANOPY,
             lastRead: date,
         });
+        var emitter = sensor.emitter;
         var sensorExpected = new Sensor(Sensor.TYPE_DS18B20, {
             loc: OyaMist.LOC_CANOPY,
             lastRead: date,
@@ -548,6 +553,7 @@
         should(sensor.toJSON()).properties({
             addresses: ["28-MOCK1", "28-MOCK2"],
         });
+        should(sensor.emitter).equal(emitter);
     });
     it("toJSON() only serializes some properties", function() {
         var sensor = new Sensor();
@@ -759,5 +765,16 @@
         should(s3.valueForTemp(400, 17)).approximately(100,e);
         should(s3.valueForTemp(410, 18)).approximately(100,e);
         should(s3.valueForTemp(420, 19)).approximately(100,e);
+    });
+    it("TESTTESTError comparison", () => {
+        var s1 = {
+            a:123,
+        };
+        var e1 = new Error(`Test message ${s1.a}`);
+        var e2 = new Error(`Test message 123`);
+        should(e1.message === e2.message).equal(true);
+        should(e1.message == e2.message).equal(true);
+        should(e1 == e2).equal(false);
+        should(e1 === e2).equal(false);
     });
 })

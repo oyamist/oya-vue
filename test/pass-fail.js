@@ -6,7 +6,7 @@
         PassFail,
     } = require('../index');
 
-    it("TESTTESTPassFail(opts) creates a pass/fail tracker", () => {
+    it("PassFail(opts) creates a pass/fail tracker", () => {
         var pf = new PassFail();
         should(pf).properties({
             nTrials: 100,
@@ -23,7 +23,7 @@
             name: 'pass/fail',
         });
     });
-    it("TESTTESTadd(result) adds a trial result", () => {
+    it("add(result) adds a trial result", () => {
         var pf = new PassFail();
 
         pf.add(true);
@@ -36,7 +36,7 @@
             trials: [true, false],
         });
     });
-    it("TESTTESTpassRate(n) property returns trial passing rate", () => {
+    it("passRate(n) property returns trial passing rate", () => {
         var pf = new PassFail({
             nTrials: 5,
         });
@@ -74,7 +74,7 @@
         // most recent 3
         should(pf.passRate(3)).equal(2/3); // f,f,f,t,t
     });
-    it("TESTTESTclear() removes all trial results", () => {
+    it("clear() removes all trial results", () => {
         var pf = new PassFail();
 
         // clear() with no trials
@@ -90,7 +90,7 @@
         should(pf.passRate()).NaN();
         should(pf.trials.length).equal(0);
     });
-    it("TESTTESTtoString() returns string summary", () => {
+    it("toString() returns string summary", () => {
         var pf = new PassFail({
             name: 'passRate',
         });
