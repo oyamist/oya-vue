@@ -319,7 +319,7 @@
         });
         should.deepEqual(sensor.data, data); // last good data
     });
-    it("read() returns a promise resolved with data read", function(done) {
+    it("TESTTESTread() returns a promise resolved with data read", function(done) {
         var async = function*() {
             try {
                 // The AM2315 sensor is an i2c sensor. 
@@ -362,6 +362,9 @@
                 should.deepEqual(data, sensor.data);
                 should(sensor.passFail.passRate()).equal(1);
                 should.deepEqual(faults, []);
+                should.deepEqual(sensor.health(), {
+                    'AM2315@internal': 1,
+                });
 
                 // read() rejects bad data 5x then doesn't read anymore
                 should(sensor.fault).equal(null);
@@ -374,6 +377,9 @@
                 should(sensor.passFail.passRate()).equal(1/2);
                 var fault = sensor.fault;
                 should.deepEqual(faults, [fault]);
+                should.deepEqual(sensor.health(), {
+                    'AM2315@internal': 'Sensor AM2315 bad CRC 3 4 1 43 0 c3 41 90 ',
+                });
 
                 // fault is cleared on successful read
                 var testData = Buffer.from([0x03,0x04,0x01,0x43,0x00,0xc3,0x41,0x91]);
@@ -382,6 +388,9 @@
                 should.deepEqual(data, sensor.data);
                 should(sensor.passFail.passRate()).equal(2/3);
                 should.deepEqual(faults, [fault, null]);
+                should.deepEqual(sensor.health(), {
+                    'AM2315@internal': 2/3,
+                });
 
                 // fault is cleared on success
                 sensor.clear();  // clear fault and permit reading
@@ -504,7 +513,7 @@
         }();
         async.next();
     });
-    it("TESTTESTupdate(sensor, ...opts) updates sensor properties", function() {
+    it("update(sensor, ...opts) updates sensor properties", function() {
         var a = {};
         should(a.x === null).equal(false);
         should(a.x == null).equal(true);
@@ -766,7 +775,7 @@
         should(s3.valueForTemp(410, 18)).approximately(100,e);
         should(s3.valueForTemp(420, 19)).approximately(100,e);
     });
-    it("TESTTESTError comparison", () => {
+    it("Error comparison", () => {
         var s1 = {
             a:123,
         };

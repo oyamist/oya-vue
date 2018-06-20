@@ -86,6 +86,9 @@ export default {
                         if (v === true) {
                             var h = healthGood;
                             text += `ok`;
+                        } else if (typeof v === 'number') {
+                            var h = healthGood;
+                            text += `${(v * 100).toFixed(0)}%`;
                         } else if (v === false) {
                             var h = healthBad;
                             text += `fault (no further information)`;

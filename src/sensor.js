@@ -505,8 +505,8 @@
                                 this.i2cRead(this.address, buf);
                                 var data = this.parseData(buf);
                                 this.lastRead = new Date();
-                                this.fault = null;
                                 this.passFail.add(true);
+                                this.fault = null;
                                 resolve(data);
                             } catch(e) {
                                 this.passFail.add(false);
@@ -560,7 +560,8 @@
             } else if ((Date.now() - this.lastRead.getTime()) > this.healthTimeout * 1000) {
                 var value = `Sensor is failing. Last read:${new Date(this.lastRead).toISOString()}`;
             } else {
-                var value = true;
+                var value = this.passFail.trials.length
+                    ? this.passFail.passRate() : true;
             }
             return {
                 [key]: value,
