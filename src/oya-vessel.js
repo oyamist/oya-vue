@@ -324,7 +324,7 @@
             if (value === this.cycle) {
                 winston.debug(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle} no change`);
             } else {
-                winston.info(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle}`);
+                winston.debug(`OyaVessel.setCycle() cycle:${value} nextCycle:${nextCycle}`);
             }
             if (this.isActive) {
                 this.activate(false);
