@@ -10,6 +10,33 @@
         <oya-plant service="oyamist" />
         <div style="flex-grow:1">&nbsp;</div>
         <oya-reactor service="oyamist" v-show="showAdvanced"></oya-reactor>
+        <table>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Internal</th>
+                <th>Canopy</th>
+                <th>Ambient</th>
+            </tr>
+            <tr >
+                <th>Temperature</th>
+                <td><oya-sensor service='oyamist' sensorProp="tempInternal"/> </td>
+                <td><oya-sensor service='oyamist' sensorProp="tempCanopy"/> </td>
+                <td><oya-sensor service='oyamist' sensorProp="tempAmbient"/> </td>
+            </tr>
+            <tr >
+                <th>Humidity</th>
+                <td><oya-sensor service='oyamist' sensorProp="humidityInternal"/> </td>
+                <td><oya-sensor service='oyamist' sensorProp="humidityCanopy"/> </td>
+                <td><oya-sensor service='oyamist' sensorProp="humidityAmbient"/> </td>
+            </tr>
+            <tr>
+                <th>Nutrient strength</th>
+                <td> <oya-sensor service='oyamist' sensorProp="ecInternal"/> </td><td>
+                <oya-sensor service='oyamist' sensorProp="ecCanopy"/> </td><td>
+                <oya-sensor service='oyamist' sensorProp="ecAmbient"/>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 

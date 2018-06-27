@@ -268,12 +268,12 @@
                 });
             if (value <= this.coolThreshold * this.thresholdHysteresis) {
                 if (this.nextCycle === this.hotCycle) {
-                    winston.info(`OyaVessel.onTemp() ${field}: reverting to default cycle`);
+                    winston.debug(`OyaVessel.onTemp() ${field}: reverting to default cycle`);
                     // cancel cooling and revert to default cycle
                     this.nextCycle = this.startCycle;
                 }
             } else if (value >= this.coolThreshold && this.nextCycle !== this.hotCycle) {
-                winston.info(`OyaVessel.onTemp() ${field}: next cycle will be cooling cycle`);
+                winston.debug(`OyaVessel.onTemp() ${field}: next cycle will be cooling cycle`);
                 this.nextCycle = this.hotCycle;
             }
             this._state[field].value = value;

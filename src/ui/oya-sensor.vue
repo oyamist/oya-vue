@@ -40,7 +40,8 @@ export default {
     },
     computed: {
         sensorAnnotation() {
-            var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
+            var oyaConf = this.rbService && this.rbService['oya-conf'];
+            var apiModel = oyaConf && oyaConf.apiModel;
             if (apiModel == null) {
                 return null;
             }
@@ -54,7 +55,8 @@ export default {
             const deltaPrecision = 2;
             const smallDelta = 0.01;
             const largeDelta = 0.05;
-            var apiModel = this.rbService && this.rbService['oya-conf'].apiModel;
+            var oyaConf = this.rbService && this.rbService['oya-conf'];
+            var apiModel = oyaConf && oyaConf.apiModel;
             if (apiModel == null) {
                 return null;
             }

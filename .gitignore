@@ -6,6 +6,7 @@ dist
 api-model/
 oyamist*.db
 unit-test*.db
+oyapi.oyamist.json
 
 # Logs
 logs

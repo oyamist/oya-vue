@@ -386,7 +386,7 @@ export default {
             console.log("calibrate dry", sensor.name);
             this.alertCalDry = null;
             this.alertCalDryError = null;
-            var url = [this.restOrigin(), this.service, 'sensor', 'calibrate'].join('/');
+            var url = [this.restOrigin(), this.serviceName, 'sensor', 'calibrate'].join('/');
             this.$http.post(url, {
                 sensor: sensor.name,
                 calibrateDry: true,
@@ -486,7 +486,7 @@ export default {
             setInterval(()=>{
                 this.updateSeconds = ((Date.now()-this.msUpdate)/1000).toFixed(0);
             }, 100);
-            var url = [this.restOrigin(), this.service, 'app', 'restart'].join('/');
+            var url = [this.restOrigin(), this.serviceName, 'app', 'restart'].join('/');
             this.$http.post(url, {
                 // empty
             }).then(r => {
@@ -522,7 +522,7 @@ export default {
             setInterval(()=>{
                 this.updateSeconds = ((Date.now()-this.msUpdate)/1000).toFixed(0);
             }, 100);
-            var url = [this.restOrigin(), this.service, 'app', 'update'].join('/');
+            var url = [this.restOrigin(), this.serviceName, 'app', 'update'].join('/');
             this.$http.post(url, {
                 // empty
             }).then(r => {
@@ -542,7 +542,7 @@ export default {
             });
         },
         clickActuator(actuator) {
-            var url = [this.restOrigin(), this.service, 'actuator'].join('/');
+            var url = [this.restOrigin(), this.serviceName, 'actuator'].join('/');
             console.log("clicked", actuator);
             this.$http.post(url, {
                 name: actuator.name,
@@ -554,7 +554,8 @@ export default {
             });
         },
         mockSensors() {
-            var url = [this.restOrigin(), this.service, 'sensor'].join('/');
+            var url = [this.restOrigin(), this.serviceName, 'sensor'].join('/');
+            console.log("DEBUG");
             this.mockPhase += 2*Math.PI / 10;
             var mockFactor = 0.1*Math.sin(this.mockPhase);
             this.$http.post(url, {
@@ -601,6 +602,9 @@ export default {
                     this.apiModelCopy.vessel.coolThreshold = value;
                 }
             },
+        },
+        serviceName() {
+            return this.service === 'test' ? 'oyamist' : this.service;
         },
         switchActionItems() {
             return [{
@@ -717,7 +721,7 @@ export default {
             },
             set: function(value) {
                 var cycle = value.key;
-                var url = [this.restOrigin(), this.service, 'reactor'].join('/');
+                var url = [this.restOrigin(), this.serviceName, 'reactor'].join('/');
                 this.$http.post(url, {
                     cycle,
                 }).then(r => {
@@ -782,12 +786,13 @@ export default {
         RbDialogRow,
     },
     created() {
+        this.service = 'oyamist'; // ignore console warning
         this.restBundleResource();
         this.rbDispatch("apiLoad").then(r => {
             console.log("OyaReactor apiLoad", r);
             this.selCycle = this.vessel.cycles[this.rbService.cycle];
         });
-        var url = [this.restOrigin(), this.service, 'sensor/types'].join('/');
+        var url = [this.restOrigin(), this.serviceName, 'sensor/types'].join('/');
         this.sensorTypes = [];
         console.log(`created() http GET #1`, url);
         this.$http.get(url).then(r => {
@@ -795,7 +800,7 @@ export default {
         }).catch(e => {
             console.error("error", e);
         });
-        var url = [this.restOrigin(), this.service, 'sensor/locations'].join('/');
+        var url = [this.restOrigin(), this.serviceName, 'sensor/locations'].join('/');
         this.sensorLocations = [];
         console.log(`created() http GET #2`, url);
         this.$http.get(url).then(r => {
@@ -803,7 +808,7 @@ export default {
         }).catch(e => {
             console.error("error", e);
         });
-        var url = [this.restOrigin(), this.service, 'mcu/hats'].join('/');
+        var url = [this.restOrigin(), this.serviceName, 'mcu/hats'].join('/');
         console.log(`created() http GET #3`, url);
         this.$http.get(url).then(r => {
             this.mcuHatItems = r.data;
