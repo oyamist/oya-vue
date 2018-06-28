@@ -1,6 +1,6 @@
 {
   "name": "oya-vue",
-  "version": "0.41.8",
+  "version": "0.41.9",
   "description": "Vue/Vuetify RestBundle for OyaMist bioreactor controller",
   "main": "index.js",
   "directories": {
@@ -9,7 +9,7 @@
     "src": "src"
   },
   "dependencies": {
-    "chart.js": "^2.7.1",
+    "chart.js": "^2.7.2",
     "memwatch-next": "^0.3.0",
     "netmask": "^1.0.6",
     "oya-ann": "^0.1.1",
