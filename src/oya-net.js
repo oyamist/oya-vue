@@ -74,7 +74,6 @@
                     res.on('end', () => {
                         try {
                             var parsedData = JSON.parse(rawData);
-                            parsedData.ip = opts.host;
                             resolve(parsedData);
                         } catch (e) {
                             reject(e);
